@@ -1,526 +1,656 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minute Burger Station POS</title>
+    <title>MINUTE BURGER POS</title>
     <style>
         * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
             margin: 0;
             padding: 0;
-        }
-        :root {
-            --primary: #00a800;
-            --primary-dark: #008000;
-            --danger: #e53935;
-            --bg: #f5f5f5;
-            --card: #ffffff;
-            --text: #333333;
-            --text-light: #666666;
-            --border: #e0e0e0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
         }
         body {
-            background: var(--bg);
-            color: var(--text);
             height: 100vh;
             overflow: hidden;
+            background: #f5f5f5;
         }
 
-        /* ========== LAYOUT ========== */
-        .app-container { display: flex; height: 100vh; }
+        /* === LAYOUT === */
+        .app {
+            display: flex;
+            height: 100vh;
+        }
 
-        /* ========== SIDEBAR ========== */
+        /* === SIDEBAR === */
         .sidebar {
-            width: 220px; background: var(--card); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; flex-shrink: 0;
+            width: 220px;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
         }
         .sidebar-header {
-            background: var(--primary); color: white; padding: 20px 15px;
+            background: #00a000;
+            color: white;
+            padding: 15px;
         }
-        .sidebar-header h1 { font-size: 20px; font-weight: bold; }
-        .sidebar-header p { font-size: 12px; opacity: 0.9; margin-top: 4px; }
-        .sidebar-menu { flex: 1; padding: 15px 0; }
+        .sidebar-header h1 {
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar-header p {
+            font-size: 13px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+        .sidebar-menu {
+            flex: 1;
+            padding-top: 10px;
+        }
         .menu-item {
-            display: flex; align-items: center; gap: 12px; padding: 14px 20px;
-            font-size: 15px; color: var(--text); cursor: pointer; transition: background 0.2s;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
         }
-        .menu-item:hover, .menu-item.active {
-            background: rgba(0,168,0,0.1); color: var(--primary-dark); font-weight: 600;
+        .menu-item.active {
+            background: #e6f9e6;
+            color: #008000;
+            font-weight: bold;
         }
-        .menu-item span { font-size: 18px; }
         .sidebar-footer {
-            padding: 15px; border-top: 1px solid var(--border);
-            font-size: 12px; color: var(--text-light);
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            font-size: 13px;
+            color: #666;
         }
 
-        /* ========== MAIN CONTENT ========== */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        /* === MAIN CONTENT — PRODUKTO === */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
         .top-bar {
-            background: var(--primary); color: white; padding: 12px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .top-bar-left { display: flex; align-items: center; gap: 15px; }
-        .menu-toggle { font-size: 24px; cursor: pointer; }
-        .current-cashier { font-size: 15px; font-weight: 500; }
-        .ticket-badge {
-            background: white; color: var(--primary-dark); padding: 6px 14px;
-            border-radius: 20px; font-weight: bold; font-size: 14px;
+            background: #00a000;
+            color: white;
+            padding: 10px 20px;
+            font-size: 15px;
         }
 
-        /* ========== CATEGORY TABS ========== */
-        .category-tabs {
-            display: flex; background: white; border-bottom: 1px solid var(--border);
-            padding: 0 20px; overflow-x: auto;
+        /* === CATEGORY TABS === */
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            overflow-x: auto;
         }
-        .tab-btn {
-            padding: 14px 20px; font-size: 14px; font-weight: 500;
-            color: var(--text-light); background: transparent; border: none;
-            border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap;
+        .tab {
+            padding: 14px 20px;
+            font-size: 15px;
+            border: none;
+            background: transparent;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            white-space: nowrap;
         }
-        .tab-btn.active {
-            color: var(--primary-dark); border-bottom: 3px solid var(--primary); font-weight: bold;
+        .tab.active {
+            color: #008000;
+            border-bottom-color: #00a000;
+            font-weight: bold;
         }
 
-        /* ========== PRODUCT GRID ========== */
-        .products-container { flex: 1; overflow-y: auto; padding: 20px; }
-        .products-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;
+        /* === PRODUKTO GRID — DITO LALABAS ANG MENU! === */
+        .products {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
         }
-        .product-card {
-            background: var(--card); border-radius: 12px; overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08); cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s; border: 2px solid transparent;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
         }
-        .product-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
-        .product-card:active { transform: scale(0.97); }
-        .product-img {
-            height: 110px; background: linear-gradient(135deg, #ffcc80, #ff9800);
-            display: flex; align-items: center; justify-content: center; font-size: 42px; color: white;
+        .item-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: 0.15s;
         }
-        .product-info { padding: 10px 12px; }
-        .product-name {
-            font-size: 13px; font-weight: 600; margin-bottom: 5px; line-height: 1.3; min-height: 34px;
+        .item-card:active {
+            transform: scale(0.96);
         }
-        .product-price { font-size: 17px; font-weight: bold; color: var(--primary-dark); }
+        .item-img {
+            height: 120px;
+            background: linear-gradient(135deg, #ffcc66, #ff9900);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: white;
+        }
+        .item-info {
+            padding: 12px;
+        }
+        .item-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            min-height: 36px;
+        }
+        .item-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #008000;
+        }
 
-        /* ========== TICKET PANEL — KANAN ========== */
-        .ticket-panel {
-            width: 340px; background: var(--card); border-left: 1px solid var(--border);
-            display: flex; flex-direction: column; flex-shrink: 0;
+        /* === TICKET PANEL — KANAN === */
+        .ticket {
+            width: 360px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
         }
         .ticket-header {
-            padding: 16px 20px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .ticket-header h2 { font-size: 18px; font-weight: bold; }
-        .ticket-clear { color: var(--danger); font-size: 14px; cursor: pointer; font-weight: 500; }
-        .ticket-items { flex: 1; overflow-y: auto; padding: 15px 20px; }
+        .ticket-header h2 {
+            font-size: 20px;
+        }
+        .clear-btn {
+            color: #e53935;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .ticket-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .empty {
+            text-align: center;
+            color: #999;
+            padding: 60px 20px;
+            font-size: 16px;
+        }
         .ticket-item {
-            display: flex; justify-content: space-between; align-items: flex-start;
-            padding: 10px 0; border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
         }
-        .item-left { display: flex; gap: 10px; align-items: flex-start; }
-        .item-qty {
-            background: #f0f0f0; width: 28px; height: 28px; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 13px;
+        .qty {
+            background: #eee;
+            width: 28px;
+            height: 28px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
         }
-        .item-name { font-size: 14px; font-weight: 500; }
-        .item-price { font-size: 15px; font-weight: 600; text-align: right; }
-        .item-remove { color: var(--danger); font-size: 18px; cursor: pointer; margin-left: 8px; line-height: 1; }
-        .ticket-empty { text-align: center; color: var(--text-light); padding: 40px 20px; font-size: 15px; }
-
-        /* ========== TOTALS & PAYMENT ========== */
+        .item-left {
+            display: flex;
+            align-items: center;
+        }
+        .remove {
+            color: #e53935;
+            margin-left: 8px;
+            cursor: pointer;
+            font-size: 20px;
+        }
         .ticket-footer {
-            border-top: 1px solid var(--border); padding: 15px 20px; background: #fafafa;
+            border-top: 1px solid #ddd;
+            padding: 20px;
         }
-        .discount-row {
-            display: flex; justify-content: space-between; padding: 6px 0;
-            font-size: 14px; color: var(--text-light);
+        .total-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 10px 0 20px;
         }
-        .total-row {
-            display: flex; justify-content: space-between; padding: 12px 0;
-            border-top: 1px solid #ddd; margin-top: 6px;
+        .total-amt {
+            color: #008000;
+            font-size: 28px;
         }
-        .total-label { font-size: 16px; font-weight: bold; }
-        .total-amount { font-size: 24px; font-weight: bold; color: var(--primary-dark); }
-        .payment-methods {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0;
+        .pay-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
         }
         .pay-btn {
-            padding: 10px; border: 2px solid var(--border); background: white;
-            border-radius: 8px; font-size: 14px; cursor: pointer; text-align: center;
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
         }
         .pay-btn.selected {
-            border-color: var(--primary); background: #e8f5e9;
-            color: var(--primary-dark); font-weight: bold;
+            border-color: #00a000;
+            background: #e6f9e6;
+            color: #008000;
+            font-weight: bold;
         }
-        .cash-input-section { margin: 10px 0; }
-        .cash-input-section label {
-            font-size: 14px; font-weight: 500; display: block; margin-bottom: 6px;
+        .cash-label {
+            font-size: 15px;
+            margin-bottom: 8px;
+            display: block;
         }
         .cash-input {
-            width: 100%; padding: 12px; font-size: 18px;
-            border: 2px solid var(--border); border-radius: 8px; text-align: right;
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            text-align: right;
         }
-        .change-display {
-            background: #e3f2fd; padding: 10px 14px; border-radius: 8px; margin: 10px 0;
-            font-size: 16px; font-weight: bold; color: #1565c0; display: none;
+        .change {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: bold;
+            color: #1565c0;
+            margin-bottom: 15px;
+            display: none;
         }
         .action-buttons {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
-        .btn {
-            padding: 14px; font-size: 16px; font-weight: bold;
-            border: none; border-radius: 8px; cursor: pointer;
+        .hold-btn {
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            background: #ff9800;
+            color: white;
+            cursor: pointer;
         }
-        .btn-save { background: #f5f5f5; color: var(--text); }
-        .btn-charge { background: var(--primary); color: white; }
-        .btn-charge:disabled { opacity: 0.5; cursor: not-allowed; }
+        .charge-btn {
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            background: #00a000;
+            color: white;
+            cursor: pointer;
+        }
 
-        /* ========== START SHIFT OVERLAY ========== */
-        .overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
-            z-index: 1000;
+        /* === START SHIFT MODAL === */
+        .modal-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
         }
         .modal {
-            background: white; padding: 30px; border-radius: 16px; width: 90%;
-            max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
         }
-        .modal h2 { text-align: center; margin-bottom: 20px; color: var(--primary-dark); font-size: 22px; }
+        .modal h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #008000;
+        }
         .modal input {
-            width: 100%; padding: 14px; font-size: 16px;
-            border: 2px solid var(--border); border-radius: 8px; margin-bottom: 15px;
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
         }
         .modal-btn {
-            width: 100%; padding: 14px; font-size: 17px; font-weight: bold;
-            border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer;
+            width: 100%;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            background: #00a000;
+            color: white;
+            cursor: pointer;
         }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- START SHIFT MODAL -->
-    <div class="overlay" id="shiftOverlay">
+    <!-- START SHIFT — LALABAS UNA -->
+    <div class="modal-bg" id="startModal">
         <div class="modal">
-            <h2>🕒 START NEW SHIFT</h2>
-            <input type="text" id="cashierName" placeholder="Cashier Name" required>
-            <input type="number" id="openingCash" placeholder="Opening Cash (Puhunan)" step="0.01">
-            <button class="modal-btn" onclick="startShift()">✅ Start Shift</button>
+            <h2>🕒 START SHIFT</h2>
+            <input type="text" id="cashierName" placeholder="Pangalan ng Cashier" required>
+            <input type="number" id="openingCash" placeholder="Puhunan / Opening Cash" step="0.01">
+            <button class="modal-btn" onclick="startApp()">✅ SIMULAN</button>
         </div>
     </div>
 
-    <!-- MAIN APP -->
-    <div class="app-container hidden" id="appContainer">
-
+    <!-- BUONG APP — HIDDEN MUNA -->
+    <div class="app hidden" id="app">
         <!-- SIDEBAR -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <h1>🍔 MINUTE BURGER</h1>
-                <p id="shiftDate">—</p>
+                <p id="currentDate">—</p>
             </div>
             <div class="sidebar-menu">
-                <div class="menu-item active"><span>🛒</span> Sales</div>
-                <div class="menu-item" onclick="showReceipts()"><span>🧾</span> Receipts</div>
-                <div class="menu-item" onclick="showShiftReport()"><span>🕒</span> Shift</div>
-                <div class="menu-item" onclick="showItems()"><span>📦</span> Items</div>
-                <div class="menu-item" onclick="showSettings()"><span>⚙️</span> Settings</div>
+                <div class="menu-item active">🛒 Sales</div>
+                <div class="menu-item">📄 Receipts</div>
+                <div class="menu-item">🕒 Shift</div>
+                <div class="menu-item">📦 Items</div>
+                <div class="menu-item">⚙️ Settings</div>
             </div>
             <div class="sidebar-footer">
-                <p id="cashierDisplay">Cashier: —</p>
+                <p id="cashierLabel">Cashier: —</p>
                 <p>v2.0</p>
             </div>
         </div>
 
-        <!-- MAIN CONTENT -->
-        <div class="main-content">
-            <div class="top-bar">
-                <div class="top-bar-left">
-                    <span class="menu-toggle">☰</span>
-                    <span class="current-cashier" id="topCashier">—</span>
+        <!-- MAIN — PRODUKTO & TABS -->
+        <div class="main">
+            <div class="top-bar" id="topCashierName">—</div>
+            
+            <!-- TABS — DITO PIPILI NG KATEGORYA -->
+            <div class="tabs" id="categoryTabs">
+                <button class="tab active" data-cat="burgers" onclick="changeTab('burgers')">🍔 SULIT</button>
+                <button class="tab" data-cat="chicken" onclick="changeTab('chicken')">🍗 CHICKEN TIME</button>
+                <button class="tab" data-cat="premium" onclick="changeTab('premium')">⭐ PREMIUM</button>
+                <button class="tab" data-cat="hotdogs" onclick="changeTab('hotdogs')">🌭 HOTDOGS</button>
+                <button class="tab" data-cat="drinks" onclick="changeTab('drinks')">🥤 DRINKS</button>
+                <button class="tab" data-cat="extras" onclick="changeTab('extras')">🧂 EXTRAS</button>
+            </div>
+
+            <!-- PRODUKTO — DITO LALABAS ANG MENU! -->
+            <div class="products">
+                <div class="grid" id="productGrid">
+                    <!-- DYNAMICALLY LOADED -->
                 </div>
-                <div class="ticket-badge">🎟️ #<span id="ticketNo">001</span></div>
-            </div>
-
-            <!-- CATEGORY TABS -->
-            <div class="category-tabs">
-                <button class="tab-btn active" data-category="burgers" onclick="switchTab('burgers')">🍔 SULIT</button>
-                <button class="tab-btn" data-category="chicken" onclick="switchTab('chicken')">🍗 CHICKEN TIME</button>
-                <button class="tab-btn" data-category="premium" onclick="switchTab('premium')">⭐ PREMIUM</button>
-                <button class="tab-btn" data-category="hotdogs" onclick="switchTab('hotdogs')">🌭 HOTDOGS</button>
-                <button class="tab-btn" data-category="drinks" onclick="switchTab('drinks')">🥤 DRINKS</button>
-                <button class="tab-btn" data-category="extras" onclick="switchTab('extras')">🧂 EXTRAS</button>
-            </div>
-
-            <!-- PRODUCTS GRID -->
-            <div class="products-container">
-                <div class="products-grid" id="productsGrid"></div>
             </div>
         </div>
 
-        <!-- TICKET PANEL — KANAN -->
-        <div class="ticket-panel">
+        <!-- TICKET — KANAN -->
+        <div class="ticket">
             <div class="ticket-header">
                 <h2>📋 TICKET</h2>
-                <span class="ticket-clear" onclick="clearCart()">🗑️ Clear All</span>
+                <span class="clear-btn" onclick="clearAll()">🗑️ Clear All</span>
             </div>
-            <div class="ticket-items" id="ticketItems">
-                <div class="ticket-empty">Walang items pa...</div>
+            <div class="ticket-body" id="ticketBody">
+                <div class="empty">Walang items pa...</div>
             </div>
             <div class="ticket-footer">
-                <div class="discount-row" id="discountRow" style="display:none;">
-                    <span>Discount (5%)</span>
-                    <span id="discountAmt">-₱0.00</span>
-                </div>
-                <div class="total-row">
-                    <span class="total-label">TOTAL</span>
-                    <span class="total-amount">₱<span id="grandTotal">0.00</span></span>
+                <div class="total-line">
+                    <span>TOTAL</span>
+                    <span class="total-amt">₱<span id="totalAmt">0.00</span></span>
                 </div>
 
-                <div class="payment-methods">
-                    <button class="pay-btn selected" data-method="Cash" onclick="selectPayMethod(this)">💰 Cash</button>
-                    <button class="pay-btn" data-method="GCash" onclick="selectPayMethod(this)">📱 GCash</button>
-                    <button class="pay-btn" data-method="FoodPanda" onclick="selectPayMethod(this)">🐼 FoodPanda</button>
-                    <button class="pay-btn" data-method="Grab" onclick="selectPayMethod(this)">🛵 Grab</button>
+                <div class="pay-buttons">
+                    <button class="pay-btn selected" data-pay="Cash" onclick="selectPay(this)">💰 Cash</button>
+                    <button class="pay-btn" data-pay="GCash" onclick="selectPay(this)">📱 GCash</button>
+                    <button class="pay-btn" data-pay="FoodPanda" onclick="selectPay(this)">🐼 FoodPanda</button>
+                    <button class="pay-btn" data-pay="Grab" onclick="selectPay(this)">🛵 Grab</button>
                 </div>
 
-                <div class="cash-input-section" id="cashSection">
-                    <label>💰 Cash Received</label>
-                    <input type="number" class="cash-input" id="cashInput" placeholder="0.00" oninput="computeChange()">
-                </div>
-                <div class="change-display" id="changeDisplay">
-                    🔁 Change: ₱<span id="changeAmt">0.00</span>
-                </div>
+                <label class="cash-label">💰 Cash Received</label>
+                <input type="number" class="cash-input" id="cashReceived" placeholder="0.00" oninput="computeChange()">
+                
+                <div class="change" id="changeBox">🔁 Sukli: ₱<span id="changeAmt">0.00</span></div>
 
                 <div class="action-buttons">
-                    <button class="btn btn-save" onclick="holdOrder()">⏸️ HOLD</button>
-                    <button class="btn btn-charge" id="chargeBtn" onclick="completeSale()">✅ CHARGE</button>
+                    <button class="hold-btn">⏸️ HOLD</button>
+                    <button class="charge-btn" onclick="completeSale()">✅ CHARGE</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ========== COMPLETE PRODUCT DATA — FINAL VERSION ==========
-        const products = {
+        // ==========================================
+        // ✅ KUMPLETONG LISTAHAN NG PRODUKTO — SIGURADO!
+        // ==========================================
+        const menu = {
             burgers: [
-                { id: 'mb', name: 'Minute Burger', price: 43, emoji: '🍔' },
-                { id: 'cb', name: 'Cheesy Burger', price: 54, emoji: '🍔' },
-                { id: 'dmb', name: 'Double Minute Burger', price: 66, emoji: '🍔' },
-                { id: 'dcb', name: 'Double Cheesy Burger', price: 82, emoji: '🍔' },
+                {id:'mb',name:'Minute Burger',price:43,icon:'🍔'},
+                {id:'cb',name:'Cheesy Burger',price:54,icon:'🍔'},
+                {id:'dmb',name:'Double Minute Burger',price:66,icon:'🍔'},
+                {id:'dcb',name:'Double Cheesy Burger',price:82,icon:'🍔'}
             ],
             chicken: [
-                { id: 'ct', name: 'Chicken Time Burger', price: 52, emoji: '🍗' },
-                { id: 'dct', name: 'Double Chicken Time', price: 72, emoji: '🍗' },
-                { id: 'cc', name: 'Crispy Chicken Chimichurri', price: 101, emoji: '🍗' },
-                { id: 'cs', name: 'Crispy Chicken Roasted Sesame', price: 97, emoji: '🍗' },
+                {id:'ct',name:'Chicken Time Burger',price:52,icon:'🍗'},
+                {id:'dct',name:'Double Chicken Time',price:72,icon:'🍗'},
+                {id:'cc',name:'Crispy Chicken Chimichurri',price:101,icon:'🍗'},
+                {id:'cs',name:'Crispy Chicken Roasted Sesame',price:97,icon:'🍗'}
             ],
             premium: [
-                { id: 'sb', name: 'Steakburger', price: 145, emoji: '🍔' },
-                { id: 'bcb', name: 'Bacon Cheese Burger', price: 99, emoji: '🍔' },
-                { id: 'bp', name: 'Black Pepper Burger', price: 92, emoji: '🍔' },
-                { id: 'bs', name: 'Beef Shawarma Burger', price: 94, emoji: '🍔' },
-                { id: 'v50', name: '50/50 Veggie Chicken', price: 89, emoji: '🍔' },
+                {id:'sb',name:'Steakburger',price:145,icon:'🍔'},
+                {id:'bcb',name:'Bacon Cheese Burger',price:99,icon:'🍔'},
+                {id:'bp',name:'Black Pepper Burger',price:92,icon:'🍔'},
+                {id:'bs',name:'Beef Shawarma Burger',price:94,icon:'🍔'},
+                {id:'v50',name:'50/50 Veggie Chicken',price:89,icon:'🍔'}
             ],
             hotdogs: [
-                { id: 'cd', name: 'Cheesydog', price: 51, emoji: '🌭' },
-                { id: 'fof', name: 'French Onion Franks', price: 93, emoji: '🌭' },
-                { id: 'bh', name: 'Beef Hungarian', price: 114, emoji: '🌭' },
+                {id:'cd',name:'Cheesydog',price:51,icon:'🌭'},
+                {id:'fof',name:'French Onion Franks',price:93,icon:'🌭'},
+                {id:'bh',name:'Beef Hungarian',price:114,icon:'🌭'}
             ],
             drinks: [
-                { id: 'cal', name: 'Calamansi Tea', price: 26, emoji: '🍹' },
-                { id: 'fw', name: 'Fruitwist', price: 26, emoji: '🥤' },
-                { id: 'ic', name: 'Iced Coffee', price: 20, emoji: '🧊' },
-                { id: 'ich', name: 'Iced Choco', price: 18, emoji: '🧊' },
-                { id: 'hc', name: 'Hot Coffee', price: 12, emoji: '☕' },
-                { id: 'hch', name: 'Hot Choco', price: 15, emoji: '☕' },
-                { id: 'water', name: 'Bottled Water', price: 16, emoji: '💧' },
+                {id:'cal',name:'Calamansi Tea',price:26,icon:'🍹'},
+                {id:'fw',name:'Fruitwist',price:26,icon:'🥤'},
+                {id:'ic',name:'Iced Coffee',price:20,icon:'🧊'},
+                {id:'ich',name:'Iced Choco',price:18,icon:'🧊'},
+                {id:'hc',name:'Hot Coffee',price:12,icon:'☕'},
+                {id:'hch',name:'Hot Choco',price:15,icon:'☕'},
+                {id:'water',name:'Bottled Water',price:16,icon:'💧'}
             ],
             extras: [
-                { id: 'egg', name: 'Egg', price: 15, emoji: '🥚' },
-                { id: 'cheese', name: 'Supreme Cheese', price: 15, emoji: '🧀' },
-                { id: 'coleslaw', name: 'Coleslaw', price: 13, emoji: '🥗' },
+                {id:'egg',name:'Egg',price:15,icon:'🥚'},
+                {id:'cheese',name:'Supreme Cheese',price:15,icon:'🧀'},
+                {id:'coleslaw',name:'Coleslaw',price:13,icon:'🥗'}
             ]
         };
 
-        // ========== GLOBAL VARIABLES ==========
         let cart = [];
-        let currentCategory = 'burgers';
-        let selectedPayMethod = 'Cash';
-        let discountType = 'none';
-        let ticketNumber = parseInt(localStorage.getItem('lastTicket')) || 0;
-        let currentShift = null;
+        let currentCat = 'burgers';
+        let ticketNo = 1;
 
-        // ========== START SHIFT ==========
-        function startShift() {
+        // ==========================================
+        // ✅ SIMULAN ANG APP — LALABAS ANG MENU!
+        // ==========================================
+        function startApp() {
             const name = document.getElementById('cashierName').value.trim();
-            const openingCash = parseFloat(document.getElementById('openingCash').value) || 0;
-            if (!name) { alert('⚠️ Ilagay ang pangalan ng cashier!'); return; }
+            if (!name) { alert('Ilagay ang pangalan ng cashier!'); return; }
 
-            currentShift = {
-                cashier: name, openingCash: openingCash,
-                startedAt: new Date().toLocaleString('en-PH'), totalSales: 0
-            };
+            // Itago modal, ipakita app
+            document.getElementById('startModal').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
 
-            document.getElementById('shiftOverlay').classList.add('hidden');
-            document.getElementById('appContainer').classList.remove('hidden');
-            document.getElementById('cashierDisplay').textContent = `Cashier: ${name}`;
-            document.getElementById('topCashier').textContent = name;
-            document.getElementById('shiftDate').textContent = currentShift.startedAt.split(',')[0];
-            updateTicketNo();
+            // Update info
+            const today = new Date();
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-PH');
+            document.getElementById('cashierLabel').textContent = 'Cashier: ' + name;
+            document.getElementById('topCashierName').textContent = name;
+
+            // ✅ SIGURADONG LALABAS ANG PRODUKTO!
             renderProducts();
         }
 
-        // ========== SWITCH CATEGORY TAB ==========
-        function switchTab(category) {
-            currentCategory = category;
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.category === category) btn.classList.add('active');
-            });
+        // ==========================================
+        // ✅ PALIT KATEGORYA
+        // ==========================================
+        function changeTab(cat) {
+            currentCat = cat;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
             renderProducts();
         }
 
-        // ========== RENDER PRODUCTS ==========
+        // ==========================================
+        // ✅ IPakita ang mga produkto — DITO ANG SIKLO!
+        // ==========================================
         function renderProducts() {
-            const grid = document.getElementById('productsGrid');
-            const items = products[currentCategory];
-            grid.innerHTML = items.map(p => `
-                <div class="product-card" onclick="addToCart('${p.id}', '${p.name}', ${p.price})">
-                    <div class="product-img">${p.emoji}</div>
-                    <div class="product-info">
-                        <div class="product-name">${p.name}</div>
-                        <div class="product-price">₱${p.price.toFixed(2)}</div>
+            const grid = document.getElementById('productGrid');
+            const items = menu[currentCat];
+            
+            grid.innerHTML = ''; // Clear muna
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.onclick = () => addItem(item);
+                card.innerHTML = `
+                    <div class="item-img">${item.icon}</div>
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">₱${item.price.toFixed(2)}</div>
                     </div>
-                </div>
-            `).join('');
+                `;
+                grid.appendChild(card);
+            });
         }
 
-        // ========== ADD TO CART ==========
-        function addToCart(id, name, price) {
-            const existing = cart.find(i => i.id === id);
+        // ==========================================
+        // ✅ I-ADD SA TICKET
+        // ==========================================
+        function addItem(item) {
+            const existing = cart.find(c => c.id === item.id);
             if (existing) existing.qty++;
-            else cart.push({ id, name, price, qty: 1 });
-            updateTicketDisplay();
+            else cart.push({ ...item, qty: 1 });
+            updateTicket();
         }
 
-        // ========== UPDATE TICKET DISPLAY ==========
-        function updateTicketDisplay() {
-            const container = document.getElementById('ticketItems');
+        // ==========================================
+        // ✅ UPDATE TICKET PANEL
+        // ==========================================
+        function updateTicket() {
+            const body = document.getElementById('ticketBody');
+            const totalEl = document.getElementById('totalAmt');
+
             if (cart.length === 0) {
-                container.innerHTML = '<div class="ticket-empty">Walang items pa...</div>';
-                document.getElementById('grandTotal').textContent = '0.00';
-                document.getElementById('discountRow').style.display = 'none';
+                body.innerHTML = '<div class="empty">Walang items pa...</div>';
+                totalEl.textContent = '0.00';
+                document.getElementById('changeBox').style.display = 'none';
                 return;
             }
 
-            container.innerHTML = cart.map((item, idx) => `
-                <div class="ticket-item">
-                    <div class="item-left">
-                        <div class="item-qty">${item.qty}</div>
-                        <div><div class="item-name">${item.name}</div></div>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <div class="item-price">₱${(item.price * item.qty).toFixed(2)}</div>
-                        <span class="item-remove" onclick="removeFromCart(${idx})">×</span>
-                    </div>
-                </div>
-            `).join('');
+            body.innerHTML = '';
+            let total = 0;
 
-            const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            let discount = 0;
-            if (discountType !== 'none') {
-                discount = subtotal * 0.05;
-                document.getElementById('discountRow').style.display = 'flex';
-                document.getElementById('discountAmt').textContent = discount.toFixed(2);
-            } else {
-                document.getElementById('discountRow').style.display = 'none';
-            }
-            const total = subtotal - discount;
-            document.getElementById('grandTotal').textContent = total.toFixed(2);
+            cart.forEach((item, idx) => {
+                total += item.price * item.qty;
+                const div = document.createElement('div');
+                div.className = 'ticket-item';
+                div.innerHTML = `
+                    <div class="item-left">
+                        <div class="qty">${item.qty}</div>
+                        <div>
+                            <div>${item.name}</div>
+                            <div style="font-size:13px; color:#666">₱${item.price.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center">
+                        <span style="font-weight:bold">₱${(item.price*item.qty).toFixed(2)}</span>
+                        <span class="remove" onclick="removeItem(${idx})">×</span>
+                    </div>
+                `;
+                body.appendChild(div);
+            });
+
+            totalEl.textContent = total.toFixed(2);
             computeChange();
         }
 
-        // ========== REMOVE FROM CART ==========
-        function removeFromCart(index) {
-            if (cart[index].qty > 1) cart[index].qty--;
-            else cart.splice(index, 1);
-            updateTicketDisplay();
+        // ==========================================
+        // ✅ ALISIN ANG ITEM
+        // ==========================================
+        function removeItem(idx) {
+            if (cart[idx].qty > 1) cart[idx].qty--;
+            else cart.splice(idx, 1);
+            updateTicket();
         }
 
-        // ========== CLEAR CART ==========
-        function clearCart() {
+        // ==========================================
+        // ✅ CLEAR ALL
+        // ==========================================
+        function clearAll() {
             if (cart.length === 0) return;
-            if (!confirm('🗑️ Clear all items?')) return;
-            cart = []; discountType = 'none';
-            document.getElementById('cashInput').value = '';
-            document.getElementById('changeDisplay').style.display = 'none';
-            updateTicketDisplay();
+            if (!confirm('Burahin lahat ng items?')) return;
+            cart = [];
+            document.getElementById('cashReceived').value = '';
+            document.getElementById('changeBox').style.display = 'none';
+            updateTicket();
         }
 
-        // ========== SELECT PAYMENT METHOD ==========
-        function selectPayMethod(btn) {
-            document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
+        // ==========================================
+        // ✅ PILIHANG PARAAN NG BAYAD
+        // ==========================================
+        function selectPay(btn) {
+            document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active','selected'));
             btn.classList.add('selected');
-            selectedPayMethod = btn.dataset.method;
-            const cashSection = document.getElementById('cashSection');
-            if (selectedPayMethod === 'Cash') {
-                cashSection.style.display = 'block';
-                computeChange();
-            } else {
-                cashSection.style.display = 'none';
-                document.getElementById('changeDisplay').style.display = 'none';
-            }
         }
 
-        // ========== COMPUTE CHANGE ==========
+        // ==========================================
+        // ✅ COMPUTE SUKLI
+        // ==========================================
         function computeChange() {
-            if (selectedPayMethod !== 'Cash') return;
-            const total = parseFloat(document.getElementById('grandTotal').textContent);
-            const cash = parseFloat(document.getElementById('cashInput').value) || 0;
-            const changeBox = document.getElementById('changeDisplay');
+            const total = parseFloat(document.getElementById('totalAmt').textContent) || 0;
+            const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
+            const box = document.getElementById('changeBox');
+
             if (cash >= total && total > 0) {
-                changeBox.style.display = 'block';
+                box.style.display = 'block';
                 document.getElementById('changeAmt').textContent = (cash - total).toFixed(2);
             } else {
-                changeBox.style.display = 'none';
+                box.style.display = 'none';
             }
         }
 
-        // ========== COMPLETE SALE ==========
+        // ==========================================
+        // ✅ TAPOS NA ANG BENTA
+        // ==========================================
         function completeSale() {
-            const total = parseFloat(document.getElementById('grandTotal').textContent);
-            if (cart.length === 0) { alert('⚠️ Walang items!'); return; }
-            if (selectedPayMethod === 'Cash' && parseFloat(document.getElementById('cashInput').value) < total) { 
-                alert('⚠️ Kulang ang pera!'); return; 
-            }
-
-            ticketNumber++;
-            localStorage.setItem('lastTicket', ticketNumber);
-            alert(`✅ SALE COMPLETE!\n🎟️ TICKET #${String(ticketNumber).padStart(3,'0')}\n💰 TOTAL: ₱${total.toFixed(2)}\n💳 Payment: ${selectedPayMethod}`);
+            const total = parseFloat(document.getElementById('totalAmt').textContent) || 0;
+            if (cart.length === 0) { alert('Walang item!'); return; }
             
-            cart = []; discountType = 'none';
-            document.getElementById('cashInput').value = '';
-            document.getElementById('changeDisplay').style.display = 'none';
-            updateTicketDisplay();
-            updateTicketNo();
+            alert(`✅ BENTA TAPOS!\nTICKET #${ticketNo}\nKABUUAN: ₱${total.toFixed(2)}`);
+            ticketNo++;
+            cart = [];
+            document.getElementById('cashReceived').value = '';
+            document.getElementById('changeBox').style.display = 'none';
+            updateTicket();
         }
-
-        // ========== UPDATE TICKET NUMBER ==========
-        function updateTicketNo() {
-            document.getElementById('ticketNo').textContent = String(ticketNumber + 1).padStart(3, '0');
-        }
-
-        // ========== PLACEHOLDER FUNCTIONS ==========
-        function holdOrder() { alert('⏸️ Order held!'); }
-        function showReceipts() { alert('📄 Receipts — coming soon!'); }
-        function showShiftReport() { alert('🕒 Shift Report — coming soon!'); }
-        function showItems() { alert('📦 Items Management — coming soon!'); }
-        function showSettings() { alert('⚙️ Settings — coming soon!'); }
     </script>
 </body>
 </html>
