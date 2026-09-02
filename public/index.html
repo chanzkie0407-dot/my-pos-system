@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger Station POS</title>
+    <title>Burger Station POS — Final</title>
     <style>
         * {
             box-sizing: border-box;
@@ -20,13 +20,21 @@
         .header {
             background: #d32f2f;
             color: white;
-            padding: 15px;
+            padding: 12px 15px;
             text-align: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             position: relative;
+        }
+        .ticket-no {
+            font-size: 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 15px;
+            display: inline-block;
+            margin-top: 5px;
         }
         .admin-btn {
             position: absolute;
@@ -42,25 +50,25 @@
             cursor: pointer;
         }
         .section-title {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: bold;
-            margin: 15px 0 8px;
+            margin: 12px 0 6px;
             color: #d32f2f;
             border-bottom: 2px solid #d32f2f;
-            padding-bottom: 5px;
+            padding-bottom: 4px;
         }
         .products {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 15px;
         }
         .product {
             background: #ff9800;
             color: white;
             border: none;
-            padding: 12px 8px;
-            font-size: 14px;
+            padding: 10px 6px;
+            font-size: 13px;
             border-radius: 8px;
             cursor: pointer;
         }
@@ -71,65 +79,68 @@
         .product strong {
             font-size: 15px;
             display: block;
-            margin-top: 4px;
+            margin-top: 3px;
         }
         .cart-section {
             background: white;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         .cart-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
+            padding: 6px 0;
             border-bottom: 1px solid #eee;
-            font-size: 15px;
+            font-size: 14px;
         }
         .remove-btn {
             background: #e53935;
             color: white;
             border: none;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
-            font-size: 18px;
+            font-size: 17px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .total {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
             color: #d32f2f;
             text-align: right;
-            margin: 12px 0;
+            margin: 10px 0;
         }
         .payment-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
-            margin: 15px 0 8px;
+            margin: 12px 0 6px;
         }
         .payment-options {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 6px;
+            margin-bottom: 12px;
         }
         .payment-btn {
-            padding: 10px;
+            padding: 8px;
             border: 2px solid #ddd;
             background: white;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
         }
         .payment-btn.selected {
@@ -140,129 +151,202 @@
         }
         input {
             width: 100%;
-            padding: 10px;
-            font-size: 16px;
+            padding: 9px;
+            font-size: 15px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            margin: 8px 0;
+            margin: 6px 0;
         }
         .btn {
             width: 100%;
-            padding: 13px;
-            font-size: 17px;
+            padding: 11px;
+            font-size: 16px;
             font-weight: bold;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 6px;
         }
         .btn-pay { background: #4caf50; color: white; }
         .btn-clear { background: #757575; color: white; }
+        .btn-void { background: #ff5722; color: white; }
         .change {
-            font-size: 19px;
+            font-size: 17px;
             font-weight: bold;
             color: #2196f3;
-            margin-top: 10px;
-            padding: 10px;
+            margin-top: 8px;
+            padding: 8px;
             background: #e3f2fd;
             border-radius: 6px;
             display: none;
         }
 
-        /* ADMIN PANEL STYLES */
-        .admin-login, .admin-panel {
+        /* ADMIN & HISTORY PANELS */
+        .panel {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 92%;
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 100;
         }
-        .admin-login h2, .admin-panel h2 {
+        .panel h2 {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #d32f2f;
+            font-size: 18px;
         }
-        .admin-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin: 5px 0;
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 99;
         }
-        .admin-row input {
-            flex: 1;
-            margin: 0;
-        }
-        .btn-admin { background: #2196f3; color: white; margin-top: 15px; }
-        .btn-danger { background: #e53935; color: white; }
         .tab-buttons {
             display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
+            gap: 4px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
         }
         .tab-btn {
             flex: 1;
-            padding: 8px;
+            min-width: 80px;
+            padding: 7px;
             border: none;
             background: #eee;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 13px;
         }
-        .tab-btn.active {
-            background: #d32f2f;
-            color: white;
-        }
+        .tab-btn.active { background: #d32f2f; color: white; }
         .hidden { display: none !important; }
+        .trans-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+        .trans-item.voided {
+            background: #ffebee;
+            text-decoration: line-through;
+            color: #c62828;
+        }
+        .trans-ticket {
+            font-weight: bold;
+            color: #d32f2f;
+        }
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .btn-void-small { background: #e53935; color: white; }
+        .btn-reprint { background: #2196f3; color: white; }
+        .btn-close { background: #757575; color: white; margin-top: 12px; }
+        .history-btn {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #2196f3;
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            z-index: 50;
+        }
+        .summary-box {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
 
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay" onclick="closeAllPanels()"></div>
+
     <!-- HEADER -->
     <div class="header">
         🍔 BURGER STATION POS
+        <div class="ticket-no">🎟️ TICKET #<span id="currentTicket">001</span></div>
         <button class="admin-btn" onclick="showAdminLogin()">⚙️ Admin</button>
     </div>
 
-    <!-- ADMIN LOGIN MODAL -->
-    <div class="admin-login" id="adminLogin">
+    <!-- ADMIN LOGIN -->
+    <div class="panel" id="adminLogin">
         <h2>🔐 Admin Login</h2>
         <input type="password" id="adminPass" placeholder="Enter Admin Password">
-        <button class="btn btn-admin" onclick="adminLogin()">Login</button>
-        <button class="btn btn-clear" onclick="hideAdminLogin()">Back</button>
+        <button class="btn btn-pay" onclick="adminLogin()">Login</button>
+        <button class="btn btn-close" onclick="closePanel('adminLogin')">Cancel</button>
     </div>
 
-    <!-- ADMIN PANEL MODAL -->
-    <div class="admin-panel" id="adminPanel">
-        <h2>⚙️ Admin Settings</h2>
+    <!-- ADMIN PANEL -->
+    <div class="panel" id="adminPanel">
+        <h2>⚙️ Admin Control Panel</h2>
         <div class="tab-buttons">
             <button class="tab-btn active" onclick="switchTab('products')">Products</button>
-            <button class="tab-btn" onclick="switchTab('sales')">Sales</button>
-            <button class="tab-btn" onclick="switchTab('password')">Password</button>
+            <button class="tab-btn" onclick="switchTab('history')">Transactions</button>
+            <button class="tab-btn" onclick="switchTab('password')">Settings</button>
         </div>
 
-        <!-- EDIT PRODUCTS TAB -->
+        <!-- EDIT PRODUCTS -->
         <div id="tab-products">
             <h3>Edit Product Prices</h3>
             <div id="productEditor"></div>
-            <button class="btn btn-admin" onclick="saveProducts()">💾 Save Changes</button>
+            <button class="btn btn-pay" onclick="saveProducts()">💾 Save Prices</button>
         </div>
 
-        <!-- SALES REPORT TAB -->
-        <div id="tab-sales" class="hidden">
-            <h3>Daily Sales Report</h3>
-            <p>Total Sales: ₱<span id="totalSales">0.00</span></p>
-            <p>Transactions: <span id="transCount">0</span></p>
-            <button class="btn btn-clear" onclick="clearSales()">Clear Sales</button>
+        <!-- TRANSACTION HISTORY + VOID -->
+        <div id="tab-history" class="hidden">
+            <h3>📋 Transaction History</h3>
+            <div class="summary-box">
+                <p><strong>Total Sales:</strong> ₱<span id="netSales">0.00</span></p>
+                <p><strong>Transactions:</strong> <span id="totalTrans">0</span> | <strong>Voided:</strong> <span id="voidCount">0</span></p>
+            </div>
+            <div id="historyList"></div>
+            <button class="btn btn-clear" onclick="clearAllHistory()">🗑️ Clear All History</button>
         </div>
 
-        <!-- CHANGE PASSWORD TAB -->
+        <!-- SETTINGS -->
         <div id="tab-password" class="hidden">
             <h3>Change Admin Password</h3>
             <input type="password" id="newPass" placeholder="New Password">
             <input type="password" id="confirmPass" placeholder="Confirm Password">
-            <button class="btn btn-admin" onclick="changePassword()">Update Password</button>
+            <button class="btn btn-pay" onclick="changePassword()">Update Password</button>
         </div>
 
-        <button class="btn btn-clear" onclick="logoutAdmin()">🚪 Logout</button>
+        <button class="btn btn-close" onclick="logoutAdmin()">🚪 Logout</button>
+    </div>
+
+    <!-- TRANSACTION HISTORY BUTTON (Cashier Access) -->
+    <button class="history-btn" onclick="showHistory()">📋</button>
+
+    <!-- HISTORY PANEL (Cashier View — No Void) -->
+    <div class="panel" id="historyPanel">
+        <h2>📋 Transaction History</h2>
+        <div class="summary-box">
+            <p><strong>Total Sales:</strong> ₱<span id="netSales2">0.00</span></p>
+            <p><strong>Transactions:</strong> <span id="totalTrans2">0</span></p>
+        </div>
+        <div id="historyList2"></div>
+        <button class="btn btn-close" onclick="closePanel('historyPanel')">Close</button>
     </div>
 
     <!-- CASHIER VIEW -->
@@ -343,26 +427,32 @@
             </div>
 
             <button class="btn btn-pay" onclick="finishSale()">✅ Complete Payment</button>
-            <button class="btn btn-clear" onclick="clearAll()">🗑️ Clear All</button>
+            <button class="btn btn-clear" onclick="clearAll()">🗑️ Clear Cart</button>
         </div>
     </div>
 
     <!-- ⚙️ SCRIPT -->
     <script>
-        // ========== GLOBAL VARIABLES ==========
+        // ========== GLOBAL VARIABLES — AUTO SAVE SA PHONE ==========
         let cart = [];
         let total = 0;
         let selectedPayment = 'Cash';
-        let adminPassword = 'admin123'; // Default — pwede palitan sa Admin Panel
-        let totalSales = parseFloat(localStorage.getItem('totalSales') || '0');
-        let transCount = parseInt(localStorage.getItem('transCount') || '0');
+        let adminPassword = localStorage.getItem('adminPass') || 'admin123';
+        let ticketNumber = parseInt(localStorage.getItem('lastTicket')) || 0;
+        let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
 
         // ========== INITIALIZE ==========
         document.addEventListener('DOMContentLoaded', () => {
+            updateTicketDisplay();
             attachProductEvents();
-            updateSalesDisplay();
+            updateHistoryDisplays();
             updateProductEditor();
         });
+
+        // ========== TICKET NUMBER ==========
+        function updateTicketDisplay() {
+            document.getElementById('currentTicket').textContent = String(ticketNumber + 1).padStart(3, '0');
+        }
 
         // ========== PRODUCT CLICK ==========
         function attachProductEvents() {
@@ -370,7 +460,7 @@
                 button.addEventListener('click', () => {
                     const name = button.dataset.name;
                     const price = parseFloat(button.dataset.price);
-                    cart.push({ name, price, id: Date.now() });
+                    cart.push({ name, price, uid: Date.now() });
                     total += price;
                     updateCartDisplay();
                 });
@@ -409,7 +499,6 @@
             btn.classList.add('selected');
             selectedPayment = btn.dataset.method;
             
-            // Show/hide cash input based on payment
             const cashInput = document.getElementById('cash-input');
             const cashLabel = document.getElementById('cashLabel');
             if (selectedPayment === 'Cash') {
@@ -437,7 +526,7 @@
             }
         }
 
-        // ========== COMPLETE SALE ==========
+        // ========== COMPLETE SALE — SAVE TRANSACTION ==========
         function finishSale() {
             const cash = parseFloat(document.getElementById('cash-input').value) || 0;
             
@@ -450,14 +539,29 @@
                 return;
             }
 
-            // Update sales
-            totalSales += total;
-            transCount++;
-            localStorage.setItem('totalSales', totalSales);
-            localStorage.setItem('transCount', transCount);
+            // 🎟️ GENERATE TICKET NUMBER
+            ticketNumber++;
+            const ticket = String(ticketNumber).padStart(3, '0');
+            localStorage.setItem('lastTicket', ticketNumber);
 
+            // 📋 SAVE TRANSACTION TO HISTORY
+            const transaction = {
+                ticket: ticket,
+                items: [...cart],
+                total: total,
+                payment: selectedPayment,
+                cash: selectedPayment === 'Cash' ? cash : null,
+                change: selectedPayment === 'Cash' ? (cash - total) : null,
+                datetime: new Date().toLocaleString('en-PH'),
+                voided: false
+            };
+            transactions.unshift(transaction);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            // ✅ SUCCESS MESSAGE
             alert(
                 '✅ PAYMENT SUCCESS!\n' +
+                '🎟️ TICKET #' + ticket + '\n' +
                 '💳 Payment: ' + selectedPayment + '\n' +
                 '------------------------\n' +
                 'TOTAL: ₱' + total.toFixed(2) + '\n' +
@@ -465,7 +569,11 @@
                 '------------------------\n' +
                 'Salamat po!'
             );
+
+            // 🔄 RESET FOR NEW TRANSACTION
             clearAll();
+            updateTicketDisplay();
+            updateHistoryDisplays();
         }
 
         // ========== CLEAR CART ==========
@@ -476,51 +584,144 @@
             updateCartDisplay();
         }
 
+        // ========== HISTORY DISPLAY ==========
+        function updateHistoryDisplays() {
+            const netSales = transactions.filter(t => !t.voided).reduce((sum, t) => sum + t.total, 0);
+            const voidCount = transactions.filter(t => t.voided).length;
+            
+            // Admin Panel Summary
+            document.getElementById('netSales').textContent = netSales.toFixed(2);
+            document.getElementById('totalTrans').textContent = transactions.length;
+            document.getElementById('voidCount').textContent = voidCount;
+            
+            // Cashier Panel Summary
+            document.getElementById('netSales2').textContent = netSales.toFixed(2);
+            document.getElementById('totalTrans2').textContent = transactions.length;
+
+            // History List — Admin (with Void)
+            const adminList = document.getElementById('historyList');
+            adminList.innerHTML = '';
+            transactions.forEach((trans, idx) => {
+                const div = document.createElement('div');
+                div.className = `trans-item ${trans.voided ? 'voided' : ''}`;
+                div.innerHTML = `
+                    <span class="trans-ticket">#${trans.ticket}</span>
+                    <span> — ₱${trans.total.toFixed(2)}</span>
+                    <span style="font-size:12px; color:#666;"> — ${trans.payment}</span>
+                    <br><small>${trans.datetime}</small>
+                    <div style="margin-top:4px;">
+                        <button class="btn-small btn-reprint" onclick="reprintTicket(${idx})">📄 View</button>
+                        ${!trans.voided ? `<button class="btn-small btn-void-small" onclick="voidTransaction(${idx})">❌ Void</button>` : '<span style="color:red; font-size:12px;">VOIDED</span>'}
+                    </div>
+                `;
+                adminList.appendChild(div);
+            });
+
+            // History List — Cashier (No Void)
+            const cashierList = document.getElementById('historyList2');
+            cashierList.innerHTML = '';
+            transactions.forEach((trans, idx) => {
+                const div = document.createElement('div');
+                div.className = `trans-item ${trans.voided ? 'voided' : ''}`;
+                div.innerHTML = `
+                    <span class="trans-ticket">#${trans.ticket}</span>
+                    <span> — ₱${trans.total.toFixed(2)}</span>
+                    <span style="font-size:12px; color:#666;"> — ${trans.payment}</span>
+                    <br><small>${trans.datetime}</small>
+                    <button class="btn-small btn-reprint" onclick="reprintTicket(${idx})">📄 View</button>
+                `;
+                cashierList.appendChild(div);
+            });
+        }
+
+        // ========== REPRINT / VIEW TICKET ==========
+        function reprintTicket(idx) {
+            const t = transactions[idx];
+            let itemsText = t.items.map(i => `${i.name} — ₱${i.price.toFixed(2)}`).join('\n');
+            alert(
+                '🎟️ TICKET #' + t.ticket + '\n' +
+                '📅 ' + t.datetime + '\n' +
+                '------------------------\n' +
+                itemsText + '\n' +
+                '------------------------\n' +
+                'TOTAL: ₱' + t.total.toFixed(2) + '\n' +
+                'PAYMENT: ' + t.payment + '\n' +
+                (t.voided ? '\n⚠️ THIS TRANSACTION IS VOIDED ⚠️' : '')
+            );
+        }
+
+        // ========== VOID TRANSACTION — ADMIN ONLY ==========
+        function voidTransaction(idx) {
+            if (!confirm('⚠️ VOID TICKET #' + transactions[idx].ticket + '?\nThis will subtract from total sales!')) return;
+            transactions[idx].voided = true;
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            updateHistoryDisplays();
+            alert('✅ TICKET #' + transactions[idx].ticket + ' HAS BEEN VOIDED!');
+        }
+
+        // ========== CLEAR ALL HISTORY ==========
+        function clearAllHistory() {
+            if (!confirm('⚠️ CLEAR ALL TRANSACTION HISTORY? This cannot be undone!')) return;
+            if (!confirm('⚠️ ARE YOU SURE? ALL DATA WILL BE DELETED!')) return;
+            transactions = [];
+            ticketNumber = 0;
+            localStorage.removeItem('transactions');
+            localStorage.removeItem('lastTicket');
+            updateTicketDisplay();
+            updateHistoryDisplays();
+            alert('✅ ALL HISTORY CLEARED! Ticket # reset to 001');
+        }
+
         // ========== ADMIN FUNCTIONS ==========
         function showAdminLogin() {
+            document.getElementById('overlay').style.display = 'block';
             document.getElementById('adminLogin').style.display = 'block';
-            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminPass').value = '';
         }
         function hideAdminLogin() {
-            document.getElementById('adminLogin').style.display = 'none';
+            closePanel('adminLogin');
         }
         function adminLogin() {
             const pass = document.getElementById('adminPass').value;
             if (pass === adminPassword) {
-                document.getElementById('adminLogin').style.display = 'none';
+                closePanel('adminLogin');
                 document.getElementById('adminPanel').style.display = 'block';
                 document.getElementById('cashierView').style.opacity = '0.3';
-                updateSalesDisplay();
+                updateHistoryDisplays();
                 updateProductEditor();
             } else {
                 alert('❌ Wrong Password!');
             }
         }
         function logoutAdmin() {
-            document.getElementById('adminPanel').style.display = 'none';
+            closePanel('adminPanel');
             document.getElementById('cashierView').style.opacity = '1';
             document.getElementById('adminPass').value = '';
+        }
+        function showHistory() {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('historyPanel').style.display = 'block';
+            updateHistoryDisplays();
+        }
+        function closePanel(panelId) {
+            document.getElementById(panelId).style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+            if (panelId === 'adminPanel') document.getElementById('cashierView').style.opacity = '1';
+        }
+        function closeAllPanels() {
+            document.getElementById('adminLogin').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('historyPanel').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('cashierView').style.opacity = '1';
         }
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById('tab-products').classList.add('hidden');
-            document.getElementById('tab-sales').classList.add('hidden');
+            document.getElementById('tab-history').classList.add('hidden');
             document.getElementById('tab-password').classList.add('hidden');
             document.getElementById('tab-' + tabName).classList.remove('hidden');
-        }
-        function updateSalesDisplay() {
-            document.getElementById('totalSales').textContent = totalSales.toFixed(2);
-            document.getElementById('transCount').textContent = transCount;
-        }
-        function clearSales() {
-            if (confirm('⚠️ Clear all sales data?')) {
-                totalSales = 0;
-                transCount = 0;
-                localStorage.removeItem('totalSales');
-                localStorage.removeItem('transCount');
-                updateSalesDisplay();
-            }
         }
         function changePassword() {
             const newP = document.getElementById('newPass').value;
@@ -528,6 +729,7 @@
             if (!newP) { alert('⚠️ Enter new password!'); return; }
             if (newP !== confirmP) { alert('⚠️ Passwords do not match!'); return; }
             adminPassword = newP;
+            localStorage.setItem('adminPass', newP);
             alert('✅ Password updated!');
             document.getElementById('newPass').value = '';
             document.getElementById('confirmPass').value = '';
@@ -537,10 +739,10 @@
             editor.innerHTML = '';
             document.querySelectorAll('.product').forEach(btn => {
                 const div = document.createElement('div');
-                div.className = 'admin-row';
+                div.style = 'display:flex; gap:6px; align-items:center; margin:4px 0;';
                 div.innerHTML = `
-                    <span style="width:140px; font-size:13px;">${btn.dataset.name}</span>
-                    <input type="number" id="edit-${btn.dataset.id}" value="${btn.dataset.price}" style="width:80px;">
+                    <span style="width:150px; font-size:13px;">${btn.dataset.name}</span>
+                    <input type="number" id="edit-${btn.dataset.id}" value="${btn.dataset.price}" style="width:70px; margin:0; padding:6px;">
                 `;
                 editor.appendChild(div);
             });
@@ -554,8 +756,8 @@
                     btn.innerHTML = btn.innerHTML.replace(/₱[\d.]+/, '₱' + newPrice.toFixed(2));
                 }
             });
-            attachProductEvents(); // Re-attach events
-            alert('✅ Products updated!');
+            attachProductEvents();
+            alert('✅ All prices updated!');
         }
     </script>
 
