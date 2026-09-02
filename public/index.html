@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MINUTE BURGER POS — FINAL WITH AUTO-LOCK</title>
+    <title>MINUTE BURGER POS — AYOS NA!</title>
     <style>
         * {
             margin: 0;
@@ -41,7 +41,7 @@
         }
         .hidden { display: none !important; }
 
-        /* 🔐 LOCK SCREEN — SHOWS ON RESUME FROM SLEEP */
+        /* 🔐 LOCK SCREEN */
         .lock-screen {
             position: fixed;
             inset: 0;
@@ -105,6 +105,7 @@
             display: none;
         }
 
+        /* 🔐 MAIN LOGIN SCREEN */
         .login-screen {
             position: fixed;
             inset: 0;
@@ -525,7 +526,7 @@
 </head>
 <body>
 
-    <!-- 🔐 AUTO-LOCK SCREEN — APPEARS AFTER SLEEP/RESUME -->
+    <!-- 🔐 LOCK SCREEN -->
     <div class="lock-screen hidden" id="lockScreen">
         <div class="lock-box">
             <h2>🔐 POS LOCKED</h2>
@@ -547,8 +548,9 @@
             <p>Select Access Type to Continue</p>
 
             <button class="login-btn" onclick="showCashierLogin()">💰 CASHIER / POS</button>
-            <button class="login-btn" onclick="promptAdminLogin()">🔐 ADMINISTRATOR</button>
+            <button class="login-btn" onclick="showAdminLogin()">🔐 ADMINISTRATOR</button>
 
+            <!-- CASHIER LOGIN FORM -->
             <div id="cashierLoginForm" class="hidden" style="margin-top:20px;">
                 <h3 style="text-align:center; color:var(--primary-dark); margin-bottom:15px;">🕒 Cashier Shift Login</h3>
                 <div class="passcode-hint">
@@ -569,8 +571,11 @@
                 <button class="login-btn" onclick="verifyCashierLogin()">✅ START SHIFT</button>
             </div>
 
-            <input type="password" id="adminPass" placeholder="Admin Password — Default: admin123" style="display:none;">
-            <button class="login-btn secondary" id="adminLoginBtn" onclick="loginAdmin()" style="display:none;">Login as Admin</button>
+            <!-- ADMIN LOGIN FORM -->
+            <div id="adminLoginForm" class="hidden" style="margin-top:20px;">
+                <input type="password" id="adminPass" placeholder="Enter Admin Password — Default: admin123">
+                <button class="login-btn" onclick="loginAdmin()">🔐 LOGIN AS ADMIN</button>
+            </div>
 
             <div class="login-note">
                 <strong>Admin Password:</strong> admin123<br>
@@ -579,9 +584,8 @@
         </div>
     </div>
 
-    <!-- 📱 MAIN APP CONTENT HERE -->
+    <!-- 📱 MAIN APP -->
     <div class="app hidden" id="mainApp">
-        <!-- FULL APP CONTENT REMAINS SAME AS BEFORE -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <h1>🍔 M. BURGER <span id="currentShiftBadge" class="shift-badge badge-morning hidden">—</span></h1>
@@ -605,22 +609,211 @@
             </div>
         </div>
 
-        <!-- ALL YOUR VIEWS (POS, Transactions, Reports, Void, Stocks, Delivery, Transfers, Settings) GO HERE -->
-        <!-- [REST OF YOUR FULL APP CODE REMAINS EXACTLY THE SAME] -->
+        <!-- 🛒 POS VIEW -->
+        <div class="menu-section" id="view-pos">
+            <div class="menu-header">
+                <span>📋 MENU — Cashier: <span id="posCashierName">—</span></span>
+                <span>Ticket #<span id="ticketNo">001</span></span>
+            </div>
+            <div class="tabs">
+                <button class="tab active" data-cat="burgers" onclick="changeTab('burgers')">🍔 SULIT</button>
+                <button class="tab" data-cat="chicken" onclick="changeTab('chicken')">🍗 CHICKEN TIME</button>
+                <button class="tab" data-cat="premium" onclick="changeTab('premium')">⭐ PREMIUM</button>
+                <button class="tab" data-cat="hotdogs" onclick="changeTab('hotdogs')">🌭 HOTDOGS</button>
+                <button class="tab" data-cat="drinks" onclick="changeTab('drinks')">🥤 DRINKS</button>
+                <button class="tab" data-cat="extras" onclick="changeTab('extras')">🧂 EXTRAS</button>
+            </div>
+            <div class="products-wrapper">
+                <div class="products-grid" id="productsGrid"></div>
+            </div>
+            <div class="order-panel">
+                <div class="order-header">
+                    <span>🛒 ORDER</span>
+                    <span class="clear-btn" onclick="clearAll()">🗑️ Clear</span>
+                </div>
+                <div class="order-items" id="orderItems">
+                    <div class="empty-msg">Tap products to add to order</div>
+                </div>
+                <div class="order-footer">
+                    <div class="total-row">
+                        <span>TOTAL:</span>
+                        <span class="total-amount">₱<span id="totalAmt">0.00</span></span>
+                    </div>
+                    <div class="pay-buttons">
+                        <button class="pay-btn selected" onclick="selectPayment(this, 'Cash')">💵 CASH</button>
+                        <button class="pay-btn" onclick="selectPayment(this, 'GCash')">📱 GCASH</button>
+                    </div>
+                    <label class="cash-label">Cash Received:</label>
+                    <input type="number" id="cashReceived" class="cash-input" placeholder="0.00" oninput="computeChange()">
+                    <div class="change-box" id="change-box">
+                        CHANGE: ₱<span id="changeAmt">0.00</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="hold-btn">⏸️ HOLD</button>
+                        <button class="charge-btn" onclick="completeSale()">✅ PAY / SAVE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- 📊 TRANSACTIONS -->
+        <div class="admin-container hidden" id="view-transactions">
+            <div class="admin-header"><h2>📊 TRANSACTIONS</h2></div>
+            <div class="admin-content">
+                <div class="admin-card">
+                    <h3>📈 Overview</h3>
+                    <div class="admin-grid">
+                        <div class="stat-card"><div class="stat-label">Total Sales</div><div class="stat-value">₱<span id="dashTotalSales">0.00</span></div></div>
+                        <div class="stat-card danger-border"><div class="stat-label">Transactions</div><div class="stat-value" id="dashTransCount">0</div></div>
+                        <div class="stat-card warning-border"><div class="stat-label">Shift Sales</div><div class="stat-value">₱<span id="dashShiftSales">0.00</span></div></div>
+                        <div class="stat-card"><div class="stat-label">Items Sold</div><div class="stat-value" id="dashItemsSold">0</div></div>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <h3>📋 Transaction History</h3>
+                    <div class="table-wrapper">
+                        <table><thead><tr><th>Ticket #</th><th>Date/Time</th><th>Cashier</th><th>Shift</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
+                        <tbody id="transBody"><tr><td colspan="8" style="text-align:center;color:#999;padding:30px;">No transactions yet...</td></tr></tbody></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📈 CASH OUT -->
+        <div class="admin-container hidden" id="view-reports">
+            <div class="admin-header"><h2>📈 CASH OUT & REPORTS</h2></div>
+            <div class="admin-content">
+                <div class="admin-card">
+                    <h3>💰 Current Shift Cash Position</h3>
+                    <div class="admin-grid">
+                        <div class="stat-card"><div class="stat-label">Opening Cash</div><div class="stat-value">₱<span id="rptOpening">0.00</span></div></div>
+                        <div class="stat-card"><div class="stat-label">Shift Sales</div><div class="stat-value">₱<span id="rptSales">0.00</span></div></div>
+                        <div class="stat-card warning-border"><div class="stat-label">Cash on Hand</div><div class="stat-value">₱<span id="rptOnHand">0.00</span></div></div>
+                        <div class="stat-card danger-border"><div class="stat-label">Cash Out</div><div class="stat-value">₱<span id="rptCashOut">0.00</span></div></div>
+                    </div>
+                    <div style="margin-top:20px;">
+                        <button class="btn btn-primary" onclick="generateCashOut()">💰 Cash Out Report</button>
+                        <button class="btn btn-blue" onclick="endShift()">🔒 End Shift</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ❌ VOID -->
+        <div class="admin-container hidden" id="view-void">
+            <div class="admin-header"><h2>❌ VOID TRANSACTIONS</h2></div>
+            <div class="admin-content">
+                <div class="admin-card">
+                    <h3>⚠️ Void Current Order</h3>
+                    <div id="voidOrderList"><p style="color:#999;">No items to void...</p></div>
+                    <div style="margin-top:20px;"><button class="btn btn-danger" onclick="voidEntireOrder()">🗑️ Void Entire Order</button></div>
+                </div>
+                <div class="admin-card">
+                    <h3>📋 Void History Log</h3>
+                    <div class="table-wrapper">
+                        <table><thead><tr><th>Date/Time</th><th>Item/Ticket</th><th>Qty</th><th>Amount</th><th>Voided By</th><th>Shift</th><th>Reason</th></tr></thead>
+                        <tbody id="voidLogBody"><tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No void records...</td></tr></tbody></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📦 STOCKS -->
+        <div class="admin-container hidden" id="view-stocks">
+            <div class="admin-header">
+                <h2>📦 INVENTORY / STOCKS</h2>
+                <button class="btn btn-primary" onclick="openStockModal()">➕ Add Stock Item</button>
+            </div>
+            <div class="admin-content">
+                <div class="admin-card">
+                    <h3>📊 Stock Summary</h3>
+                    <div class="admin-grid">
+                        <div class="stat-card"><div class="stat-label">Total Items</div><div class="stat-value" id="stockTotalItems">0</div></div>
+                        <div class="stat-card warning-border"><div class="stat-label">Low Stock</div><div class="stat-value" id="stockLowItems">0</div></div>
+                        <div class="stat-card danger-border"><div class="stat-label">Out of Stock</div><div class="stat-value" id="stockOutItems">0</div></div>
+                        <div class="stat-card"><div class="stat-label">Stock Value</div><div class="stat-value">₱<span id="stockValue">0.00</span></div></div>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <h3>📋 Current Stock List</h3>
+                    <div class="table-wrapper">
+                        <table><thead><tr><th>Item</th><th>Unit</th><th>Qty</th><th>Reorder Lvl</th><th>Cost</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="stockBody"><tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No stock items yet...</td></tr></tbody></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🚚 DELIVERY -->
+        <div class="admin-container hidden" id="view-delivery">
+            <div class="admin-header"><h2>🚚 STOCK DELIVERY</h2></div>
+            <div class="admin-content">
+                <div class="admin-card">
+                    <h3>📥 Record New Delivery</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>Item</label><select id="deliverItem"><option value="">-- Select Item --</option></select></div>
+                        <div class="form-group"><label>Qty Delivered</label><input type="number" id="deliverQty" placeholder="0"></div>
+                        <div class="form-group"><label>Supplier</label><input type="text" id="deliverSupplier" placeholder="Supplier name"></div>
+                        <div class="form-group"><label>Remarks</label><input type="text" id="deliverRemarks" placeholder="Remarks"></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveDelivery()">✅ Save Delivery</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔄 TRANSFERS -->
+        <div class="admin-container hidden" id="view-transfer">
+            <div class="admin-header"><h2>🔄 STOCK TRANSFERS</h2></div>
+            <div class="admin-content">
+                <div class="admin-card">
+                    <h3 style="color:var(--trans-out);">📤 TRANS‑OUT</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>Item to Transfer OUT</label><select id="transOutItem"><option value="">-- Select Item --</option></select></div>
+                        <div class="form-group"><label>Quantity</label><input type="number" id="transOutQty" placeholder="0"></div>
+                        <div class="form-group"><label>Send To</label><input type="text" id="transOutTo" placeholder="Branch name"></div>
+                        <div class="form-group"><label>Reference #</label><input type="text" id="transOutRef" placeholder="Reference"></div>
+                    </div>
+                    <button class="btn btn-trans-out" onclick="saveTransOut()">📤 RECORD TRANS‑OUT</button>
+                </div>
+                <div class="admin-card">
+                    <h3 style="color:var(--trans-in);">📥 TRANS‑IN</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>Item Received</label><select id="transInItem"><option value="">-- Select Item --</option></select></div>
+                        <div class="form-group"><label>Quantity</label><input type="number" id="transInQty" placeholder="0"></div>
+                        <div class="form-group"><label>Received From</label><input type="text" id="transInFrom" placeholder="Branch name"></div>
+                        <div class="form-group"><label>Reference #</label><input type="text" id="transInRef" placeholder="Reference"></div>
+                    </div>
+                    <button class="btn btn-trans-in" onclick="saveTransIn()">📥 RECORD TRANS‑IN</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ⚙️ SETTINGS -->
+        <div class="admin-container hidden" id="view-settings">
+            <div class="admin-header"><h2>⚙️ SETTINGS</h2></div>
+            <div class="admin-content">
+                <div class="admin-card">
+                    <h3>🔐 Admin Security</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>New Admin Password</label><input type="password" id="newAdminPass" placeholder="New password"></div>
+                        <div class="form-group"><label>Confirm Password</label><input type="password" id="confirmAdminPass" placeholder="Confirm password"></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="changeAdminPassword()">🔒 Change Password</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         // ==========================================
-        // 🔐 SESSION DATA — SAVE CURRENT LOGIN INFO
+        // 🔐 SESSION DATA
         // ==========================================
         let currentSession = {
             isLoggedIn: false,
-            userType: null, // 'cashier' or 'admin'
+            userType: null,
             name: null,
-            shift: null, // 'morning', 'swing', 'graveyard'
-            openingCash: 0,
-            passcode: null
+            shift: null,
+            openingCash: 0
         };
 
         const PASSCODES = {
@@ -630,75 +823,50 @@
         };
 
         // ==========================================
-        // 🔐 AUTO-LOCK SYSTEM — DETECT SLEEP/RESUME
+        // 🔐 AUTO-LOCK SYSTEM
         // ==========================================
-        let lockTimer = null;
-        const LOCK_DELAY = 1000; // 1 second after page hidden = lock
-
-        // Detect when page becomes hidden (screen off/sleep)
         document.addEventListener('visibilitychange', function() {
             if (document.hidden && currentSession.isLoggedIn) {
-                // Page hidden — schedule lock
-                lockTimer = setTimeout(lockPOS, LOCK_DELAY);
-            } else if (!document.hidden && currentSession.isLoggedIn && !document.getElementById('lockScreen').classList.contains('hidden')) {
-                // Page visible again — lock screen already shown, ready for passcode
-                document.getElementById('lockPasscodeInput').value = '';
-                document.getElementById('lockPasscodeInput').focus();
+                setTimeout(lockPOS, 500);
             }
         });
-
-        // Also detect window blur (app switched/minimized)
         window.addEventListener('blur', function() {
-            if (currentSession.isLoggedIn) {
-                lockPOS();
-            }
+            if (currentSession.isLoggedIn) lockPOS();
         });
 
         function lockPOS() {
             if (!currentSession.isLoggedIn) return;
-            // Show lock screen — keep session data, just lock UI
             document.getElementById('lockCashierName').textContent = currentSession.name;
-            document.getElementById('lockShiftName').textContent = 
-                currentSession.shift ? currentSession.shift.toUpperCase() + ' SHIFT' : 'ADMIN';
+            document.getElementById('lockShiftName').textContent = currentSession.shift ? currentSession.shift.toUpperCase() + ' SHIFT' : 'ADMIN';
             document.getElementById('lockScreen').classList.remove('hidden');
             document.getElementById('lockPasscodeInput').value = '';
             document.getElementById('lockErrorMsg').style.display = 'none';
-            document.getElementById('lockPasscodeInput').focus();
         }
 
         function unlockPOS() {
             const entered = document.getElementById('lockPasscodeInput').value.trim();
-            
-            // Admin can unlock without passcode OR cashier uses correct shift passcode
             if (currentSession.userType === 'admin' || entered === PASSCODES[currentSession.shift]) {
-                // SUCCESS — unlock
                 document.getElementById('lockScreen').classList.add('hidden');
-                document.getElementById('lockPasscodeInput').value = '';
-                document.getElementById('lockErrorMsg').style.display = 'none';
             } else {
-                // FAILED — show error
                 document.getElementById('lockErrorMsg').style.display = 'block';
                 document.getElementById('lockPasscodeInput').value = '';
-                document.getElementById('lockPasscodeInput').focus();
-                setTimeout(() => {
-                    document.getElementById('lockErrorMsg').style.display = 'none';
-                }, 3000);
+                setTimeout(() => document.getElementById('lockErrorMsg').style.display = 'none', 3000);
             }
         }
 
         // ==========================================
-        // 🔑 CASHIER LOGIN WITH SHIFT PASSCODE
+        // 🔑 LOGIN FUNCTIONS — INAYOS NA!
         // ==========================================
         function showCashierLogin() {
+            console.log('Cashier button clicked!');
             document.getElementById('cashierLoginForm').classList.remove('hidden');
-            document.getElementById('adminPass').style.display = 'none';
-            document.getElementById('adminLoginBtn').style.display = 'none';
+            document.getElementById('adminLoginForm').classList.add('hidden');
         }
 
-        function promptAdminLogin() {
+        function showAdminLogin() {
+            console.log('Admin button clicked!');
+            document.getElementById('adminLoginForm').classList.remove('hidden');
             document.getElementById('cashierLoginForm').classList.add('hidden');
-            document.getElementById('adminPass').style.display = 'block';
-            document.getElementById('adminLoginBtn').style.display = 'block';
         }
 
         function verifyCashierLogin() {
@@ -710,28 +878,21 @@
             if (!shift) return alert('⚠️ Please select your shift!');
             if (!passcode || passcode.length !== 4) return alert('⚠️ Enter 4-digit passcode!');
             if (!name) return alert('⚠️ Enter your full name!');
+            if (passcode !== PASSCODES[shift]) return alert('❌ Incorrect passcode for ' + shift.toUpperCase() + ' shift!');
 
-            if (passcode !== PASSCODES[shift]) {
-                return alert('❌ Incorrect passcode for ' + shift.toUpperCase() + ' shift!');
-            }
-
-            // ✅ LOGIN SUCCESS — SAVE SESSION
             currentSession = {
                 isLoggedIn: true,
                 userType: 'cashier',
                 name: name,
                 shift: shift,
-                openingCash: openingCash,
-                passcode: passcode
+                openingCash: openingCash
             };
-
             startMainApp();
         }
 
         function loginAdmin() {
             const pass = document.getElementById('adminPass').value.trim();
             const ADMIN_PASS = localStorage.getItem('adminPassword') || 'admin123';
-            
             if (pass === ADMIN_PASS) {
                 currentSession = {
                     isLoggedIn: true,
@@ -747,15 +908,14 @@
         }
 
         function startMainApp() {
-            // Hide login, show main app
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
 
-            // Update UI with session info
             document.getElementById('userLabel').textContent = 'User: ' + currentSession.name;
             document.getElementById('roleLabel').textContent = 'Role: ' + currentSession.userType.toUpperCase();
             document.getElementById('posCashierName').textContent = currentSession.name;
-            
+            document.getElementById('rptOpening').textContent = currentSession.openingCash.toFixed(2);
+
             if (currentSession.shift) {
                 document.getElementById('shiftLabel').textContent = 'Shift: ' + currentSession.shift.toUpperCase();
                 const badge = document.getElementById('currentShiftBadge');
@@ -764,12 +924,10 @@
                 badge.className = 'shift-badge badge-' + currentSession.shift;
             }
 
-            // Set current date
             document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-PH', {
                 weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
             });
 
-            // Initialize your app functions here
             initApp();
         }
 
@@ -780,267 +938,329 @@
             document.getElementById('lockScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
             
-            // Reset form fields
             document.getElementById('shiftSelect').value = '';
             document.getElementById('shiftPasscode').value = '';
             document.getElementById('cashierName').value = '';
             document.getElementById('openingCash').value = '';
             document.getElementById('adminPass').value = '';
+            document.getElementById('cashierLoginForm').classList.add('hidden');
+            document.getElementById('adminLoginForm').classList.add('hidden');
         }
 
-        // Your existing app init & other functions here
-        function initApp() {
-            loadProducts();
-            updateDashboard();
-            populateStockSelects();
-            renderStockTable();
-            renderTransactionTable();
-            renderCashoutTable();
-            renderTransferTable();
-            renderDeliveryTable();
-            renderVoidLog();
-        }
+        // ==========================================
+        // 📋 MENU PRODUCTS
+        // ==========================================
+        const menu = {
+            burgers:
+   burgers: [
+      {id:1,name:'Burger Regular',price:35,icon:'🍔'},
+      {id:2,name:'Burger Cheese',price:45,icon:'🍔'},
+      {id:3,name:'Burger Special',price:55,icon:'🍔'},
+      {id:4,name:'Burger Double',price:75,icon:'🍔'},
+    ],
+    chicken: [
+      {id:5,name:'1pc Chicken',price:49,icon:'🍗'},
+      {id:6,name:'2pc Chicken',price:89,icon:'🍗'},
+      {id:7,name:'Chicken Meal',price:65,icon:'🍗'},
+    ],
+    premium: [
+      {id:8,name:'Big Burger',price:85,icon:'⭐'},
+      {id:9,name:'Cheesy Burger',price:95,icon:'⭐'},
+    ],
+    hotdogs: [
+      {id:10,name:'Hotdog Regular',price:30,icon:'🌭'},
+      {id:11,name:'Hotdog Special',price:40,icon:'🌭'},
+    ],
+    drinks: [
+      {id:12,name:'Soft Drink Reg',price:15,icon:'🥤'},
+      {id:13,name:'Soft Drink Large',price:20,icon:'🥤'},
+      {id:14,name:'Iced Tea',price:18,icon:'🥤'},
+      {id:15,name:'Water',price:10,icon:'💧'},
+    ],
+    extras: [
+      {id:16,name:'Fries',price:25,icon:'🍟'},
+      {id:17,name:'Rice',price:12,icon:'🍚'},
+      {id:18,name:'Sundae',price:20,icon:'🍦'},
+    ]
+  };
 
-        // All your existing POS functions (loadProducts, switchView, addToCart, etc.) continue below
-        function loadProducts() {
-            const grid = document.getElementById('productsGrid');
-            grid.innerHTML = '';
-            const cat = currentCat || 'burgers';
-            const products = menu[cat] || [];
-            products.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.onclick = () => addToCart(p);
-                card.innerHTML = `
-                    <div class="product-icon">${p.icon}</div>
-                    <div class="product-info">
-                        <div class="product-name">${p.name}</div>
-                        <div class="product-price">₱${p.price.toFixed(2)}</div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
+  let currentCat = 'burgers';
+  let cart = [];
+  let ticketNumber = parseInt(localStorage.getItem('lastTicket') || '0') + 1;
+  let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+  let stocks = JSON.parse(localStorage.getItem('stocks') || '[]');
+  let voidLogs = JSON.parse(localStorage.getItem('voidLogs') || '[]');
+  let selectedPayment = 'Cash';
 
-        let currentCat = 'burgers';
-        function changeTab(cat) {
-            currentCat = cat;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            loadProducts();
-        }
+  function initApp() {
+    loadProducts();
+    updateDashboard();
+    renderTransactionTable();
+    renderStockTable();
+    renderVoidLog();
+    document.getElementById('ticketNo').textContent = String(ticketNumber).padStart(3, '0');
+    document.getElementById('rptOpening').textContent = (currentSession.openingCash || 0).toFixed(2);
+  }
 
-        let cart = [];
-        function addToCart(product) {
-            const existing = cart.find(i => i.id === product.id);
-            if (existing) existing.qty++;
-            else cart.push({ ...product, qty: 1 });
-            updateCartDisplay();
-        }
+  function loadProducts() {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = '';
+    const items = menu[currentCat] || [];
+    items.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.onclick = () => addToCart(p);
+      card.innerHTML = `
+        <div class="product-icon">${p.icon}</div>
+        <div class="product-info">
+          <div class="product-name">${p.name}</div>
+          <div class="product-price">₱${p.price.toFixed(2)}</div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartDisplay();
-        }
+  function changeTab(cat) {
+    currentCat = cat;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    loadProducts();
+  }
 
-        function updateCartDisplay() {
-            const container = document.getElementById('orderItems');
-            if (cart.length === 0) {
-                container.innerHTML = '<div class="empty-msg">Tap products to add to order</div>';
-            } else {
-                container.innerHTML = cart.map((item, idx) => `
-                    <div class="order-item">
-                        <div class="item-left">
-                            <span class="qty-badge">${item.qty}</span>
-                            <div>
-                                <div class="item-name">${item.name}</div>
-                                <div style="color:var(--text-light);font-size:12px;">₱${item.price.toFixed(2)} each</div>
-                            </div>
-                        </div>
-                        <div style="font-weight:bold;">₱${(item.price * item.qty).toFixed(2)}</div>
-                        <span class="item-remove" onclick="removeFromCart(${idx})">×</span>
-                    </div>
-                `).join('');
-            }
-            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            document.getElementById('totalAmt').textContent = total.toFixed(2);
-            document.getElementById('changeBox').style.display = 'none';
-            document.getElementById('cashReceived').value = '';
-        }
+  function addToCart(product) {
+    const existing = cart.find(i => i.id === product.id);
+    if (existing) existing.qty++;
+    else cart.push({ ...product, qty: 1 });
+    updateCartDisplay();
+  }
 
-        function clearAll() {
-            if (cart.length > 0 && !confirm('Clear entire order?')) return;
-            cart = [];
-            updateCartDisplay();
-        }
+  function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartDisplay();
+  }
 
-        let selectedPayment = 'Cash';
-        function selectPayment(btn, method) {
-            selectedPayment = method;
-            document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-        }
+  function updateCartDisplay() {
+    const container = document.getElementById('orderItems');
+    if (cart.length === 0) {
+      container.innerHTML = '<div class="empty-msg">Tap products to add to order</div>';
+    } else {
+      container.innerHTML = cart.map((item, idx) => `
+        <div class="order-item">
+          <div class="item-left">
+            <span class="qty-badge">${item.qty}</span>
+            <div><div class="item-name">${item.name}</div><div style="font-size:12px;color:#888;">₱${item.price.toFixed(2)}</div></div>
+          </div>
+          <div style="font-weight:bold;">₱${(item.price * item.qty).toFixed(2)}</div>
+          <span class="item-remove" onclick="removeFromCart(${idx})">×</span>
+        </div>`).join('');
+    }
+    const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+    document.getElementById('totalAmt').textContent = total.toFixed(2);
+    document.getElementById('change-box').style.display = 'none';
+    document.getElementById('cashReceived').value = '';
+  }
 
-        function computeChange() {
-            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
-            const changeEl = document.getElementById('changeBox');
-            if (cash >= total && total > 0) {
-                changeEl.style.display = 'block';
-                document.getElementById('changeAmt').textContent = (cash - total).toFixed(2);
-            } else {
-                changeEl.style.display = 'none';
-            }
-        }
+  function clearAll() {
+    if (cart.length > 0 && !confirm('Clear order?')) return;
+    cart = [];
+    updateCartDisplay();
+  }
 
-        function completeSale() {
-            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            if (total <= 0) return alert('⚠️ Cart is empty!');
-            const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
-            if (selectedPayment === 'Cash' && cash < total) return alert('⚠️ Insufficient cash!');
+  function selectPayment(btn, method) {
+    selectedPayment = method;
+    document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
 
-            ticketNumber++;
-            const sale = {
-                ticket: ticketNumber,
-                datetime: new Date().toLocaleString('en-PH'),
-                cashier: currentSession.name,
-                shift: currentSession.shift,
-                items: [...cart],
-                total: total,
-                payment: selectedPayment,
-                cashReceived: cash,
-                change: cash - total,
-                status: 'COMPLETED'
-            };
-            transactions.unshift(sale);
-            saveTransactions();
-            updateDashboard();
-            renderTransactionTable();
+  function computeChange() {
+    const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+    const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
+    const box = document.getElementById('change-box');
+    if (cash >= total && total > 0) {
+      box.style.display = 'block';
+      document.getElementById('changeAmt').textContent = (cash - total).toFixed(2);
+    } else {
+      box.style.display = 'none';
+    }
+  }
 
-            alert(`✅ SALE COMPLETED!\nTicket #${ticketNumber}\nTotal: ₱${total.toFixed(2)}\nChange: ₱${(cash - total).toFixed(2)}`);
-            cart = [];
-            updateCartDisplay();
-        }
+  function completeSale() {
+    const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+    if (total <= 0) return alert('⚠️ Cart empty!');
+    const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
+    if (selectedPayment === 'Cash' && cash < total) return alert('⚠️ Not enough cash!');
 
-        // Ticket counter
-        let ticketNumber = parseInt(localStorage.getItem('lastTicket') || '0') + 1;
-        document.getElementById('ticketNo').textContent = String(ticketNumber).padStart(3, '0');
+    ticketNumber++;
+    const sale = {
+      ticket: ticketNumber,
+      datetime: new Date().toLocaleString('en-PH'),
+      cashier: currentSession.name,
+      shift: currentSession.shift,
+      items: [...cart],
+      total: total,
+      payment: selectedPayment,
+      cashReceived: cash,
+      change: cash - total,
+      status: 'COMPLETED'
+    };
+    transactions.unshift(sale);
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+    localStorage.setItem('lastTicket', ticketNumber);
+    updateDashboard();
+    renderTransactionTable();
+    alert(`✅ SALE COMPLETED!\nTicket #${ticketNumber}\nTotal: ₱${total.toFixed(2)}\nChange: ₱${(cash - total).toFixed(2)}`);
+    cart = [];
+    updateCartDisplay();
+  }
 
-        // Transactions storage
-        let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-        function saveTransactions() {
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-            localStorage.setItem('lastTicket', ticketNumber);
-        }
+  function updateDashboard() {
+    document.getElementById('dashTotalSales').textContent = transactions.reduce((s,t)=>s+t.total,0).toFixed(2);
+    document.getElementById('dashTransCount').textContent = transactions.length;
+    document.getElementById('dashItemsSold').textContent = transactions.reduce((s,t)=>s+t.items.reduce((s2,i)=>s2+i.qty,0),0);
+    const shiftSales = transactions.filter(t => t.shift === currentSession.shift).reduce((s,t)=>s+t.total,0);
+    document.getElementById('dashShiftSales').textContent = shiftSales.toFixed(2);
+    document.getElementById('rptSales').textContent = shiftSales.toFixed(2);
+    const opening = currentSession.openingCash || 0;
+    document.getElementById('rptOnHand').textContent = (opening + shiftSales).toFixed(2);
+  }
 
-        function updateDashboard() {
-            document.getElementById('dashTotalSales').textContent = transactions.reduce((s,t)=>s+t.total,0).toFixed(2);
-            document.getElementById('dashTransCount').textContent = transactions.length;
-            document.getElementById('dashItemsSold').textContent = transactions.reduce((s,t)=>s+t.items.reduce((s2,i)=>s2+i.qty,0),0);
-            const shiftSales = transactions.filter(t => t.shift === currentSession.shift).reduce((s,t)=>s+t.total,0);
-            document.getElementById('dashShiftSales').textContent = shiftSales.toFixed(2);
-        }
+  function renderTransactionTable() {
+    const tbody = document.getElementById('transBody');
+    if (transactions.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999;padding:30px;">No transactions yet...</td></tr>';
+      return;
+    }
+    tbody.innerHTML = transactions.map(t => `
+      <tr>
+        <td>#${String(t.ticket).padStart(3,'0')}</td>
+        <td>${t.datetime}</td>
+        <td>${t.cashier}</td>
+        <td>${t.shift ? t.shift.toUpperCase() : '—'}</td>
+        <td>${t.items.length} item(s)</td>
+        <td>₱${t.total.toFixed(2)}</td>
+        <td>${t.payment}</td>
+        <td><span class="status-badge status-active">${t.status}</span></td>
+      </tr>`).join('');
+  }
 
-        function renderTransactionTable() {
-            const tbody = document.getElementById('transBody');
-            if (transactions.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999;padding:30px;">No transactions yet...</td></tr>';
-                return;
-            }
-            tbody.innerHTML = transactions.map(t => `
-                <tr>
-                    <td>#${String(t.ticket).padStart(3,'0')}</td>
-                    <td>${t.datetime}</td>
-                    <td>${t.cashier}</td>
-                    <td>${t.shift ? t.shift.toUpperCase() : '—'}</td>
-                    <td>${t.items.length} item(s)</td>
-                    <td>₱${t.total.toFixed(2)}</td>
-                    <td>${t.payment}</td>
-                    <td><span class="status-badge status-active">${t.status}</span></td>
-                </tr>
-            `).join('');
-        }
+  function switchView(viewName) {
+    document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.menu-item[data-view="${viewName}"]`).classList.add('active');
+    document.querySelectorAll('.menu-section, .admin-container').forEach(el => el.classList.add('hidden'));
+    document.getElementById('view-' + viewName).classList.remove('hidden');
+  }
 
-        // Switch views
-        function switchView(viewName) {
-            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-            document.querySelector(`.menu-item[data-view="${viewName}"]`).classList.add('active');
-            document.querySelectorAll('.menu-section, .admin-container').forEach(el => el.classList.add('hidden'));
-            document.getElementById('view-' + viewName).classList.remove('hidden');
-        }
+  function renderStockTable() {
+    const tbody = document.getElementById('stockBody');
+    if (stocks.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No stock items yet...</td></tr>';
+      return;
+    }
+    tbody.innerHTML = stocks.map((item, idx) => {
+      let status = 'status-active', statusText = 'In Stock';
+      if (item.qty <= 0) { status = 'status-out'; statusText = 'OUT OF STOCK'; }
+      else if (item.qty <= item.reorderLevel) { status = 'status-low'; statusText = 'LOW'; }
+      return `
+        <tr>
+          <td><strong>${item.name}</strong></td>
+          <td>${item.unit}</td>
+          <td>${item.qty}</td>
+          <td>${item.reorderLevel}</td>
+          <td>₱${item.cost.toFixed(2)}</td>
+          <td><span class="status-badge ${status}">${statusText}</span></td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="adjustStockQty(${idx})">Qty</button>
+            <button class="btn btn-sm btn-danger" onclick="removeStockItem(${idx})">Del</button>
+          </td>
+        </tr>`;
+    }).join('');
+    document.getElementById('stockTotalItems').textContent = stocks.length;
+    document.getElementById('stockLowItems').textContent = stocks.filter(i => i.qty > 0 && i.qty <= i.reorderLevel).length;
+    document.getElementById('stockOutItems').textContent = stocks.filter(i => i.qty <= 0).length;
+    document.getElementById('stockValue').textContent = stocks.reduce((s,i)=>s+(i.qty*i.cost),0).toFixed(2);
+  }
 
-        // All remaining functions — stocks, delivery, transfers, reports, void, settings
-        let stocks = JSON.parse(localStorage.getItem('stocks') || '[]');
-        let deliveryLogs = JSON.parse(localStorage.getItem('deliveryLogs') || '[]');
-        let transferLogs = JSON.parse(localStorage.getItem('transferLogs') || '[]');
-        let cashoutLogs = JSON.parse(localStorage.getItem('cashoutLogs') || '[]');
-        let voidLogs = JSON.parse(localStorage.getItem('voidLogs') || '[]');
+  function openStockModal() {
+    const name = prompt('Item name:'); if (!name) return;
+    const unit = prompt('Unit (pcs, kg, pack):'); if (!unit) return;
+    const qty = parseInt(prompt('Quantity:')) || 0;
+    const reorder = parseInt(prompt('Reorder level:')) || 5;
+    const cost = parseFloat(prompt('Cost per unit:')) || 0;
+    stocks.push({ name, unit, qty, reorderLevel: reorder, cost });
+    localStorage.setItem('stocks', JSON.stringify(stocks));
+    renderStockTable();
+  }
 
-        function saveStocks() { localStorage.setItem('stocks', JSON.stringify(stocks)); }
-        function saveDeliveryLogs() { localStorage.setItem('deliveryLogs', JSON.stringify(deliveryLogs)); }
-        function saveTransferLogs() { localStorage.setItem('transferLogs', JSON.stringify(transferLogs)); }
-        function saveCashoutLogs() { localStorage.setItem('cashoutLogs', JSON.stringify(cashoutLogs)); }
-        function saveVoidLogs() { localStorage.setItem('voidLogs', JSON.stringify(voidLogs)); }
+  function adjustStockQty(idx) {
+    const newQty = parseInt(prompt('New quantity:', stocks[idx].qty));
+    if (isNaN(newQty)) return;
+    stocks[idx].qty = newQty;
+    localStorage.setItem('stocks', JSON.stringify(stocks));
+    renderStockTable();
+  }
 
-        function renderStockTable() {
-            const tbody = document.getElementById('stockBody');
-            if (stocks.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No stock items yet...</td></tr>';
-                return;
-            }
-            tbody.innerHTML = stocks.map((item, idx) => {
-                let status = 'status-active';
-                let statusText = 'In Stock';
-                if (item.qty <= 0) { status = 'status-out'; statusText = 'OUT OF STOCK'; }
-                else if (item.qty <= item.reorderLevel) { status = 'status-low'; statusText = 'LOW'; }
-                return `
-                    <tr>
-                        <td><strong>${item.name}</strong></td>
-                        <td>${item.unit}</td>
-                        <td>${item.qty}</td>
-                        <td>${item.reorderLevel}</td>
-                        <td>₱${item.cost.toFixed(2)}</td>
-                        <td><span class="status-badge ${status}">${statusText}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-primary" onclick="adjustStockQty(${idx})">Qty</button>
-                            <button class="btn btn-sm btn-danger" onclick="removeStockItem(${idx})">Del</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-            document.getElementById('stockTotalItems').textContent = stocks.length;
-            document.getElementById('stockLowItems').textContent = stocks.filter(i => i.qty > 0 && i.qty <= i.reorderLevel).length;
-            document.getElementById('stockOutItems').textContent = stocks.filter(i => i.qty <= 0).length;
-            document.getElementById('stockValue').textContent = stocks.reduce((s,i)=>s+(i.qty*i.cost),0).toFixed(2);
-        }
+  function removeStockItem(idx) {
+    if (!confirm(`Delete "${stocks[idx].name}"?`)) return;
+    stocks.splice(idx, 1);
+    localStorage.setItem('stocks', JSON.stringify(stocks));
+    renderStockTable();
+  }
 
-        function populateStockSelects() {
-            const opts = '<option value="">-- Select Item --</option>' + 
-                stocks.map((s,i) => `<option value="${i}">${s.name} (${s.qty} ${s.unit} avail)</option>`).join('');
-            document.getElementById('deliverItem').innerHTML = opts;
-            document.getElementById('transOutItem').innerHTML = opts;
-            document.getElementById('transInItem').innerHTML = opts;
-        }
+  function renderVoidLog() {
+    const tbody = document.getElementById('voidLogBody');
+    if (voidLogs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No void records...</td></tr>';
+      return;
+    }
+    tbody.innerHTML = voidLogs.map(v => `
+      <tr>
+        <td>${v.datetime}</td><td>${v.item}</td><td>${v.qty}</td>
+        <td>₱${v.amount.toFixed(2)}</td><td>${v.by}</td><td>${v.shift}</td><td>${v.reason}</td>
+      </tr>`).join('');
+  }
 
-        function openStockModal() {
-            const name = prompt('Enter item name:'); if (!name) return;
-            const unit = prompt('Enter unit (pcs, kg, pack, etc.):'); if (!unit) return;
-            const qty = parseInt(prompt('Enter quantity:')) || 0;
-            const reorder = parseInt(prompt('Reorder level (alert when below):')) || 5;
-            const cost = parseFloat(prompt('Cost per unit:')) || 0;
-            stocks.push({ name, unit, qty, reorderLevel: reorder, cost });
-            saveStocks(); renderStockTable(); populateStockSelects();
-        }
+  function voidEntireOrder() {
+    if (cart.length === 0) return alert('⚠️ Nothing to void!');
+    const reason = prompt('Reason for void:'); if (!reason) return;
+    cart.forEach(item => {
+      voidLogs.unshift({
+        datetime: new Date().toLocaleString('en-PH'),
+        item: item.name, qty: item.qty, amount: item.price * item.qty,
+        by: currentSession.name, shift: currentSession.shift, reason: reason
+      });
+    });
+    localStorage.setItem('voidLogs', JSON.stringify(voidLogs));
+    cart = [];
+    updateCartDisplay();
+    renderVoidLog();
+    alert('✅ Order voided!');
+  }
 
-        function adjustStockQty(idx) {
-            const newQty = parseInt(prompt('Enter new quantity:', stocks[idx].qty));
-            if (isNaN(newQty)) return;
-            stocks[idx].qty = newQty;
-            saveStocks(); renderStockTable(); populateStockSelects();
-        }
+  function generateCashOut() {
+    const opening = currentSession.openingCash || 0;
+    const sales = transactions.filter(t => t.shift === currentSession.shift).reduce((s,t)=>s+t.total,0);
+    const totalCash = opening + sales;
+    document.getElementById('rptCashOut').textContent = totalCash.toFixed(2);
+    alert(`💰 CASH OUT REPORT\nOpening: ₱${opening.toFixed(2)}\nSales: ₱${sales.toFixed(2)}\nTotal Cash: ₱${totalCash.toFixed(2)}`);
+  }
 
-        function removeStockItem(idx) {
-            if (!confirm(`Delete "${stocks[idx].name}" from inventory?`)) return;
-            stocks.splice(idx,
+  function endShift() {
+    if (!confirm('🔒 End shift? Make sure you have cashed out first!')) return;
+    alert('✅ Shift ended! Please logout.');
+  }
+
+  function changeAdminPassword() {
+    const newPass = document.getElementById('newAdminPass').value.trim();
+    const confirmPass = document.getElementById('confirmAdminPass').value.trim();
+    if (!newPass || newPass.length < 4) return alert('⚠️ Password at least 4 chars!');
+    if (newPass !== confirmPass) return alert('⚠️ Passwords do not match!');
+    localStorage.setItem('adminPassword', newPass);
+    alert('✅ Admin password changed!');
+    document.getElementById('newAdminPass').value = '';
+    document.getElementById('confirmAdminPass').value = '';
+  }
+</script>
+</body>
+</html>
 
 
