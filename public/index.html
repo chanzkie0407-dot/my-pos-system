@@ -3,476 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MINUTE BURGER POS — AYOS NA!</title>
+    <title>MINUTE BURGER POS — FULL WORKING</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-        html, body {
-            height: 100%;
-            overflow: hidden;
-            background: #f5f5f5;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        html, body { height: 100%; overflow: hidden; background: #f5f5f5; }
         :root {
-            --primary: #00a000;
-            --primary-dark: #008000;
-            --danger: #e53935;
-            --warning: #ff9800;
-            --blue: #1976d2;
-            --bg: #f5f5f5;
-            --card: #ffffff;
-            --border: #ddd;
-            --text: #333;
-            --text-light: #666;
-            --trans-in: #2196f3;
-            --trans-out: #ff5722;
+            --primary: #00a000; --primary-dark: #008000; --danger: #e53935;
+            --warning: #ff9800; --blue: #1976d2; --bg: #f5f5f5; --card: #fff;
+            --border: #ddd; --text: #333; --text-light: #666;
+            --trans-in: #2196f3; --trans-out: #ff5722;
         }
-
-        .app {
-            display: flex;
-            height: 100vh;
-            height: 100dvh;
-            width: 100vw;
-            overflow: hidden;
-        }
+        .app { display: flex; height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; }
         .hidden { display: none !important; }
 
-        /* 🔐 LOCK SCREEN */
+        /* LOCK SCREEN */
         .lock-screen {
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background: linear-gradient(135deg, #00a000, #006600);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            padding: 20px;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 99999; padding: 20px;
         }
         .lock-box {
-            background: white;
-            padding: clamp(24px, 5vw, 35px);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            text-align: center;
+            background: white; padding: 30px; border-radius: 16px;
+            width: 100%; max-width: 400px; text-align: center;
         }
-        .lock-box h2 {
-            color: var(--primary-dark);
-            margin-bottom: 10px;
-            font-size: clamp(18px, 4vw, 22px);
-        }
-        .lock-box p {
-            color: var(--text-light);
-            margin-bottom: 20px;
-        }
-        .lock-box .shift-info {
-            background: #f5f5f5;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
+        .lock-box h2 { color: var(--primary-dark); margin-bottom: 10px; }
+        .shift-info { background: #f5f5f5; padding: 12px; border-radius: 8px; margin: 15px 0; }
         .lock-box input {
-            width: 100%;
-            padding: 14px;
-            font-size: 20px;
-            text-align: center;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 15px;
-            letter-spacing: 8px;
-            font-weight: bold;
+            width: 100%; padding: 14px; font-size: 20px; text-align: center;
+            border: 2px solid var(--border); border-radius: 8px;
+            margin-bottom: 15px; letter-spacing: 8px; font-weight: bold;
         }
         .lock-btn {
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            background: var(--primary);
-            color: white;
-            cursor: pointer;
+            width: 100%; padding: 14px; font-size: 16px; font-weight: bold;
+            border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer;
         }
-        .lock-error {
-            color: var(--danger);
-            margin-top: 12px;
-            display: none;
-        }
+        .lock-error { color: var(--danger); margin-top: 12px; display: none; }
 
-        /* 🔐 MAIN LOGIN SCREEN */
+        /* LOGIN SCREEN */
         .login-screen {
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background: linear-gradient(135deg, #00a000, #006600);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            padding: 20px;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; padding: 20px;
         }
         .login-box {
-            background: white;
-            padding: clamp(24px, 5vw, 35px);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            background: white; padding: 30px; border-radius: 16px;
+            width: 100%; max-width: 420px;
         }
-        .login-box h2 {
-            text-align: center;
-            color: var(--primary-dark);
-            margin-bottom: 20px;
-            font-size: clamp(18px, 4vw, 22px);
-        }
-        .login-box p {
-            text-align: center;
-            color: var(--text-light);
-            margin-bottom: 15px;
-        }
-        .login-box input, .login-box select {
-            width: 100%;
-            padding: clamp(12px, 3vw, 14px);
-            font-size: clamp(15px, 3vw, 16px);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
+        .login-box h2 { text-align: center; color: var(--primary-dark); margin-bottom: 20px; }
+        .login-box p { text-align: center; color: var(--text-light); margin-bottom: 15px; }
         .login-btn {
-            width: 100%;
-            padding: clamp(12px, 3vw, 14px);
-            font-size: clamp(15px, 3vw, 17px);
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            background: var(--primary);
-            color: white;
-            cursor: pointer;
-            margin-bottom: 10px;
+            width: 100%; padding: 14px; font-size: 17px; font-weight: bold;
+            border: none; border-radius: 8px; background: var(--primary); color: white;
+            cursor: pointer; margin-bottom: 10px;
         }
         .login-btn.secondary { background: #f0f0f0; color: var(--text); }
-        .login-note {
-            font-size: 13px;
-            color: #888;
-            text-align: center;
-            margin-top: 15px;
-            line-height: 1.6;
+        .login-box input, .login-box select {
+            width: 100%; padding: 14px; font-size: 16px;
+            border: 2px solid var(--border); border-radius: 8px; margin-bottom: 12px;
         }
         .passcode-hint {
-            background: #fff8e1;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            color: #856404;
-            line-height: 1.8;
+            background: #fff8e1; padding: 12px; border-radius: 8px;
+            margin-bottom: 15px; font-size: 14px; color: #856404; line-height: 1.8;
         }
+        .login-note { text-align: center; color: #888; margin-top: 15px; }
 
+        /* SIDEBAR */
         .sidebar {
-            width: clamp(180px, 18vw, 210px);
-            min-width: 180px;
-            background: var(--card);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            overflow: hidden;
+            width: 220px; background: var(--card); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
         }
-        .sidebar-header {
-            background: var(--primary);
-            color: white;
-            padding: clamp(12px, 2vw, 15px) clamp(10px, 2vw, 12px);
-        }
-        .sidebar-header h1 {
-            font-size: clamp(15px, 2.5vw, 17px);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .sidebar-header p {
-            font-size: 12px;
-            margin-top: 5px;
-            opacity: 0.9;
-        }
-        .sidebar-menu {
-            flex: 1;
-            padding: 10px 0;
-            overflow-y: auto;
-        }
+        .sidebar-header { background: var(--primary); color: white; padding: 15px; }
+        .sidebar-menu { flex: 1; padding: 10px 0; }
         .menu-item {
-            padding: clamp(11px, 2vw, 13px) clamp(14px, 2vw, 18px);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: clamp(13px, 2vw, 14px);
-            color: var(--text);
-            cursor: pointer;
-            border-left: 3px solid transparent;
-            white-space: nowrap;
+            padding: 14px 18px; cursor: pointer; display: flex; align-items: center; gap: 10px;
         }
-        .menu-item:hover, .menu-item.active {
-            background: #e6f9e6;
-            color: var(--primary-dark);
-            border-left-color: var(--primary);
+        .menu-item:hover, .menu-item.active { background: #e6f9e6; color: var(--primary-dark); }
+        .menu-item.danger:hover { background: #ffebee; color: var(--danger); }
+        .sidebar-footer { padding: 15px; border-top: 1px solid var(--border); font-size: 12px; }
+        .shift-badge {
+            display: inline-block; padding: 4px 10px; border-radius: 12px;
+            font-size: 11px; font-weight: bold; margin-left: 8px;
         }
-        .menu-item.danger:hover { background: #ffebee; color: var(--danger); border-left-color: var(--danger); }
-        .sidebar-footer {
-            padding: 12px;
-            border-top: 1px solid var(--border);
-            font-size: 11px;
-            color: var(--text-light);
-            flex-shrink: 0;
-        }
+        .badge-morning { background: #fff3e0; color: #e65100; }
+        .badge-swing { background: #fff8e1; color: #827717; }
+        .badge-graveyard { background: #e8eaf6; color: #283593; }
 
-        .menu-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            min-width: 0;
-            min-height: 0;
-        }
+        /* POS LAYOUT */
+        .menu-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .menu-header {
-            background: white;
-            border-bottom: 1px solid var(--border);
-            padding: clamp(10px, 2vw, 12px) clamp(16px, 3vw, 20px);
-            font-size: clamp(16px, 3vw, 18px);
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            flex-shrink: 0;
+            padding: 15px 20px; background: white; border-bottom: 1px solid var(--border);
+            font-weight: bold; display: flex; justify-content: space-between;
+            flex-wrap: wrap; gap: 8px;
         }
-        .tabs {
-            display: flex;
-            background: white;
-            border-bottom: 1px solid var(--border);
-            overflow-x: auto;
-            flex-shrink: 0;
-        }
+        .tabs { display: flex; background: white; border-bottom: 1px solid var(--border); overflow-x: auto; }
         .tab {
-            padding: clamp(10px, 2vw, 12px) clamp(12px, 2.5vw, 15px);
-            font-size: clamp(13px, 2vw, 14px);
-            border: none;
-            background: transparent;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            white-space: nowrap;
+            padding: 12px 16px; border: none; background: transparent; cursor: pointer;
+            border-bottom: 3px solid transparent; white-space: nowrap;
         }
-        .tab.active {
-            color: var(--primary-dark);
-            border-bottom-color: var(--primary);
-            font-weight: bold;
-        }
-        .products-wrapper {
-            flex: 1;
-            overflow-y: auto;
-            padding: clamp(12px, 2vw, 15px);
-            background: var(--bg);
-            min-height: 0;
-        }
+        .tab.active { border-bottom-color: var(--primary); color: var(--primary-dark); font-weight: bold; }
+        .products-wrapper { flex: 1; padding: 15px; background: var(--bg); overflow-y: auto; }
         .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(clamp(120px, 18vw, 140px), 1fr));
-            gap: clamp(10px, 2vw, 12px);
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;
         }
         .product-card {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: transform 0.1s;
+            background: white; border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); cursor: pointer;
         }
         .product-card:active { transform: scale(0.97); }
         .product-icon {
-            height: clamp(85px, 15vw, 100px);
-            background: linear-gradient(135deg, #ffcc66, #ff9900);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(36px, 7vw, 42px);
-            color: white;
+            height: 100px; background: linear-gradient(135deg, #ffcc66, #ff9900);
+            display: flex; align-items: center; justify-content: center; font-size: 40px; color: white;
         }
-        .product-info { padding: clamp(8px, 2vw, 10px); }
-        .product-name {
-            font-size: clamp(12px, 2vw, 13px);
-            font-weight: 600;
-            margin-bottom: 6px;
-            min-height: 34px;
-            line-height: 1.3;
-        }
-        .product-price {
-            font-size: clamp(15px, 3vw, 17px);
-            font-weight: bold;
-            color: var(--primary-dark);
-        }
+        .product-info { padding: 10px; }
+        .product-name { font-weight: 600; margin-bottom: 5px; min-height: 36px; line-height: 1.3; }
+        .product-price { font-weight: bold; color: var(--primary-dark); font-size: 18px; }
 
+        /* ORDER PANEL */
         .order-panel {
-            width: clamp(300px, 32vw, 340px);
-            min-width: 300px;
-            background: white;
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            overflow: hidden;
+            width: 340px; background: white; border-left: 1px solid var(--border);
+            display: flex; flex-direction: column;
         }
         .order-header {
-            padding: clamp(10px, 2vw, 12px) clamp(14px, 2vw, 16px);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: clamp(16px, 3vw, 18px);
-            font-weight: bold;
-            flex-shrink: 0;
+            padding: 15px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; font-weight: bold;
         }
-        .clear-btn { color: var(--danger); font-size: 14px; cursor: pointer; }
-        .order-items {
-            flex: 1;
-            overflow-y: auto;
-            padding: clamp(14px, 2vw, 16px);
-            min-height: 0;
-        }
-        .empty-msg {
-            text-align: center;
-            color: #999;
-            padding: clamp(40px, 8vw, 50px) 20px;
-            font-size: clamp(14px, 2.5vw, 15px);
-        }
+        .clear-btn { color: var(--danger); cursor: pointer; }
+        .order-items { flex: 1; padding: 15px; overflow-y: auto; min-height: 0; }
+        .empty-msg { text-align: center; color: #999; padding: 40px 20px; }
         .order-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            gap: 8px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid #eee; gap: 8px;
+        }
+        .qty-badge {
+            background: #eee; width: 28px; height: 28px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;
         }
         .item-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
-        .qty-badge {
-            background: #eee; width: 26px; height: 26px; border-radius: 5px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 13px; flex-shrink: 0;
-        }
         .item-name { font-size: 14px; font-weight: 500; }
-        .item-remove {
-            color: var(--danger); font-size: 20px; cursor: pointer; margin-left: 8px; line-height: 1; flex-shrink: 0;
-        }
-        .order-footer {
-            border-top: 1px solid var(--border);
-            padding: clamp(12px, 2vw, 16px);
-            flex-shrink: 0;
-        }
-        .total-row {
-            display: flex; justify-content: space-between; padding: 8px 0 16px;
-            font-size: clamp(20px, 4vw, 22px); font-weight: bold;
-        }
-        .total-amount { color: var(--primary-dark); font-size: clamp(24px, 5vw, 26px); }
-        .pay-buttons {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;
-        }
+        .item-remove { color: var(--danger); font-size: 20px; cursor: pointer; margin-left: 8px; flex-shrink: 0; }
+        .order-footer { padding: 15px; border-top: 1px solid var(--border); flex-shrink: 0; }
+        .total-row { display: flex; justify-content: space-between; font-size: 24px; font-weight: bold; padding: 10px 0; }
+        .total-amount { color: var(--primary-dark); }
+        .pay-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .pay-btn {
-            padding: clamp(10px, 2vw, 12px); border: 2px solid var(--border); background: white;
-            border-radius: 8px; font-size: clamp(13px, 2.5vw, 14px); cursor: pointer; text-align: center;
+            padding: 12px; border: 2px solid var(--border); background: white;
+            border-radius: 8px; cursor: pointer; font-weight: 500;
         }
-        .pay-btn.selected {
-            border-color: var(--primary); background: #e6f9e6;
-            color: var(--primary-dark); font-weight: bold;
-        }
+        .pay-btn.selected { border-color: var(--primary); background: #e6f9e6; color: var(--primary-dark); font-weight: bold; }
         .cash-label { font-size: 14px; margin-bottom: 6px; display: block; }
         .cash-input {
-            width: 100%; padding: clamp(10px, 2vw, 12px); font-size: clamp(16px, 3vw, 18px);
+            width: 100%; padding: 12px; font-size: 18px;
             border: 2px solid var(--border); border-radius: 8px; margin-bottom: 10px; text-align: right;
         }
         .change-box {
-            background: #e3f2fd; padding: clamp(10px, 2vw, 12px); border-radius: 8px;
-            font-size: clamp(14px, 2.5vw, 16px); font-weight: bold; color: #1565c0;
+            background: #e3f2fd; padding: 12px; border-radius: 8px;
+            font-size: 16px; font-weight: bold; color: #1565c0;
             margin-bottom: 12px; display: none;
         }
-        .action-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .hold-btn, .charge-btn {
-            padding: clamp(12px, 2.5vw, 14px); font-size: clamp(15px, 3vw, 16px);
-            font-weight: bold; border: none; border-radius: 8px; color: white; cursor: pointer;
+            padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; color: white; cursor: pointer;
         }
         .hold-btn { background: var(--warning); }
         .charge-btn { background: var(--primary); }
 
+        /* ADMIN PAGES */
         .admin-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background: var(--bg);
-            min-width: 0;
-            min-height: 0;
+            flex: 1; display: flex; flex-direction: column; overflow: hidden;
+            background: var(--bg); min-width: 0; min-height: 0;
         }
         .admin-header {
-            background: white;
-            border-bottom: 1px solid var(--border);
-            padding: clamp(12px, 2vw, 15px) clamp(20px, 3vw, 25px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            flex-shrink: 0;
+            background: white; border-bottom: 1px solid var(--border);
+            padding: 15px 20px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 10px; flex-shrink: 0;
         }
-        .admin-header h2 { font-size: clamp(18px, 3vw, 20px); color: var(--text); }
-        .admin-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: clamp(15px, 3vw, 20px);
-            min-height: 0;
-        }
+        .admin-header h2 { font-size: 20px; color: var(--text); }
+        .admin-content { flex: 1; overflow-y: auto; padding: 20px; min-height: 0; }
         .admin-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-            padding: clamp(16px, 3vw, 20px);
-            margin-bottom: 20px;
+            background: white; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            padding: 20px; margin-bottom: 20px;
         }
         .admin-card h3 {
-            font-size: clamp(15px, 3vw, 17px); margin-bottom: 15px; color: var(--text);
+            font-size: 17px; margin-bottom: 15px; color: var(--text);
             padding-bottom: 10px; border-bottom: 1px solid #eee;
         }
         .admin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(clamp(240px, 30vw, 280px), 1fr));
-            gap: 15px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px;
         }
         .stat-card {
             background: linear-gradient(135deg, #f9f9f9, #fff);
-            border-left: 4px solid var(--primary);
-            padding: 15px; border-radius: 8px;
+            border-left: 4px solid var(--primary); padding: 15px; border-radius: 8px;
         }
         .stat-card.danger-border { border-left-color: var(--danger); }
         .stat-card.warning-border { border-left-color: var(--warning); }
         .stat-card.trans-in-border { border-left-color: var(--trans-in); }
         .stat-card.trans-out-border { border-left-color: var(--trans-out); }
         .stat-label { font-size: 13px; color: var(--text-light); margin-bottom: 5px; }
-        .stat-value { font-size: clamp(20px, 4vw, 22px); font-weight: bold; color: var(--text); }
+        .stat-value { font-size: 22px; font-weight: bold; color: var(--text); }
         .table-wrapper { overflow-x: auto; margin: 0 -5px; padding: 0 5px; }
         table {
             width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px;
         }
         th, td {
-            padding: clamp(10px, 2vw, 12px) clamp(8px, 1.5vw, 10px); text-align: left;
+            padding: 12px 10px; text-align: left;
             border-bottom: 1px solid #eee; font-size: 14px;
         }
         th { background: #f9f9f9; font-weight: 600; color: var(--text-light); }
         .btn {
-            padding: clamp(8px, 2vw, 10px) clamp(12px, 2vw, 16px); border: none; border-radius: 6px;
-            font-size: 14px; font-weight: 500; cursor: pointer; margin-right: 8px; margin-bottom: 5px;
-            white-space: nowrap;
+            padding: 10px 16px; border: none; border-radius: 6px;
+            font-size: 14px; font-weight: 500; cursor: pointer; margin-right: 8px; margin-bottom: 8px;
         }
         .btn-primary { background: var(--primary); color: white; }
         .btn-danger { background: var(--danger); color: white; }
@@ -483,8 +224,7 @@
         .btn-sm { padding: 6px 12px; font-size: 13px; }
         input, select {
             padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px;
-            font-size: 14px; margin-right: 8px; margin-bottom: 10px;
-            max-width: 100%;
+            font-size: 14px; margin-right: 8px; margin-bottom: 10px; max-width: 100%;
         }
         .form-row {
             display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; margin-bottom: 12px;
@@ -492,507 +232,476 @@
         .form-group { flex: 1; min-width: 180px; }
         .form-group label { display: block; font-size: 13px; color: var(--text-light); margin-bottom: 5px; }
         .status-badge {
-            display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;
+            display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;
         }
         .status-active { background: #e8f5e9; color: #2e7d32; }
         .status-low { background: #fff3e0; color: #e65100; }
         .status-out { background: #ffebee; color: #c62828; }
-        .badge-trans-in { background: #e3f2fd; color: #1565c0; }
-        .badge-trans-out { background: #fbe9e7; color: #d84315; }
-        .shift-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 8px;
-        }
-        .badge-morning { background: #fff3e0; color: #e65100; }
-        .badge-swing { background: #fff8e1; color: #827717; }
-        .badge-graveyard { background: #e8eaf6; color: #283593; }
 
         @media (max-width: 768px) {
             .app { flex-direction: column; }
-            .sidebar {
-                width: 100%; max-width: 100%;
-                flex-direction: row; align-items: center; padding: 8px;
-            }
-            .sidebar-header { padding: 8px; }
-            .sidebar-menu { display: flex; overflow-x: auto; padding: 0; flex: 1; }
+            .sidebar { width: 100%; flex-direction: row; }
+            .sidebar-menu { display: flex; overflow-x: auto; }
             .sidebar-footer { display: none; }
-            .order-panel { width: 100%; max-width: 100%; }
+            .order-panel { width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 🔐 LOCK SCREEN -->
-    <div class="lock-screen hidden" id="lockScreen">
-        <div class="lock-box">
-            <h2>🔐 POS LOCKED</h2>
-            <p>Screen was locked due to inactivity/sleep</p>
-            <div class="shift-info">
-                🧑‍💼 Cashier: <span id="lockCashierName">—</span><br>
-                🕒 Current Shift: <span id="lockShiftName">—</span>
+<!-- 🔐 LOCK SCREEN -->
+<div class="lock-screen hidden" id="lockScreen">
+    <div class="lock-box">
+        <h2>🔐 POS LOCKED</h2>
+        <p>Screen was locked due to inactivity/sleep</p>
+        <div class="shift-info">
+            🧑‍💼 Cashier: <span id="lockCashierName">—</span><br>
+            🕒 Current Shift: <span id="lockShiftName">—</span>
+        </div>
+        <input type="password" id="lockPasscodeInput" placeholder="Enter 4-Digit Passcode" maxlength="4" autocomplete="off">
+        <button class="lock-btn" onclick="unlockPOS()">🔓 UNLOCK & CONTINUE</button>
+        <div class="lock-error" id="lockErrorMsg">❌ Incorrect passcode! Try again.</div>
+    </div>
+</div>
+
+<!-- 🔐 MAIN LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-box">
+        <h2>🍔 MINUTE BURGER POS</h2>
+        <p>Select Access Type to Continue</p>
+
+        <button class="login-btn" onclick="showCashierLogin()">💰 CASHIER / POS</button>
+        <button class="login-btn" onclick="showAdminLogin()">🔐 ADMINISTRATOR</button>
+
+        <!-- CASHIER LOGIN FORM -->
+        <div id="cashierLoginForm" class="hidden" style="margin-top:20px;">
+            <h3 style="text-align:center; color:var(--primary-dark); margin-bottom:15px;">🕒 Cashier Shift Login</h3>
+            <div class="passcode-hint">
+                <strong>🔑 Shift Passcodes:</strong><br>
+                🌅 Morning (6AM–2PM) = <strong>1111</strong><br>
+                🌞 Swing (2PM–10PM) = <strong>2222</strong><br>
+                🌙 Graveyard (10PM–6AM) = <strong>3333</strong>
             </div>
-            <input type="password" id="lockPasscodeInput" placeholder="Enter 4-Digit Passcode" maxlength="4" autocomplete="off">
-            <button class="lock-btn" onclick="unlockPOS()">🔓 UNLOCK & CONTINUE</button>
-            <div class="lock-error" id="lockErrorMsg">❌ Incorrect passcode! Try again.</div>
+            <select id="shiftSelect">
+                <option value="">-- Select Your Shift --</option>
+                <option value="morning">🌅 Morning Shift (6:00 AM – 2:00 PM)</option>
+                <option value="swing">🌞 Swing Shift (2:00 PM – 10:00 PM)</option>
+                <option value="graveyard">🌙 Graveyard Shift (10:00 PM – 6:00 AM)</option>
+            </select>
+            <input type="password" id="shiftPasscode" placeholder="Enter Shift Passcode (4 digits)" maxlength="4">
+            <input type="text" id="cashierName" placeholder="Your Full Name" required>
+            <input type="number" id="openingCash" placeholder="Opening Cash / Puhunan" step="0.01">
+            <button class="login-btn" onclick="verifyCashierLogin()">✅ START SHIFT</button>
+        </div>
+
+        <!-- ADMIN LOGIN FORM -->
+        <div id="adminLoginForm" class="hidden" style="margin-top:20px;">
+            <input type="password" id="adminPass" placeholder="Enter Admin Password — Default: admin123">
+            <button class="login-btn" onclick="loginAdmin()">🔐 LOGIN AS ADMIN</button>
+        </div>
+
+        <div class="login-note">
+            <strong>Admin Password:</strong> admin123<br>
+            <em>Change in Settings anytime!</em>
+        </div>
+    </div>
+</div>
+
+<!-- 📱 MAIN APP -->
+<div class="app hidden" id="mainApp">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>🍔 M. BURGER <span id="currentShiftBadge" class="shift-badge badge-morning hidden">—</span></h1>
+            <p id="currentDate">—</p>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" data-view="pos" onclick="switchView('pos')">🛒 POS</div>
+            <div class="menu-item" data-view="transactions" onclick="switchView('transactions')">📊 Transactions</div>
+            <div class="menu-item" data-view="reports" onclick="switchView('reports')">📈 Cash Out</div>
+            <div class="menu-item" data-view="void" onclick="switchView('void')">❌ Void</div>
+            <div class="menu-item" data-view="stocks" onclick="switchView('stocks')">📦 Stocks</div>
+            <div class="menu-item" data-view="delivery" onclick="switchView('delivery')">🚚 Delivery</div>
+            <div class="menu-item" data-view="transfer" onclick="switchView('transfer')">🔄 Transfers</div>
+            <div class="menu-item" data-view="settings" onclick="switchView('settings')">⚙️ Settings</div>
+            <div class="menu-item danger" onclick="logout()">🚪 Logout</div>
+        </div>
+        <div class="sidebar-footer">
+            <p id="userLabel">User: —</p>
+            <p id="roleLabel">Role: —</p>
+            <p id="shiftLabel">Shift: —</p>
         </div>
     </div>
 
-    <!-- 🔐 MAIN LOGIN SCREEN -->
-    <div class="login-screen" id="loginScreen">
-        <div class="login-box">
-            <h2>🍔 MINUTE BURGER POS</h2>
-            <p>Select Access Type to Continue</p>
-
-            <button class="login-btn" onclick="showCashierLogin()">💰 CASHIER / POS</button>
-            <button class="login-btn" onclick="showAdminLogin()">🔐 ADMINISTRATOR</button>
-
-            <!-- CASHIER LOGIN FORM -->
-            <div id="cashierLoginForm" class="hidden" style="margin-top:20px;">
-                <h3 style="text-align:center; color:var(--primary-dark); margin-bottom:15px;">🕒 Cashier Shift Login</h3>
-                <div class="passcode-hint">
-                    <strong>🔑 Shift Passcodes:</strong><br>
-                    🌅 Morning (6AM–2PM) = <strong>1111</strong><br>
-                    🌞 Swing (2PM–10PM) = <strong>2222</strong><br>
-                    🌙 Graveyard (10PM–6AM) = <strong>3333</strong>
-                </div>
-                <select id="shiftSelect">
-                    <option value="">-- Select Your Shift --</option>
-                    <option value="morning">🌅 Morning Shift (6:00 AM – 2:00 PM)</option>
-                    <option value="swing">🌞 Swing Shift (2:00 PM – 10:00 PM)</option>
-                    <option value="graveyard">🌙 Graveyard Shift (10:00 PM – 6:00 AM)</option>
-                </select>
-                <input type="password" id="shiftPasscode" placeholder="Enter Shift Passcode (4 digits)" maxlength="4">
-                <input type="text" id="cashierName" placeholder="Your Full Name" required>
-                <input type="number" id="openingCash" placeholder="Opening Cash / Puhunan" step="0.01">
-                <button class="login-btn" onclick="verifyCashierLogin()">✅ START SHIFT</button>
-            </div>
-
-            <!-- ADMIN LOGIN FORM -->
-            <div id="adminLoginForm" class="hidden" style="margin-top:20px;">
-                <input type="password" id="adminPass" placeholder="Enter Admin Password — Default: admin123">
-                <button class="login-btn" onclick="loginAdmin()">🔐 LOGIN AS ADMIN</button>
-            </div>
-
-            <div class="login-note">
-                <strong>Admin Password:</strong> admin123<br>
-                <em>Change in Settings anytime!</em>
-            </div>
+    <!-- 🛒 POS VIEW -->
+    <div class="menu-section" id="view-pos">
+        <div class="menu-header">
+            <span>📋 MENU — Cashier: <span id="posCashierName">—</span></span>
+            <span>Ticket #<span id="ticketNo">001</span></span>
         </div>
-    </div>
-
-    <!-- 📱 MAIN APP -->
-    <div class="app hidden" id="mainApp">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h1>🍔 M. BURGER <span id="currentShiftBadge" class="shift-badge badge-morning hidden">—</span></h1>
-                <p id="currentDate">—</p>
-            </div>
-            <div class="sidebar-menu">
-                <div class="menu-item active" data-view="pos" onclick="switchView('pos')">🛒 POS</div>
-                <div class="menu-item" data-view="transactions" onclick="switchView('transactions')">📊 Transactions</div>
-                <div class="menu-item" data-view="reports" onclick="switchView('reports')">📈 Cash Out</div>
-                <div class="menu-item" data-view="void" onclick="switchView('void')">❌ Void</div>
-                <div class="menu-item" data-view="stocks" onclick="switchView('stocks')">📦 Stocks</div>
-                <div class="menu-item" data-view="delivery" onclick="switchView('delivery')">🚚 Delivery</div>
-                <div class="menu-item" data-view="transfer" onclick="switchView('transfer')">🔄 Transfers</div>
-                <div class="menu-item" data-view="settings" onclick="switchView('settings')">⚙️ Settings</div>
-                <div class="menu-item danger" onclick="logout()">🚪 Logout</div>
-            </div>
-            <div class="sidebar-footer">
-                <p id="userLabel">User: —</p>
-                <p id="roleLabel">Role: —</p>
-                <p id="shiftLabel">Shift: —</p>
-            </div>
+        <div class="tabs">
+            <button class="tab active" data-cat="burgers" onclick="changeTab('burgers')">🍔 SULIT</button>
+            <button class="tab" data-cat="chicken" onclick="changeTab('chicken')">🍗 CHICKEN TIME</button>
+            <button class="tab" data-cat="premium" onclick="changeTab('premium')">⭐ PREMIUM</button>
+            <button class="tab" data-cat="hotdogs" onclick="changeTab('hotdogs')">🌭 HOTDOGS</button>
+            <button class="tab" data-cat="drinks" onclick="changeTab('drinks')">🥤 DRINKS</button>
+            <button class="tab" data-cat="extras" onclick="changeTab('extras')">🧂 EXTRAS</button>
         </div>
-
-        <!-- 🛒 POS VIEW -->
-        <div class="menu-section" id="view-pos">
-            <div class="menu-header">
-                <span>📋 MENU — Cashier: <span id="posCashierName">—</span></span>
-                <span>Ticket #<span id="ticketNo">001</span></span>
-            </div>
-            <div class="tabs">
-                <button class="tab active" data-cat="burgers" onclick="changeTab('burgers')">🍔 SULIT</button>
-                <button class="tab" data-cat="chicken" onclick="changeTab('chicken')">🍗 CHICKEN TIME</button>
-                <button class="tab" data-cat="premium" onclick="changeTab('premium')">⭐ PREMIUM</button>
-                <button class="tab" data-cat="hotdogs" onclick="changeTab('hotdogs')">🌭 HOTDOGS</button>
-                <button class="tab" data-cat="drinks" onclick="changeTab('drinks')">🥤 DRINKS</button>
-                <button class="tab" data-cat="extras" onclick="changeTab('extras')">🧂 EXTRAS</button>
-            </div>
-            <div class="products-wrapper">
-                <div class="products-grid" id="productsGrid"></div>
-            </div>
-            <div class="order-panel">
-                <div class="order-header">
-                    <span>🛒 ORDER</span>
-                    <span class="clear-btn" onclick="clearAll()">🗑️ Clear</span>
-                </div>
-                <div class="order-items" id="orderItems">
-                    <div class="empty-msg">Tap products to add to order</div>
-                </div>
-                <div class="order-footer">
-                    <div class="total-row">
-                        <span>TOTAL:</span>
-                        <span class="total-amount">₱<span id="totalAmt">0.00</span></span>
-                    </div>
-                    <div class="pay-buttons">
-                        <button class="pay-btn selected" onclick="selectPayment(this, 'Cash')">💵 CASH</button>
-                        <button class="pay-btn" onclick="selectPayment(this, 'GCash')">📱 GCASH</button>
-                    </div>
-                    <label class="cash-label">Cash Received:</label>
-                    <input type="number" id="cashReceived" class="cash-input" placeholder="0.00" oninput="computeChange()">
-                    <div class="change-box" id="change-box">
-                        CHANGE: ₱<span id="changeAmt">0.00</span>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="hold-btn">⏸️ HOLD</button>
-                        <button class="charge-btn" onclick="completeSale()">✅ PAY / SAVE</button>
-                    </div>
-                </div>
-            </div>
+        <div class="products-wrapper">
+            <div class="products-grid" id="productsGrid"></div>
         </div>
-
-        <!-- 📊 TRANSACTIONS -->
-        <div class="admin-container hidden" id="view-transactions">
-            <div class="admin-header"><h2>📊 TRANSACTIONS</h2></div>
-            <div class="admin-content">
-                <div class="admin-card">
-                    <h3>📈 Overview</h3>
-                    <div class="admin-grid">
-                        <div class="stat-card"><div class="stat-label">Total Sales</div><div class="stat-value">₱<span id="dashTotalSales">0.00</span></div></div>
-                        <div class="stat-card danger-border"><div class="stat-label">Transactions</div><div class="stat-value" id="dashTransCount">0</div></div>
-                        <div class="stat-card warning-border"><div class="stat-label">Shift Sales</div><div class="stat-value">₱<span id="dashShiftSales">0.00</span></div></div>
-                        <div class="stat-card"><div class="stat-label">Items Sold</div><div class="stat-value" id="dashItemsSold">0</div></div>
-                    </div>
-                </div>
-                <div class="admin-card">
-                    <h3>📋 Transaction History</h3>
-                    <div class="table-wrapper">
-                        <table><thead><tr><th>Ticket #</th><th>Date/Time</th><th>Cashier</th><th>Shift</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
-                        <tbody id="transBody"><tr><td colspan="8" style="text-align:center;color:#999;padding:30px;">No transactions yet...</td></tr></tbody></table>
-                    </div>
-                </div>
+        <div class="order-panel">
+            <div class="order-header">
+                <span>🛒 ORDER</span>
+                <span class="clear-btn" onclick="clearAll()">🗑️ Clear</span>
             </div>
-        </div>
-
-        <!-- 📈 CASH OUT -->
-        <div class="admin-container hidden" id="view-reports">
-            <div class="admin-header"><h2>📈 CASH OUT & REPORTS</h2></div>
-            <div class="admin-content">
-                <div class="admin-card">
-                    <h3>💰 Current Shift Cash Position</h3>
-                    <div class="admin-grid">
-                        <div class="stat-card"><div class="stat-label">Opening Cash</div><div class="stat-value">₱<span id="rptOpening">0.00</span></div></div>
-                        <div class="stat-card"><div class="stat-label">Shift Sales</div><div class="stat-value">₱<span id="rptSales">0.00</span></div></div>
-                        <div class="stat-card warning-border"><div class="stat-label">Cash on Hand</div><div class="stat-value">₱<span id="rptOnHand">0.00</span></div></div>
-                        <div class="stat-card danger-border"><div class="stat-label">Cash Out</div><div class="stat-value">₱<span id="rptCashOut">0.00</span></div></div>
-                    </div>
-                    <div style="margin-top:20px;">
-                        <button class="btn btn-primary" onclick="generateCashOut()">💰 Cash Out Report</button>
-                        <button class="btn btn-blue" onclick="endShift()">🔒 End Shift</button>
-                    </div>
-                </div>
+            <div class="order-items" id="orderItems">
+                <div class="empty-msg">Tap products to add to order</div>
             </div>
-        </div>
-
-        <!-- ❌ VOID -->
-        <div class="admin-container hidden" id="view-void">
-            <div class="admin-header"><h2>❌ VOID TRANSACTIONS</h2></div>
-            <div class="admin-content">
-                <div class="admin-card">
-                    <h3>⚠️ Void Current Order</h3>
-                    <div id="voidOrderList"><p style="color:#999;">No items to void...</p></div>
-                    <div style="margin-top:20px;"><button class="btn btn-danger" onclick="voidEntireOrder()">🗑️ Void Entire Order</button></div>
+            <div class="order-footer">
+                <div class="total-row">
+                    <span>TOTAL:</span>
+                    <span class="total-amount">₱<span id="totalAmt">0.00</span></span>
                 </div>
-                <div class="admin-card">
-                    <h3>📋 Void History Log</h3>
-                    <div class="table-wrapper">
-                        <table><thead><tr><th>Date/Time</th><th>Item/Ticket</th><th>Qty</th><th>Amount</th><th>Voided By</th><th>Shift</th><th>Reason</th></tr></thead>
-                        <tbody id="voidLogBody"><tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No void records...</td></tr></tbody></table>
-                    </div>
+                <div class="pay-buttons">
+                    <button class="pay-btn selected" onclick="selectPayment(this, 'Cash')">💵 CASH</button>
+                    <button class="pay-btn" onclick="selectPayment(this, 'GCash')">📱 GCash</button>
                 </div>
-            </div>
-        </div>
-
-        <!-- 📦 STOCKS -->
-        <div class="admin-container hidden" id="view-stocks">
-            <div class="admin-header">
-                <h2>📦 INVENTORY / STOCKS</h2>
-                <button class="btn btn-primary" onclick="openStockModal()">➕ Add Stock Item</button>
-            </div>
-            <div class="admin-content">
-                <div class="admin-card">
-                    <h3>📊 Stock Summary</h3>
-                    <div class="admin-grid">
-                        <div class="stat-card"><div class="stat-label">Total Items</div><div class="stat-value" id="stockTotalItems">0</div></div>
-                        <div class="stat-card warning-border"><div class="stat-label">Low Stock</div><div class="stat-value" id="stockLowItems">0</div></div>
-                        <div class="stat-card danger-border"><div class="stat-label">Out of Stock</div><div class="stat-value" id="stockOutItems">0</div></div>
-                        <div class="stat-card"><div class="stat-label">Stock Value</div><div class="stat-value">₱<span id="stockValue">0.00</span></div></div>
-                    </div>
+                <label class="cash-label">Cash Received:</label>
+                <input type="number" id="cashReceived" class="cash-input" placeholder="0.00" oninput="computeChange()">
+                <div class="change-box" id="change-box">
+                    CHANGE: ₱<span id="changeAmt">0.00</span>
                 </div>
-                <div class="admin-card">
-                    <h3>📋 Current Stock List</h3>
-                    <div class="table-wrapper">
-                        <table><thead><tr><th>Item</th><th>Unit</th><th>Qty</th><th>Reorder Lvl</th><th>Cost</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="stockBody"><tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No stock items yet...</td></tr></tbody></table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 🚚 DELIVERY -->
-        <div class="admin-container hidden" id="view-delivery">
-            <div class="admin-header"><h2>🚚 STOCK DELIVERY</h2></div>
-            <div class="admin-content">
-                <div class="admin-card">
-                    <h3>📥 Record New Delivery</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>Item</label><select id="deliverItem"><option value="">-- Select Item --</option></select></div>
-                        <div class="form-group"><label>Qty Delivered</label><input type="number" id="deliverQty" placeholder="0"></div>
-                        <div class="form-group"><label>Supplier</label><input type="text" id="deliverSupplier" placeholder="Supplier name"></div>
-                        <div class="form-group"><label>Remarks</label><input type="text" id="deliverRemarks" placeholder="Remarks"></div>
-                    </div>
-                    <button class="btn btn-primary" onclick="saveDelivery()">✅ Save Delivery</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 🔄 TRANSFERS -->
-        <div class="admin-container hidden" id="view-transfer">
-            <div class="admin-header"><h2>🔄 STOCK TRANSFERS</h2></div>
-            <div class="admin-content">
-                <div class="admin-card">
-                    <h3 style="color:var(--trans-out);">📤 TRANS‑OUT</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>Item to Transfer OUT</label><select id="transOutItem"><option value="">-- Select Item --</option></select></div>
-                        <div class="form-group"><label>Quantity</label><input type="number" id="transOutQty" placeholder="0"></div>
-                        <div class="form-group"><label>Send To</label><input type="text" id="transOutTo" placeholder="Branch name"></div>
-                        <div class="form-group"><label>Reference #</label><input type="text" id="transOutRef" placeholder="Reference"></div>
-                    </div>
-                    <button class="btn btn-trans-out" onclick="saveTransOut()">📤 RECORD TRANS‑OUT</button>
-                </div>
-                <div class="admin-card">
-                    <h3 style="color:var(--trans-in);">📥 TRANS‑IN</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>Item Received</label><select id="transInItem"><option value="">-- Select Item --</option></select></div>
-                        <div class="form-group"><label>Quantity</label><input type="number" id="transInQty" placeholder="0"></div>
-                        <div class="form-group"><label>Received From</label><input type="text" id="transInFrom" placeholder="Branch name"></div>
-                        <div class="form-group"><label>Reference #</label><input type="text" id="transInRef" placeholder="Reference"></div>
-                    </div>
-                    <button class="btn btn-trans-in" onclick="saveTransIn()">📥 RECORD TRANS‑IN</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ⚙️ SETTINGS -->
-        <div class="admin-container hidden" id="view-settings">
-            <div class="admin-header"><h2>⚙️ SETTINGS</h2></div>
-            <div class="admin-content">
-                <div class="admin-card">
-                    <h3>🔐 Admin Security</h3>
-                    <div class="form-row">
-                        <div class="form-group"><label>New Admin Password</label><input type="password" id="newAdminPass" placeholder="New password"></div>
-                        <div class="form-group"><label>Confirm Password</label><input type="password" id="confirmAdminPass" placeholder="Confirm password"></div>
-                    </div>
-                    <button class="btn btn-primary" onclick="changeAdminPassword()">🔒 Change Password</button>
+                <div class="action-buttons">
+                    <button class="hold-btn">⏸️ HOLD</button>
+                    <button class="charge-btn" onclick="completeSale()">✅ PAY / SAVE</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // ==========================================
-        // 🔐 SESSION DATA
-        // ==========================================
-        let currentSession = {
-            isLoggedIn: false,
-            userType: null,
-            name: null,
-            shift: null,
-            openingCash: 0
-        };
+    <!-- 📊 TRANSACTIONS -->
+    <div class="admin-container hidden" id="view-transactions">
+        <div class="admin-header"><h2>📊 TRANSACTIONS</h2></div>
+        <div class="admin-content">
+            <div class="admin-card">
+                <h3>📈 Overview</h3>
+                <div class="admin-grid">
+                    <div class="stat-card"><div class="stat-label">Total Sales</div><div class="stat-value">₱<span id="dashTotalSales">0.00</span></div></div>
+                    <div class="stat-card danger-border"><div class="stat-label">Transactions</div><div class="stat-value" id="dashTransCount">0</div></div>
+                    <div class="stat-card warning-border"><div class="stat-label">Shift Sales</div><div class="stat-value">₱<span id="dashShiftSales">0.00</span></div></div>
+                    <div class="stat-card"><div class="stat-label">Items Sold</div><div class="stat-value" id="dashItemsSold">0</div></div>
+                </div>
+            </div>
+            <div class="admin-card">
+                <h3>📋 Transaction History</h3>
+                <div class="table-wrapper">
+                    <table><thead><tr><th>Ticket #</th><th>Date/Time</th><th>Cashier</th><th>Shift</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
+                    <tbody id="transBody"><tr><td colspan="8" style="text-align:center;color:#999;padding:30px;">No transactions yet...</td></tr></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        const PASSCODES = {
-            morning: '1111',
-            swing: '2222',
-            graveyard: '3333'
-        };
+    <!-- 📈 CASH OUT -->
+    <div class="admin-container hidden" id="view-reports">
+        <div class="admin-header"><h2>📈 CASH OUT & REPORTS</h2></div>
+        <div class="admin-content">
+            <div class="admin-card">
+                <h3>💰 Current Shift Cash Position</h3>
+                <div class="admin-grid">
+                    <div class="stat-card"><div class="stat-label">Opening Cash</div><div class="stat-value">₱<span id="rptOpening">0.00</span></div></div>
+                    <div class="stat-card"><div class="stat-label">Shift Sales</div><div class="stat-value">₱<span id="rptSales">0.00</span></div></div>
+                    <div class="stat-card warning-border"><div class="stat-label">Cash on Hand</div><div class="stat-value">₱<span id="rptOnHand">0.00</span></div></div>
+                    <div class="stat-card danger-border"><div class="stat-label">Cash Out</div><div class="stat-value">₱<span id="rptCashOut">0.00</span></div></div>
+                </div>
+                <div style="margin-top:20px;">
+                    <button class="btn btn-primary" onclick="generateCashOut()">💰 Cash Out Report</button>
+                    <button class="btn btn-blue" onclick="endShift()">🔒 End Shift</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // ==========================================
-        // 🔐 AUTO-LOCK SYSTEM
-        // ==========================================
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden && currentSession.isLoggedIn) {
-                setTimeout(lockPOS, 500);
-            }
-        });
-        window.addEventListener('blur', function() {
-            if (currentSession.isLoggedIn) lockPOS();
-        });
+    <!-- ❌ VOID -->
+    <div class="admin-container hidden" id="view-void">
+        <div class="admin-header"><h2>❌ VOID TRANSACTIONS</h2></div>
+        <div class="admin-content">
+            <div class="admin-card">
+                <h3>⚠️ Void Current Order</h3>
+                <div id="voidOrderList"><p style="color:#999;">No items to void...</p></div>
+                <div style="margin-top:20px;"><button class="btn btn-danger" onclick="voidEntireOrder()">🗑️ Void Entire Order</button></div>
+            </div>
+            <div class="admin-card">
+                <h3>📋 Void History Log</h3>
+                <div class="table-wrapper">
+                    <table><thead><tr><th>Date/Time</th><th>Item/Ticket</th><th>Qty</th><th>Amount</th><th>Voided By</th><th>Shift</th><th>Reason</th></tr></thead>
+                    <tbody id="voidLogBody"><tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No void records...</td></tr></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        function lockPOS() {
-            if (!currentSession.isLoggedIn) return;
-            document.getElementById('lockCashierName').textContent = currentSession.name;
-            document.getElementById('lockShiftName').textContent = currentSession.shift ? currentSession.shift.toUpperCase() + ' SHIFT' : 'ADMIN';
-            document.getElementById('lockScreen').classList.remove('hidden');
-            document.getElementById('lockPasscodeInput').value = '';
-            document.getElementById('lockErrorMsg').style.display = 'none';
-        }
+    <!-- 📦 STOCKS -->
+    <div class="admin-container hidden" id="view-stocks">
+        <div class="admin-header">
+            <h2>📦 INVENTORY / STOCKS</h2>
+            <button class="btn btn-primary" onclick="openStockModal()">➕ Add Stock Item</button>
+        </div>
+        <div class="admin-content">
+            <div class="admin-card">
+                <h3>📊 Stock Summary</h3>
+                <div class="admin-grid">
+                    <div class="stat-card"><div class="stat-label">Total Items</div><div class="stat-value" id="stockTotalItems">0</div></div>
+                    <div class="stat-card warning-border"><div class="stat-label">Low Stock</div><div class="stat-value" id="stockLowItems">0</div></div>
+                    <div class="stat-card danger-border"><div class="stat-label">Out of Stock</div><div class="stat-value" id="stockOutItems">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Stock Value</div><div class="stat-value">₱<span id="stockValue">0.00</span></div></div>
+                </div>
+            </div>
+            <div class="admin-card">
+                <h3>📋 Current Stock List</h3>
+                <div class="table-wrapper">
+                    <table><thead><tr><th>Item</th><th>Unit</th><th>Qty</th><th>Reorder Lvl</th><th>Cost</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="stockBody"><tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No stock items yet...</td></tr></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        function unlockPOS() {
-            const entered = document.getElementById('lockPasscodeInput').value.trim();
-            if (currentSession.userType === 'admin' || entered === PASSCODES[currentSession.shift]) {
-                document.getElementById('lockScreen').classList.add('hidden');
-            } else {
-                document.getElementById('lockErrorMsg').style.display = 'block';
-                document.getElementById('lockPasscodeInput').value = '';
-                setTimeout(() => document.getElementById('lockErrorMsg').style.display = 'none', 3000);
-            }
-        }
+    <!-- 🚚 DELIVERY -->
+    <div class="admin-container hidden" id="view-delivery">
+        <div class="admin-header"><h2>🚚 STOCK DELIVERY</h2></div>
+        <div class="admin-content">
+            <div class="admin-card">
+                <h3>📥 Record New Delivery</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>Item</label><select id="deliverItem"><option value="">-- Select Item --</option></select></div>
+                    <div class="form-group"><label>Qty Delivered</label><input type="number" id="deliverQty" placeholder="0"></div>
+                    <div class="form-group"><label>Supplier</label><input type="text" id="deliverSupplier" placeholder="Supplier name"></div>
+                    <div class="form-group"><label>Remarks</label><input type="text" id="deliverRemarks" placeholder="Remarks"></div>
+                </div>
+                <button class="btn btn-primary" onclick="saveDelivery()">✅ Save Delivery</button>
+            </div>
+        </div>
+    </div>
 
-        // ==========================================
-        // 🔑 LOGIN FUNCTIONS — INAYOS NA!
-        // ==========================================
-        function showCashierLogin() {
-            console.log('Cashier button clicked!');
-            document.getElementById('cashierLoginForm').classList.remove('hidden');
-            document.getElementById('adminLoginForm').classList.add('hidden');
-        }
+    <!-- 🔄 TRANSFERS -->
+    <div class="admin-container hidden" id="view-transfer">
+        <div class="admin-header"><h2>🔄 STOCK TRANSFERS</h2></div>
+        <div class="admin-content">
+            <div class="admin-card">
+                <h3 style="color:var(--trans-out);">📤 TRANS‑OUT</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>Item to Transfer OUT</label><select id="transOutItem"><option value="">-- Select Item --</option></select></div>
+                    <div class="form-group"><label>Quantity</label><input type="number" id="transOutQty" placeholder="0"></div>
+                    <div class="form-group"><label>Send To</label><input type="text" id="transOutTo" placeholder="Branch name"></div>
+                    <div class="form-group"><label>Reference #</label><input type="text" id="transOutRef" placeholder="Reference"></div>
+                </div>
+                <button class="btn btn-trans-out" onclick="saveTransOut()">📤 RECORD TRANS‑OUT</button>
+            </div>
+            <div class="admin-card">
+                <h3 style="color:var(--trans-in);">📥 TRANS‑IN</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>Item Received</label><select id="transInItem"><option value="">-- Select Item --</option></select></div>
+                    <div class="form-group"><label>Quantity</label><input type="number" id="transInQty" placeholder="0"></div>
+                    <div class="form-group"><label>Received From</label><input type="text" id="transInFrom" placeholder="Branch name"></div>
+                    <div class="form-group"><label>Reference #</label><input type="text" id="transInRef" placeholder="Reference"></div>
+                </div>
+                <button class="btn btn-trans-in" onclick="saveTransIn()">📥 RECORD TRANS‑IN</button>
+            </div>
+        </div>
+    </div>
 
-        function showAdminLogin() {
-            console.log('Admin button clicked!');
-            document.getElementById('adminLoginForm').classList.remove('hidden');
-            document.getElementById('cashierLoginForm').classList.add('hidden');
-        }
+    <!-- ⚙️ SETTINGS -->
+    <div class="admin-container hidden" id="view-settings">
+        <div class="admin-header"><h2>⚙️ SETTINGS</h2></div>
+        <div class="admin-content">
+            <div class="admin-card">
+                <h3>🔐 Admin Security</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>New Admin Password</label><input type="password" id="newAdminPass" placeholder="New password"></div>
+                    <div class="form-group"><label>Confirm Password</label><input type="password" id="confirmAdminPass" placeholder="Confirm password"></div>
+                </div>
+                <button class="btn btn-primary" onclick="changeAdminPassword()">🔒 Change Password</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        function verifyCashierLogin() {
-            const shift = document.getElementById('shiftSelect').value;
-            const passcode = document.getElementById('shiftPasscode').value.trim();
-            const name = document.getElementById('cashierName').value.trim();
-            const openingCash = parseFloat(document.getElementById('openingCash').value) || 0;
+<script>
+// ==========================================
+// 🔐 SESSION DATA
+// ==========================================
+let currentSession = {
+    isLoggedIn: false,
+    userType: null,
+    name: null,
+    shift: null,
+    openingCash: 0
+};
 
-            if (!shift) return alert('⚠️ Please select your shift!');
-            if (!passcode || passcode.length !== 4) return alert('⚠️ Enter 4-digit passcode!');
-            if (!name) return alert('⚠️ Enter your full name!');
-            if (passcode !== PASSCODES[shift]) return alert('❌ Incorrect passcode for ' + shift.toUpperCase() + ' shift!');
+const PASSCODES = {
+    morning: '1111',
+    swing: '2222',
+    graveyard: '3333'
+};
 
-            currentSession = {
-                isLoggedIn: true,
-                userType: 'cashier',
-                name: name,
-                shift: shift,
-                openingCash: openingCash
-            };
-            startMainApp();
-        }
+// ==========================================
+// 🔐 AUTO-LOCK SYSTEM
+// ==========================================
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden && currentSession.isLoggedIn) {
+        setTimeout(lockPOS, 500);
+    }
+});
+window.addEventListener('blur', function() {
+    if (currentSession.isLoggedIn) lockPOS();
+});
 
-        function loginAdmin() {
-            const pass = document.getElementById('adminPass').value.trim();
-            const ADMIN_PASS = localStorage.getItem('adminPassword') || 'admin123';
-            if (pass === ADMIN_PASS) {
-                currentSession = {
-                    isLoggedIn: true,
-                    userType: 'admin',
-                    name: 'Administrator',
-                    shift: null,
-                    openingCash: 0
-                };
-                startMainApp();
-            } else {
-                alert('❌ Incorrect admin password!');
-            }
-        }
+function lockPOS() {
+    if (!currentSession.isLoggedIn) return;
+    document.getElementById('lockCashierName').textContent = currentSession.name;
+    document.getElementById('lockShiftName').textContent = currentSession.shift ? currentSession.shift.toUpperCase() + ' SHIFT' : 'ADMIN';
+    document.getElementById('lockScreen').classList.remove('hidden');
+    document.getElementById('lockPasscodeInput').value = '';
+    document.getElementById('lockErrorMsg').style.display = 'none';
+}
 
-        function startMainApp() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
+function unlockPOS() {
+    const entered = document.getElementById('lockPasscodeInput').value.trim();
+    if (currentSession.userType === 'cashier' && PASSCODES[currentSession.shift] === entered) {
+        document.getElementById('lockScreen').classList.add('hidden');
+    } else if (currentSession.userType === 'admin' && entered === (localStorage.getItem('adminPassword') || 'admin123')) {
+        document.getElementById('lockScreen').classList.add('hidden');
+    } else {
+        document.getElementById('lockErrorMsg').style.display = 'block';
+    }
+}
 
-            document.getElementById('userLabel').textContent = 'User: ' + currentSession.name;
-            document.getElementById('roleLabel').textContent = 'Role: ' + currentSession.userType.toUpperCase();
-            document.getElementById('posCashierName').textContent = currentSession.name;
-            document.getElementById('rptOpening').textContent = currentSession.openingCash.toFixed(2);
+// ==========================================
+// 🔐 LOGIN FUNCTIONS
+// ==========================================
+function showCashierLogin() {
+    document.getElementById('cashierLoginForm').classList.remove('hidden');
+    document.getElementById('adminLoginForm').classList.add('hidden');
+}
 
-            if (currentSession.shift) {
-                document.getElementById('shiftLabel').textContent = 'Shift: ' + currentSession.shift.toUpperCase();
-                const badge = document.getElementById('currentShiftBadge');
-                badge.textContent = currentSession.shift.toUpperCase();
-                badge.classList.remove('hidden');
-                badge.className = 'shift-badge badge-' + currentSession.shift;
-            }
+function showAdminLogin() {
+    document.getElementById('adminLoginForm').classList.remove('hidden');
+    document.getElementById('cashierLoginForm').classList.add('hidden');
+}
 
-            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-PH', {
-                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
-            });
+function verifyCashierLogin() {
+    const shift = document.getElementById('shiftSelect').value;
+    const passcode = document.getElementById('shiftPasscode').value.trim();
+    const name = document.getElementById('cashierName').value.trim();
+    const openingCash = parseFloat(document.getElementById('openingCash').value) || 0;
 
-            initApp();
-        }
+    if (!shift || !passcode || !name) return alert('⚠️ Fill in all fields!');
+    if (PASSCODES[shift] !== passcode) return alert('⚠️ Incorrect passcode!');
 
-        function logout() {
-            if (!confirm('🚪 Are you sure you want to logout?')) return;
-            currentSession = { isLoggedIn: false };
-            document.getElementById('mainApp').classList.add('hidden');
-            document.getElementById('lockScreen').classList.add('hidden');
-            document.getElementById('loginScreen').classList.remove('hidden');
-            
-            document.getElementById('shiftSelect').value = '';
-            document.getElementById('shiftPasscode').value = '';
-            document.getElementById('cashierName').value = '';
-            document.getElementById('openingCash').value = '';
-            document.getElementById('adminPass').value = '';
-            document.getElementById('cashierLoginForm').classList.add('hidden');
-            document.getElementById('adminLoginForm').classList.add('hidden');
-        }
+    currentSession = {
+        isLoggedIn: true,
+        userType: 'cashier',
+        name: name,
+        shift: shift,
+        openingCash: openingCash
+    };
 
-        // ==========================================
-        // 📋 MENU PRODUCTS
-        // ==========================================
-        const menu = {
-            burgers:
-   burgers: [
-      {id:1,name:'Burger Regular',price:35,icon:'🍔'},
-      {id:2,name:'Burger Cheese',price:45,icon:'🍔'},
-      {id:3,name:'Burger Special',price:55,icon:'🍔'},
-      {id:4,name:'Burger Double',price:75,icon:'🍔'},
+    startApp();
+}
+
+function loginAdmin() {
+    const inputPass = document.getElementById('adminPass').value.trim();
+    const correctPass = localStorage.getItem('adminPassword') || 'admin123';
+    if (inputPass !== correctPass) return alert('⚠️ Incorrect admin password!');
+
+    currentSession = {
+        isLoggedIn: true,
+        userType: 'admin',
+        name: 'ADMIN',
+        shift: null,
+        openingCash: 0
+    };
+
+    startApp();
+}
+
+function startApp() {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('currentDate').textContent = new Date().toLocaleString('en-PH');
+    document.getElementById('userLabel').textContent = 'User: ' + currentSession.name;
+    document.getElementById('roleLabel').textContent = 'Role: ' + currentSession.userType.toUpperCase();
+    if (currentSession.shift) {
+        document.getElementById('shiftLabel').textContent = 'Shift: ' + currentSession.shift.toUpperCase();
+        const badge = document.getElementById('currentShiftBadge');
+        badge.textContent = currentSession.shift.toUpperCase();
+        badge.classList.remove('hidden');
+    }
+    document.getElementById('posCashierName').textContent = currentSession.name;
+    document.getElementById('rptOpening').textContent = currentSession.openingCash.toFixed(2);
+    initApp();
+}
+
+function logout() {
+    if (!confirm('🚪 Logout now?')) return;
+    currentSession = { isLoggedIn: false, userType: null, name: null, shift: null, openingCash: 0 };
+    document.getElementById('mainApp').classList.add('hidden');
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('cashierLoginForm').classList.add('hidden');
+    document.getElementById('adminLoginForm').classList.add('hidden');
+    document.getElementById('shiftSelect').value = '';
+    document.getElementById('shiftPasscode').value = '';
+    document.getElementById('cashierName').value = '';
+    document.getElementById('openingCash').value = '';
+    document.getElementById('adminPass').value = '';
+}
+
+// ==========================================
+// 📋 MENU PRODUCTS & APP INIT
+// ==========================================
+const menu = {
+    burgers: [
+        {id:1,name:'Burger Regular',price:35,icon:'🍔'},
+        {id:2,name:'Burger Cheese',price:45,icon:'🍔'},
+        {id:3,name:'Burger Special',price:55,icon:'🍔'},
+        {id:4,name:'Burger Double',price:75,icon:'🍔'},
     ],
     chicken: [
-      {id:5,name:'1pc Chicken',price:49,icon:'🍗'},
-      {id:6,name:'2pc Chicken',price:89,icon:'🍗'},
-      {id:7,name:'Chicken Meal',price:65,icon:'🍗'},
+        {id:5,name:'1pc Chicken',price:49,icon:'🍗'},
+        {id:6,name:'2pc Chicken',price:89,icon:'🍗'},
+        {id:7,name:'Chicken Meal',price:65,icon:'🍗'},
     ],
     premium: [
-      {id:8,name:'Big Burger',price:85,icon:'⭐'},
-      {id:9,name:'Cheesy Burger',price:95,icon:'⭐'},
+        {id:8,name:'Big Burger',price:85,icon:'⭐'},
+        {id:9,name:'Cheesy Burger',price:95,icon:'⭐'},
     ],
     hotdogs: [
-      {id:10,name:'Hotdog Regular',price:30,icon:'🌭'},
-      {id:11,name:'Hotdog Special',price:40,icon:'🌭'},
+        {id:10,name:'Hotdog Regular',price:30,icon:'🌭'},
+        {id:11,name:'Hotdog Special',price:40,icon:'🌭'},
     ],
     drinks: [
-      {id:12,name:'Soft Drink Reg',price:15,icon:'🥤'},
-      {id:13,name:'Soft Drink Large',price:20,icon:'🥤'},
-      {id:14,name:'Iced Tea',price:18,icon:'🥤'},
-      {id:15,name:'Water',price:10,icon:'💧'},
+        {id:12,name:'Soft Drink Reg',price:15,icon:'🥤'},
+        {id:13,name:'Soft Drink Large',price:20,icon:'🥤'},
+        {id:14,name:'Iced Tea',price:18,icon:'🥤'},
+        {id:15,name:'Water',price:10,icon:'💧'},
     ],
     extras: [
-      {id:16,name:'Fries',price:25,icon:'🍟'},
-      {id:17,name:'Rice',price:12,icon:'🍚'},
-      {id:18,name:'Sundae',price:20,icon:'🍦'},
+        {id:16,name:'Fries',price:25,icon:'🍟'},
+        {id:17,name:'Rice',price:12,icon:'🍚'},
+        {id:18,name:'Sundae',price:20,icon:'🍦'},
     ]
-  };
+};
 
-  let currentCat = 'burgers';
-  let cart = [];
-  let ticketNumber = parseInt(localStorage.getItem('lastTicket') || '0') + 1;
-  let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-  let stocks = JSON.parse(localStorage.getItem('stocks') || '[]');
-  let voidLogs = JSON.parse(localStorage.getItem('voidLogs') || '[]');
-  let selectedPayment = 'Cash';
+let currentCat = 'burgers';
+let cart = [];
+let ticketNumber = parseInt(localStorage.getItem('lastTicket') || '0') + 1;
+let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+let stocks = JSON.parse(localStorage.getItem('stocks') || '[]');
+let voidLogs = JSON.parse(localStorage.getItem('voidLogs') || '[]');
+let selectedPayment = 'Cash';
 
-  function initApp() {
+function initApp() {
     loadProducts();
     updateDashboard();
     renderTransactionTable();
@@ -1000,91 +709,91 @@
     renderVoidLog();
     document.getElementById('ticketNo').textContent = String(ticketNumber).padStart(3, '0');
     document.getElementById('rptOpening').textContent = (currentSession.openingCash || 0).toFixed(2);
-  }
+}
 
-  function loadProducts() {
+function loadProducts() {
     const grid = document.getElementById('productsGrid');
     grid.innerHTML = '';
     const items = menu[currentCat] || [];
     items.forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'product-card';
-      card.onclick = () => addToCart(p);
-      card.innerHTML = `
-        <div class="product-icon">${p.icon}</div>
-        <div class="product-info">
-          <div class="product-name">${p.name}</div>
-          <div class="product-price">₱${p.price.toFixed(2)}</div>
-        </div>`;
-      grid.appendChild(card);
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.onclick = () => addToCart(p);
+        card.innerHTML = `
+            <div class="product-icon">${p.icon}</div>
+            <div class="product-info">
+                <div class="product-name">${p.name}</div>
+                <div class="product-price">₱${p.price.toFixed(2)}</div>
+            </div>`;
+        grid.appendChild(card);
     });
-  }
+}
 
-  function changeTab(cat) {
+function changeTab(cat) {
     currentCat = cat;
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     event.target.classList.add('active');
     loadProducts();
-  }
+}
 
-  function addToCart(product) {
+function addToCart(product) {
     const existing = cart.find(i => i.id === product.id);
     if (existing) existing.qty++;
     else cart.push({ ...product, qty: 1 });
     updateCartDisplay();
-  }
+}
 
-  function removeFromCart(index) {
+function removeFromCart(index) {
     cart.splice(index, 1);
     updateCartDisplay();
-  }
+}
 
-  function updateCartDisplay() {
+function updateCartDisplay() {
     const container = document.getElementById('orderItems');
     if (cart.length === 0) {
-      container.innerHTML = '<div class="empty-msg">Tap products to add to order</div>';
+        container.innerHTML = '<div class="empty-msg">Tap products to add to order</div>';
     } else {
-      container.innerHTML = cart.map((item, idx) => `
-        <div class="order-item">
-          <div class="item-left">
-            <span class="qty-badge">${item.qty}</span>
-            <div><div class="item-name">${item.name}</div><div style="font-size:12px;color:#888;">₱${item.price.toFixed(2)}</div></div>
-          </div>
-          <div style="font-weight:bold;">₱${(item.price * item.qty).toFixed(2)}</div>
-          <span class="item-remove" onclick="removeFromCart(${idx})">×</span>
-        </div>`).join('');
+        container.innerHTML = cart.map((item, idx) => `
+            <div class="order-item">
+                <div class="item-left">
+                    <span class="qty-badge">${item.qty}</span>
+                    <div><div class="item-name">${item.name}</div><div style="font-size:12px;color:#888;">₱${item.price.toFixed(2)}</div></div>
+                </div>
+                <div style="font-weight:bold;">₱${(item.price * item.qty).toFixed(2)}</div>
+                <span class="item-remove" onclick="removeFromCart(${idx})">×</span>
+            </div>`).join('');
     }
     const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
     document.getElementById('totalAmt').textContent = total.toFixed(2);
     document.getElementById('change-box').style.display = 'none';
     document.getElementById('cashReceived').value = '';
-  }
+}
 
-  function clearAll() {
+function clearAll() {
     if (cart.length > 0 && !confirm('Clear order?')) return;
     cart = [];
     updateCartDisplay();
-  }
+}
 
-  function selectPayment(btn, method) {
+function selectPayment(btn, method) {
     selectedPayment = method;
     document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
-  }
+}
 
-  function computeChange() {
+function computeChange() {
     const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
     const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
     const box = document.getElementById('change-box');
     if (cash >= total && total > 0) {
-      box.style.display = 'block';
-      document.getElementById('changeAmt').textContent = (cash - total).toFixed(2);
+        box.style.display = 'block';
+        document.getElementById('changeAmt').textContent = (cash - total).toFixed(2);
     } else {
-      box.style.display = 'none';
+        box.style.display = 'none';
     }
-  }
+}
 
-  function completeSale() {
+function completeSale() {
     const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
     if (total <= 0) return alert('⚠️ Cart empty!');
     const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
@@ -1092,16 +801,16 @@
 
     ticketNumber++;
     const sale = {
-      ticket: ticketNumber,
-      datetime: new Date().toLocaleString('en-PH'),
-      cashier: currentSession.name,
-      shift: currentSession.shift,
-      items: [...cart],
-      total: total,
-      payment: selectedPayment,
-      cashReceived: cash,
-      change: cash - total,
-      status: 'COMPLETED'
+        ticket: ticketNumber,
+        datetime: new Date().toLocaleString('en-PH'),
+        cashier: currentSession.name,
+        shift: currentSession.shift,
+        items: [...cart],
+        total: total,
+        payment: selectedPayment,
+        cashReceived: cash,
+        change: cash - total,
+        status: 'COMPLETED'
     };
     transactions.unshift(sale);
     localStorage.setItem('transactions', JSON.stringify(transactions));
@@ -1111,156 +820,12 @@
     alert(`✅ SALE COMPLETED!\nTicket #${ticketNumber}\nTotal: ₱${total.toFixed(2)}\nChange: ₱${(cash - total).toFixed(2)}`);
     cart = [];
     updateCartDisplay();
-  }
+}
 
-  function updateDashboard() {
+function updateDashboard() {
     document.getElementById('dashTotalSales').textContent = transactions.reduce((s,t)=>s+t.total,0).toFixed(2);
     document.getElementById('dashTransCount').textContent = transactions.length;
     document.getElementById('dashItemsSold').textContent = transactions.reduce((s,t)=>s+t.items.reduce((s2,i)=>s2+i.qty,0),0);
     const shiftSales = transactions.filter(t => t.shift === currentSession.shift).reduce((s,t)=>s+t.total,0);
-    document.getElementById('dashShiftSales').textContent = shiftSales.toFixed(2);
-    document.getElementById('rptSales').textContent = shiftSales.toFixed(2);
-    const opening = currentSession.openingCash || 0;
-    document.getElementById('rptOnHand').textContent = (opening + shiftSales).toFixed(2);
-  }
-
-  function renderTransactionTable() {
-    const tbody = document.getElementById('transBody');
-    if (transactions.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999;padding:30px;">No transactions yet...</td></tr>';
-      return;
-    }
-    tbody.innerHTML = transactions.map(t => `
-      <tr>
-        <td>#${String(t.ticket).padStart(3,'0')}</td>
-        <td>${t.datetime}</td>
-        <td>${t.cashier}</td>
-        <td>${t.shift ? t.shift.toUpperCase() : '—'}</td>
-        <td>${t.items.length} item(s)</td>
-        <td>₱${t.total.toFixed(2)}</td>
-        <td>${t.payment}</td>
-        <td><span class="status-badge status-active">${t.status}</span></td>
-      </tr>`).join('');
-  }
-
-  function switchView(viewName) {
-    document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-    document.querySelector(`.menu-item[data-view="${viewName}"]`).classList.add('active');
-    document.querySelectorAll('.menu-section, .admin-container').forEach(el => el.classList.add('hidden'));
-    document.getElementById('view-' + viewName).classList.remove('hidden');
-  }
-
-  function renderStockTable() {
-    const tbody = document.getElementById('stockBody');
-    if (stocks.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No stock items yet...</td></tr>';
-      return;
-    }
-    tbody.innerHTML = stocks.map((item, idx) => {
-      let status = 'status-active', statusText = 'In Stock';
-      if (item.qty <= 0) { status = 'status-out'; statusText = 'OUT OF STOCK'; }
-      else if (item.qty <= item.reorderLevel) { status = 'status-low'; statusText = 'LOW'; }
-      return `
-        <tr>
-          <td><strong>${item.name}</strong></td>
-          <td>${item.unit}</td>
-          <td>${item.qty}</td>
-          <td>${item.reorderLevel}</td>
-          <td>₱${item.cost.toFixed(2)}</td>
-          <td><span class="status-badge ${status}">${statusText}</span></td>
-          <td>
-            <button class="btn btn-sm btn-primary" onclick="adjustStockQty(${idx})">Qty</button>
-            <button class="btn btn-sm btn-danger" onclick="removeStockItem(${idx})">Del</button>
-          </td>
-        </tr>`;
-    }).join('');
-    document.getElementById('stockTotalItems').textContent = stocks.length;
-    document.getElementById('stockLowItems').textContent = stocks.filter(i => i.qty > 0 && i.qty <= i.reorderLevel).length;
-    document.getElementById('stockOutItems').textContent = stocks.filter(i => i.qty <= 0).length;
-    document.getElementById('stockValue').textContent = stocks.reduce((s,i)=>s+(i.qty*i.cost),0).toFixed(2);
-  }
-
-  function openStockModal() {
-    const name = prompt('Item name:'); if (!name) return;
-    const unit = prompt('Unit (pcs, kg, pack):'); if (!unit) return;
-    const qty = parseInt(prompt('Quantity:')) || 0;
-    const reorder = parseInt(prompt('Reorder level:')) || 5;
-    const cost = parseFloat(prompt('Cost per unit:')) || 0;
-    stocks.push({ name, unit, qty, reorderLevel: reorder, cost });
-    localStorage.setItem('stocks', JSON.stringify(stocks));
-    renderStockTable();
-  }
-
-  function adjustStockQty(idx) {
-    const newQty = parseInt(prompt('New quantity:', stocks[idx].qty));
-    if (isNaN(newQty)) return;
-    stocks[idx].qty = newQty;
-    localStorage.setItem('stocks', JSON.stringify(stocks));
-    renderStockTable();
-  }
-
-  function removeStockItem(idx) {
-    if (!confirm(`Delete "${stocks[idx].name}"?`)) return;
-    stocks.splice(idx, 1);
-    localStorage.setItem('stocks', JSON.stringify(stocks));
-    renderStockTable();
-  }
-
-  function renderVoidLog() {
-    const tbody = document.getElementById('voidLogBody');
-    if (voidLogs.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No void records...</td></tr>';
-      return;
-    }
-    tbody.innerHTML = voidLogs.map(v => `
-      <tr>
-        <td>${v.datetime}</td><td>${v.item}</td><td>${v.qty}</td>
-        <td>₱${v.amount.toFixed(2)}</td><td>${v.by}</td><td>${v.shift}</td><td>${v.reason}</td>
-      </tr>`).join('');
-  }
-
-  function voidEntireOrder() {
-    if (cart.length === 0) return alert('⚠️ Nothing to void!');
-    const reason = prompt('Reason for void:'); if (!reason) return;
-    cart.forEach(item => {
-      voidLogs.unshift({
-        datetime: new Date().toLocaleString('en-PH'),
-        item: item.name, qty: item.qty, amount: item.price * item.qty,
-        by: currentSession.name, shift: currentSession.shift, reason: reason
-      });
-    });
-    localStorage.setItem('voidLogs', JSON.stringify(voidLogs));
-    cart = [];
-    updateCartDisplay();
-    renderVoidLog();
-    alert('✅ Order voided!');
-  }
-
-  function generateCashOut() {
-    const opening = currentSession.openingCash || 0;
-    const sales = transactions.filter(t => t.shift === currentSession.shift).reduce((s,t)=>s+t.total,0);
-    const totalCash = opening + sales;
-    document.getElementById('rptCashOut').textContent = totalCash.toFixed(2);
-    alert(`💰 CASH OUT REPORT\nOpening: ₱${opening.toFixed(2)}\nSales: ₱${sales.toFixed(2)}\nTotal Cash: ₱${totalCash.toFixed(2)}`);
-  }
-
-  function endShift() {
-    if (!confirm('🔒 End shift? Make sure you have cashed out first!')) return;
-    alert('✅ Shift ended! Please logout.');
-  }
-
-  function changeAdminPassword() {
-    const newPass = document.getElementById('newAdminPass').value.trim();
-    const confirmPass = document.getElementById('confirmAdminPass').value.trim();
-    if (!newPass || newPass.length < 4) return alert('⚠️ Password at least 4 chars!');
-    if (newPass !== confirmPass) return alert('⚠️ Passwords do not match!');
-    localStorage.setItem('adminPassword', newPass);
-    alert('✅ Admin password changed!');
-    document.getElementById('newAdminPass').value = '';
-    document.getElementById('confirmAdminPass').value = '';
-  }
-</script>
-</body>
-</html>
-
+    document.getElementById('dashShiftSales').
 
