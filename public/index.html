@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger Station POS — Fixed</title>
+    <title>Burger Station POS</title>
     <style>
         * {
             box-sizing: border-box;
@@ -46,11 +46,7 @@
             padding: 3px 8px;
             border-radius: 12px;
         }
-        .admin-btn {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
+        .history-header-btn {
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
@@ -236,7 +232,7 @@
             display: none;
         }
 
-        /* ========== PANELS — ALL ========== */
+        /* ========== PANELS ========== */
         .overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -263,23 +259,6 @@
             color: #d32f2f;
             font-size: 20px;
         }
-        .tab-buttons {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-        .tab-btn {
-            flex: 1;
-            min-width: 70px;
-            padding: 7px;
-            border: none;
-            background: #eee;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .tab-btn.active { background: #d32f2f; color: white; }
         .hidden { display: none !important; }
         .trans-item {
             padding: 8px;
@@ -298,61 +277,12 @@
             font-size: 13px;
             background: #fff8e1;
         }
-        .sales-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            font-size: 12px;
-            margin: 10px 0;
-        }
-        .sales-item {
-            background: #f5f5f5;
-            padding: 8px;
-            border-radius: 5px;
-        }
-        .sales-item strong { font-size: 15px; color: #d32f2f; }
-        .net-sales {
-            background: #e8f5e9;
-            padding: 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 8px;
-            font-size: 15px;
-            color: #2e7d32;
-        }
-        .btn-small {
-            padding: 4px 8px;
-            font-size: 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-left: 5px;
-        }
-        .btn-void-small { background: #e53935; color: white; }
-        .btn-reprint { background: #2196f3; color: white; }
         .btn-close { background: #757575; color: white; margin-top: 12px; }
-        .history-btn {
-            position: fixed;
-            bottom: 15px;
-            right: 15px;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: #2196f3;
-            color: white;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-            z-index: 50;
-        }
-        .disabled { opacity: 0.5; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <!-- SHIFT START SCREEN — FIXED LAYOUT -->
+    <!-- START SHIFT PANEL -->
     <div class="overlay" id="shiftStartOverlay">
         <div class="panel">
             <h2>🕒 START NEW SHIFT</h2>
@@ -362,78 +292,16 @@
         </div>
     </div>
 
-    <!-- HEADER -->
+    <!-- HEADER — WALANG ADMIN BUTTON ✅ -->
     <div class="header" id="mainHeader" style="display:none;">
         <h1>🍔 BURGER STATION POS</h1>
         <div class="shift-info">
             <div>👤 <span id="currentCashier">—</span></div>
             <div>🕒 <span id="shiftTime">—</span></div>
             <div class="ticket-no">🎟️ #<span id="currentTicket">001</span></div>
-            <button class="admin-btn" onclick="showAdminLogin()">⚙️ Admin</button>
+            <button class="history-header-btn" onclick="showTransactionsWindow()">📋 Transaction History</button>
         </div>
     </div>
-
-    <!-- ADMIN LOGIN -->
-    <div class="overlay" id="adminLoginOverlay" style="display:none;">
-        <div class="panel">
-            <h2>🔐 Admin Login</h2>
-            <input type="password" id="adminPass" placeholder="Enter Admin Password">
-            <button class="btn btn-pay" onclick="adminLogin()">Login</button>
-            <button class="btn btn-close" onclick="closeAdminLogin()">Cancel</button>
-        </div>
-    </div>
-
-    <!-- ADMIN PANEL -->
-    <div class="overlay" id="adminOverlay" style="display:none;">
-        <div class="panel" style="max-height:90vh;">
-            <h2>⚙️ Admin Control Panel</h2>
-            <div class="tab-buttons">
-                <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
-                <button class="tab-btn" onclick="switchTab('shifts')">Shifts</button>
-                <button class="tab-btn" onclick="switchTab('products')">Products</button>
-                <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
-            </div>
-
-            <!-- 📊 SALES OVERVIEW — ADMIN ONLY! 🔒 -->
-            <div id="tab-overview">
-                <h3>📊 CURRENT SHIFT SALES OVERVIEW</h3>
-                <div class="sales-grid">
-                    <div class="sales-item">💰 Total Sales<br><strong id="ovTotal">₱0.00</strong></div>
-                    <div class="sales-item">💵 Cash Sales<br><strong id="ovCash">₱0.00</strong></div>
-                    <div class="sales-item">📱 GCash<br><strong id="ovGcash">₱0.00</strong></div>
-                    <div class="sales-item">🐼 FoodPanda<br><strong id="ovFoodpanda">₱0.00</strong></div>
-                    <div class="sales-item">🛵 Grab<br><strong id="ovGrab">₱0.00</strong></div>
-                    <div class="sales-item">❌ Void<br><strong id="ovVoid">₱0.00</strong></div>
-                    <div class="sales-item">💸 Cash Out<br><strong id="ovCashout">₱0.00</strong></div>
-                    <div class="sales-item">👥 Discounts<br><strong id="ovDiscount">₱0.00</strong></div>
-                </div>
-                <div class="net-sales">💵 ACTUAL CASH ON HAND: <span id="ovNetCash">₱0.00</span></div>
-            </div>
-
-            <div id="tab-shifts" class="hidden">
-                <h3>📋 All Shift History</h3>
-                <div id="allShiftsList"></div>
-            </div>
-
-            <div id="tab-products" class="hidden">
-                <h3>Edit Product Prices</h3>
-                <div id="productEditor"></div>
-                <button class="btn btn-pay" onclick="saveProducts()">💾 Save Prices</button>
-            </div>
-
-            <div id="tab-settings" class="hidden">
-                <h3>Change Admin Password</h3>
-                <input type="password" id="newPass" placeholder="New Password">
-                <input type="password" id="confirmPass" placeholder="Confirm Password">
-                <button class="btn btn-pay" onclick="changePassword()">Update Password</button>
-            </div>
-
-            <button class="btn btn-close" onclick="closeAdminPanel()">🚪 Logout</button>
-        </div>
-    </div>
-
-    <!-- TRANSACTIONS HISTORY BUTTON -->
-    <button class="history-btn" id="historyBtn" style="display:none;" onclick="showTransactionsWindow()">📋</button>
 
     <!-- TRANSACTIONS PANEL -->
     <div class="overlay" id="transOverlay" style="display:none;">
@@ -525,7 +393,6 @@
         let total = 0;
         let selectedPayment = 'Cash';
         let discountType = 'none';
-        let adminPassword = localStorage.getItem('adminPass') || 'admin123';
         let ticketNumber = parseInt(localStorage.getItem('lastTicket')) || 0;
         let currentShift = null;
         let shiftTransactions = [];
@@ -536,12 +403,10 @@
             selectDiscount('none');
         });
 
-        // ========== START SHIFT — FIXED! ✅ ==========
+        // ========== START SHIFT ==========
         function startShift() {
             const name = document.getElementById('cashierName').value.trim();
             const openingCash = parseFloat(document.getElementById('openingCash').value) || 0;
-            
-            console.log('Start Shift clicked!', {name, openingCash}); // Debug log
             
             if (!name) { 
                 alert('⚠️ Ilagay ang pangalan ng cashier!'); 
@@ -549,7 +414,6 @@
             }
 
             currentShift = {
-                id: Date.now(),
                 cashier: name,
                 openingCash: openingCash,
                 startedAt: new Date().toLocaleString('en-PH'),
@@ -565,11 +429,9 @@
             shiftTransactions = [];
             cashOutRecords = [];
             
-            // HIDE START PANEL, SHOW MAIN APP
             document.getElementById('shiftStartOverlay').style.display = 'none';
             document.getElementById('mainHeader').style.display = 'block';
             document.getElementById('cashierView').style.display = 'block';
-            document.getElementById('historyBtn').style.display = 'block';
             
             document.getElementById('currentCashier').textContent = name;
             document.getElementById('shiftTime').textContent = currentShift.startedAt.split(',')[0];
@@ -724,43 +586,6 @@
             document.getElementById('currentTicket').textContent = String(ticketNumber + 1).padStart(3, '0');
         }
 
-        function showAdminLogin() {
-            document.getElementById('adminLoginOverlay').style.display = 'flex';
-            document.getElementById('adminPass').value = '';
-        }
-        function closeAdminLogin() {
-            document.getElementById('adminLoginOverlay').style.display = 'none';
-        }
-        function adminLogin() {
-            if (document.getElementById('adminPass').value === adminPassword) {
-                closeAdminLogin();
-                document.getElementById('adminOverlay').style.display = 'flex';
-                updateAdminOverview();
-            } else alert('❌ Wrong Password!');
-        }
-        function closeAdminPanel() {
-            document.getElementById('adminOverlay').style.display = 'none';
-        }
-        function switchTab(name) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            ['overview','shifts','products','settings'].forEach(t => document.getElementById('tab-'+t).classList.add('hidden'));
-            document.getElementById('tab-'+name).classList.remove('hidden');
-        }
-        function updateAdminOverview() {
-            if (!currentShift) return;
-            const totalCashOut = cashOutRecords.reduce((sum, c) => sum + c.amount, 0);
-            const actualCash = currentShift.totalCash - totalCashOut;
-            document.getElementById('ovTotal').textContent = (currentShift.totalSales - currentShift.totalVoid).toFixed(2);
-            document.getElementById('ovCash').textContent = currentShift.totalCash.toFixed(2);
-            document.getElementById('ovGcash').textContent = currentShift.totalGcash.toFixed(2);
-            document.getElementById('ovFoodpanda').textContent = currentShift.totalFoodpanda.toFixed(2);
-            document.getElementById('ovGrab').textContent = currentShift.totalGrab.toFixed(2);
-            document.getElementById('ovVoid').textContent = currentShift.totalVoid.toFixed(2);
-            document.getElementById('ovCashout').textContent = totalCashOut.toFixed(2);
-            document.getElementById('ovDiscount').textContent = currentShift.totalDiscount.toFixed(2);
-            document.getElementById('ovNetCash').textContent = actualCash.toFixed(2);
-        }
         function showTransactionsWindow() {
             document.getElementById('transOverlay').style.display = 'flex';
             document.getElementById('transCashier').textContent = currentShift?.cashier || '—';
@@ -777,12 +602,20 @@
                     </div>
                 `).join('');
         }
-        function closeTransPanel() { document.getElementById('transOverlay').style.display = 'none'; }
+
+        function closeTransPanel() { 
+            document.getElementById('transOverlay').style.display = 'none'; 
+        }
+
         function showCashoutPanel() {
             document.getElementById('transOverlay').style.display = 'none';
             document.getElementById('cashoutOverlay').style.display = 'flex';
         }
-        function closeCashoutPanel() { document.getElementById('cashoutOverlay').style.display = 'none'; }
+
+        function closeCashoutPanel() { 
+            document.getElementById('cashoutOverlay').style.display = 'none'; 
+        }
+
         function saveCashout() {
             const amount = parseFloat(document.getElementById('cashoutAmount').value);
             const comment = document.getElementById('cashoutComment').value.trim() || 'No remarks';
@@ -790,27 +623,20 @@
             cashOutRecords.push({ amount, comment, datetime: new Date().toLocaleString('en-PH') });
             alert(`✅ CASH OUT SAVED!\nAmount: ₱${amount.toFixed(2)}\nRemarks: ${comment}`);
             closeCashoutPanel();
-            updateAdminOverview();
             showTransactionsWindow();
         }
+
         function endShift() {
             if (!confirm('🛑 END THIS SHIFT?')) return;
             alert('✅ Shift ended! Thank you!');
             closeTransPanel();
             document.getElementById('mainHeader').style.display = 'none';
             document.getElementById('cashierView').style.display = 'none';
-            document.getElementById('historyBtn').style.display = 'none';
             document.getElementById('shiftStartOverlay').style.display = 'flex';
             document.getElementById('cashierName').value = '';
             document.getElementById('openingCash').value = '';
             currentShift = null;
             clearAll();
-        }
-        function changePassword() {
-            const n = document.getElementById('newPass').value, c = document.getElementById('confirmPass').value;
-            if (!n) { alert('⚠️ Enter new password!'); return; }
-            if (n !== c) { alert('⚠️ Passwords do not match!'); return; }
-            adminPassword = n; localStorage.setItem('adminPass', n); alert('✅ Password updated!');
         }
     </script>
 
