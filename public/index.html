@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger Station POS — Complete</title>
+    <title>Burger Station POS — Updated</title>
     <style>
         * {
             box-sizing: border-box;
@@ -16,44 +16,6 @@
             padding: 8px;
             max-width: 480px;
             margin: 0 auto;
-        }
-
-        /* ========== SALES OVERVIEW — REAL-TIME ========== */
-        .sales-overview {
-            background: linear-gradient(135deg, #2e7d32, #4caf50);
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-        }
-        .sales-overview h3 {
-            font-size: 14px;
-            margin-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-            padding-bottom: 5px;
-        }
-        .sales-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            font-size: 12px;
-        }
-        .sales-item {
-            background: rgba(255,255,255,0.2);
-            padding: 6px 8px;
-            border-radius: 5px;
-        }
-        .sales-item strong { font-size: 14px; }
-        .net-sales {
-            grid-column: span 2;
-            background: rgba(0,0,0,0.2);
-            padding: 8px;
-            font-weight: bold;
-            font-size: 15px;
-            text-align: center;
-            margin-top: 4px;
-            border-radius: 6px;
         }
 
         /* ========== HEADER ========== */
@@ -121,8 +83,12 @@
             font-size: 13px;
             border-radius: 8px;
             cursor: pointer;
+            transition: transform 0.1s;
         }
-        .product:active { background: #fb8c00; transform: scale(0.97); }
+        .product:active { 
+            background: #fb8c00; 
+            transform: scale(0.97); 
+        }
         .product strong { font-size: 15px; display: block; margin-top: 3px; }
 
         /* ========== CART & DISCOUNT ========== */
@@ -258,6 +224,7 @@
         .btn-pay { background: #4caf50; color: white; }
         .btn-clear { background: #757575; color: white; }
         .btn-cashout { background: #ff9800; color: white; }
+        .btn-end-shift { background: #e53935; color: white; }
         .change {
             font-size: 17px;
             font-weight: bold;
@@ -269,7 +236,7 @@
             display: none;
         }
 
-        /* ========== PANELS — SHIFT, TRANSACTIONS, ADMIN ========== */
+        /* ========== PANELS — ALL ========== */
         .overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -347,6 +314,29 @@
             margin-bottom: 8px;
             color: #d32f2f;
         }
+        .sales-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .sales-item {
+            background: #f5f5f5;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .sales-item strong { font-size: 15px; color: #d32f2f; }
+        .net-sales {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 8px;
+            font-size: 15px;
+            color: #2e7d32;
+        }
         .btn-small {
             padding: 4px 8px;
             font-size: 12px;
@@ -389,22 +379,6 @@
         <button class="btn btn-pay" onclick="startShift()">✅ Start Shift</button>
     </div>
 
-    <!-- ========== SALES OVERVIEW — REAL-TIME ========== -->
-    <div class="sales-overview" id="salesOverview" style="opacity:0.3; pointer-events:none;">
-        <h3>📊 SALES OVERVIEW — CURRENT SHIFT</h3>
-        <div class="sales-grid">
-            <div class="sales-item">💰 Total Sales<br><strong id="ovTotal">₱0.00</strong></div>
-            <div class="sales-item">💵 Cash Sales<br><strong id="ovCash">₱0.00</strong></div>
-            <div class="sales-item">📱 GCash<br><strong id="ovGcash">₱0.00</strong></div>
-            <div class="sales-item">🐼 FoodPanda<br><strong id="ovFoodpanda">₱0.00</strong></div>
-            <div class="sales-item">🛵 Grab<br><strong id="ovGrab">₱0.00</strong></div>
-            <div class="sales-item">❌ Void<br><strong id="ovVoid">₱0.00</strong></div>
-            <div class="sales-item">💸 Cash Out<br><strong id="ovCashout">₱0.00</strong></div>
-            <div class="sales-item">👥 Discounts<br><strong id="ovDiscount">₱0.00</strong></div>
-        </div>
-        <div class="net-sales">💵 ACTUAL CASH ON HAND: <span id="ovNetCash">₱0.00</span></div>
-    </div>
-
     <!-- HEADER -->
     <div class="header" id="mainHeader" style="opacity:0.3; pointer-events:none;">
         <h1>🍔 BURGER STATION POS</h1>
@@ -424,17 +398,54 @@
         <button class="btn btn-close" onclick="closePanel('adminLogin')">Cancel</button>
     </div>
 
-    <!-- ADMIN PANEL -->
+    <!-- ADMIN PANEL — MAY SALES OVERVIEW DITO! 🔒 -->
     <div class="panel" id="adminPanel">
         <h2>⚙️ Admin Control Panel</h2>
         <div class="tab-buttons">
-            <button class="tab-btn active" onclick="switchTab('shifts')">Shifts</button>
+            <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
+            <button class="tab-btn" onclick="switchTab('shifts')">Shifts</button>
             <button class="tab-btn" onclick="switchTab('products')">Products</button>
             <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
         </div>
-        <div id="tab-shifts"><h3>📋 All Shift History</h3><div id="allShiftsList"></div></div>
-        <div id="tab-products" class="hidden"><h3>Edit Prices</h3><div id="productEditor"></div><button class="btn btn-pay" onclick="saveProducts()">💾 Save</button></div>
-        <div id="tab-settings" class="hidden"><h3>Change Password</h3><input type="password" id="newPass" placeholder="New"><input type="password" id="confirmPass" placeholder="Confirm"><button class="btn btn-pay" onclick="changePassword()">Update</button></div>
+
+        <!-- 📊 SALES OVERVIEW — ADMIN ONLY! 🔒 -->
+        <div id="tab-overview">
+            <h3>📊 CURRENT SHIFT SALES OVERVIEW</h3>
+            <div class="sales-grid">
+                <div class="sales-item">💰 Total Sales<br><strong id="ovTotal">₱0.00</strong></div>
+                <div class="sales-item">💵 Cash Sales<br><strong id="ovCash">₱0.00</strong></div>
+                <div class="sales-item">📱 GCash<br><strong id="ovGcash">₱0.00</strong></div>
+                <div class="sales-item">🐼 FoodPanda<br><strong id="ovFoodpanda">₱0.00</strong></div>
+                <div class="sales-item">🛵 Grab<br><strong id="ovGrab">₱0.00</strong></div>
+                <div class="sales-item">❌ Void<br><strong id="ovVoid">₱0.00</strong></div>
+                <div class="sales-item">💸 Cash Out<br><strong id="ovCashout">₱0.00</strong></div>
+                <div class="sales-item">👥 Discounts<br><strong id="ovDiscount">₱0.00</strong></div>
+            </div>
+            <div class="net-sales">💵 ACTUAL CASH ON HAND: <span id="ovNetCash">₱0.00</span></div>
+        </div>
+
+        <!-- SHIFTS HISTORY -->
+        <div id="tab-shifts" class="hidden">
+            <h3>📋 All Shift History</h3>
+            <div id="allShiftsList"></div>
+            <button class="btn btn-clear" onclick="exportAllData()">📤 Export Data</button>
+        </div>
+
+        <!-- EDIT PRODUCTS -->
+        <div id="tab-products" class="hidden">
+            <h3>Edit Product Prices</h3>
+            <div id="productEditor"></div>
+            <button class="btn btn-pay" onclick="saveProducts()">💾 Save Prices</button>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="tab-settings" class="hidden">
+            <h3>Change Admin Password</h3>
+            <input type="password" id="newPass" placeholder="New Password">
+            <input type="password" id="confirmPass" placeholder="Confirm Password">
+            <button class="btn btn-pay" onclick="changePassword()">Update Password</button>
+        </div>
+
         <button class="btn btn-close" onclick="logoutAdmin()">🚪 Logout</button>
     </div>
 
@@ -444,7 +455,7 @@
     <!-- ========== SEPARATE TRANSACTIONS WINDOW ========== -->
     <div class="panel" id="transactionsPanel">
         <h2>📋 TRANSACTION HISTORY — CURRENT SHIFT</h2>
-        <div class="summary-box" style="background:#f5f5f5; padding:10px; border-radius:6px; margin-bottom:10px; font-size:14px;">
+        <div style="background:#f5f5f5; padding:10px; border-radius:6px; margin-bottom:10px; font-size:14px;">
             <p><strong>Cashier:</strong> <span id="transCashier">—</span> | <strong>Shift Started:</strong> <span id="transShiftTime">—</span></p>
             <p><strong>Total Sales:</strong> ₱<span id="transSales">0.00</span> | <strong>Transactions:</strong> <span id="transCount">0</span> | <strong>Voided:</strong> <span id="transVoid">0</span></p>
             <p><strong>Total Cash Outs:</strong> ₱<span id="transCashout">0.00</span></p>
@@ -455,6 +466,7 @@
         <h4 style="margin:15px 0 5px; color:#e65100;">💸 Cash Out Records</h4>
         <div id="cashoutList"></div>
         <button class="btn btn-cashout" onclick="showCashoutPanel()">💸 New Cash Out</button>
+        <button class="btn btn-end-shift" onclick="endShift()">🛑 End Shift & Close</button>
         <button class="btn btn-close" onclick="closePanel('transactionsPanel')">Close</button>
     </div>
 
@@ -499,7 +511,7 @@
             
             <!-- 👴👩‍🦯 DISCOUNT BUTTONS -->
             <div class="discount-bar">
-                <button class="discount-btn" id="discNone" onclick="selectDiscount('none')">No Discount</button>
+                <button class="discount-btn selected" id="discNone" onclick="selectDiscount('none')">No Discount</button>
                 <button class="discount-btn" id="discSenior" onclick="selectDiscount('senior')">👴 Senior Citizen (5%)</button>
                 <button class="discount-btn" id="discPwd" onclick="selectDiscount('pwd')">👩‍🦯 PWD (5%)</button>
             </div>
@@ -537,7 +549,7 @@
         let subtotal = 0;
         let total = 0;
         let selectedPayment = 'Cash';
-        let discountType = 'none'; // none, senior, pwd
+        let discountType = 'none';
         let adminPassword = localStorage.getItem('adminPass') || 'admin123';
         let ticketNumber = parseInt(localStorage.getItem('lastTicket')) || 0;
         
@@ -588,8 +600,6 @@
             
             // SHOW MAIN APP
             document.getElementById('shiftStartPanel').style.display = 'none';
-            document.getElementById('salesOverview').style.opacity = '1';
-            document.getElementById('salesOverview').style.pointerEvents = 'auto';
             document.getElementById('mainHeader').style.opacity = '1';
             document.getElementById('mainHeader').style.pointerEvents = 'auto';
             document.getElementById('cashierView').style.opacity = '1';
@@ -598,7 +608,7 @@
             
             document.getElementById('currentCashier').textContent = name;
             document.getElementById('shiftTime').textContent = currentShift.startedAt.split(',')[0];
-            updateSalesOverview();
+            updateAdminOverview();
             
             alert(`✅ SHIFT STARTED!\n👤 Cashier: ${name}\n💰 Opening Cash: ₱${openingCash.toFixed(2)}`);
         }
@@ -609,8 +619,6 @@
             cashOutRecords = currentShift.cashOuts || [];
             
             document.getElementById('shiftStartPanel').style.display = 'none';
-            document.getElementById('salesOverview').style.opacity = '1';
-            document.getElementById('salesOverview').style.pointerEvents = 'auto';
             document.getElementById('mainHeader').style.opacity = '1';
             document.getElementById('mainHeader').style.pointerEvents = 'auto';
             document.getElementById('cashierView').style.opacity = '1';
@@ -619,21 +627,16 @@
             
             document.getElementById('currentCashier').textContent = currentShift.cashier;
             document.getElementById('shiftTime').textContent = currentShift.startedAt.split(',')[0];
-            updateSalesOverview();
+            updateAdminOverview();
         }
 
         // ========== DISCOUNT SELECTION ==========
         function selectDiscount(type) {
             discountType = type;
             document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('selected'));
-            document.getElementById('discNone').classList.remove('selected');
-            document.getElementById('discSenior').classList.remove('selected');
-            document.getElementById('discPwd').classList.remove('selected');
-            
             if (type === 'none') document.getElementById('discNone').classList.add('selected');
             else if (type === 'senior') document.getElementById('discSenior').classList.add('selected');
             else if (type === 'pwd') document.getElementById('discPwd').classList.add('selected');
-            
             recalculateTotals();
         }
 
@@ -643,7 +646,7 @@
             let discountAmount = 0;
             
             if (discountType !== 'none' && subtotal > 0) {
-                discountAmount = subtotal * 0.05; // 5% discount
+                discountAmount = subtotal * 0.05;
                 document.getElementById('discountRow').style.display = 'block';
                 document.getElementById('discountAmt').textContent = discountAmount.toFixed(2);
             } else {
@@ -657,7 +660,7 @@
             computeChange();
         }
 
-        // ========== PRODUCT CLICK ==========
+        // ========== PRODUCT CLICK — AYOS NA! ✅ ==========
         function attachProductEvents() {
             document.querySelectorAll('.product').forEach(button => {
                 button.addEventListener('click', () => {
@@ -737,12 +740,10 @@
             if (cart.length === 0) { alert('⚠️ Wala pang order!'); return; }
             if (selectedPayment === 'Cash' && cash < total) { alert('⚠️ Kulang ang pera!'); return; }
 
-            // TICKET NUMBER
             ticketNumber++;
             const ticket = String(ticketNumber).padStart(3, '0');
             localStorage.setItem('lastTicket', ticketNumber);
 
-            // SAVE TRANSACTION
             const transaction = {
                 ticket: ticket,
                 items: [...cart],
@@ -758,9 +759,7 @@
             };
             shiftTransactions.unshift(transaction);
             currentShift.transactions = shiftTransactions;
-            localStorage.setItem('currentShift', JSON.stringify(currentShift));
 
-            // UPDATE SALES FIGURES
             if (!transaction.voided) {
                 if (selectedPayment === 'Cash') currentShift.totalCash += total;
                 else if (selectedPayment === 'GCash') currentShift.totalGcash += total;
@@ -770,7 +769,7 @@
                 currentShift.totalDiscount += transaction.discountAmount;
             }
             localStorage.setItem('currentShift', JSON.stringify(currentShift));
-            updateSalesOverview();
+            updateAdminOverview();
 
             alert(
                 '✅ PAYMENT SUCCESS!\n' +
@@ -800,8 +799,8 @@
             updateCartDisplay();
         }
 
-        // ========== SALES OVERVIEW — REAL-TIME UPDATE ==========
-        function updateSalesOverview() {
+        // ========== ADMIN OVERVIEW UPDATE — NALIPAT DITO! 🔒 ==========
+        function updateAdminOverview() {
             if (!currentShift) return;
             const netSales = currentShift.totalSales - currentShift.totalVoid;
             const totalCashOut = cashOutRecords.reduce((sum, c) => sum + c.amount, 0);
@@ -867,7 +866,7 @@
             if (cashOutRecords.length === 0) {
                 cList.innerHTML = '<p style="color:#888; text-align:center; padding:15px;">No cash out yet.</p>';
             } else {
-                cashOutRecords.forEach((c, idx) => {
+                cashOutRecords.forEach((c) => {
                     const div = document.createElement('div');
                     div.className = 'cashout-item';
                     div.innerHTML = `
@@ -907,8 +906,8 @@
             alert(`✅ CASH OUT SAVED!\n💸 Amount: ₱${amount.toFixed(2)}\n📝 Remarks: ${comment || 'None'}`);
             
             document.getElementById('cashoutPanel').style.display = 'none';
-            updateSalesOverview();
-            showTransactionsWindow(); // Refresh the window
+            updateAdminOverview();
+            showTransactionsWindow();
         }
 
         // ========== VOID TRANSACTION ==========
@@ -927,9 +926,9 @@
             currentShift.transactions = shiftTransactions;
             localStorage.setItem('currentShift', JSON.stringify(currentShift));
             
-            updateSalesOverview();
+            updateAdminOverview();
             alert('✅ TICKET #' + shiftTransactions[idx].ticket + ' HAS BEEN VOIDED!');
-            showTransactionsWindow(); // Refresh
+            showTransactionsWindow();
         }
 
         // ========== REPRINT TICKET ==========
@@ -951,7 +950,50 @@
             );
         }
 
-        // ========== ADMIN & UTILITY FUNCTIONS ==========
+        // ========== END SHIFT ==========
+        function endShift() {
+            if (!confirm('🛑 END THIS SHIFT?\nThis will close the current session and save all transactions.')) return;
+            
+            const shiftTotal = shiftTransactions.filter(t => !t.voided).reduce((sum, t) => sum + t.total, 0);
+            const totalCashOut = cashOutRecords.reduce((sum, c) => sum + c.amount, 0);
+            const closingCash = currentShift.openingCash + currentShift.totalCash - totalCashOut;
+            
+            currentShift.endedAt = new Date().toLocaleString('en-PH');
+            currentShift.totalSales = shiftTotal;
+            currentShift.closingCash = closingCash;
+            currentShift.transactions = shiftTransactions;
+            currentShift.cashOuts = cashOutRecords;
+            
+            allShifts.unshift({...currentShift});
+            localStorage.setItem('allShifts', JSON.stringify(allShifts));
+            localStorage.removeItem('currentShift');
+            
+            alert(
+                `✅ SHIFT ENDED!\n` +
+                `👤 Cashier: ${currentShift.cashier}\n` +
+                `🕒 Started: ${currentShift.startedAt}\n` +
+                `🕒 Ended: ${currentShift.endedAt}\n` +
+                `💰 Opening Cash: ₱${currentShift.openingCash.toFixed(2)}\n` +
+                `💰 Total Sales: ₱${shiftTotal.toFixed(2)}\n` +
+                `💸 Total Cash Out: ₱${totalCashOut.toFixed(2)}\n` +
+                `💰 Expected Closing Cash: ₱${closingCash.toFixed(2)}\n` +
+                `📋 Transactions: ${shiftTransactions.length}\n` +
+                `❌ Voided: ${shiftTransactions.filter(t => t.voided).length}`
+            );
+            
+            closeAllPanels();
+            document.getElementById('mainHeader').style.opacity = '0.3';
+            document.getElementById('mainHeader').style.pointerEvents = 'none';
+            document.getElementById('cashierView').style.opacity = '0.3';
+            document.getElementById('cashierView').style.pointerEvents = 'none';
+            document.getElementById('historyBtn').style.display = 'none';
+            document.getElementById('shiftStartPanel').style.display = 'block';
+            document.getElementById('cashierName').value = '';
+            document.getElementById('openingCash').value = '';
+            clearAll();
+        }
+
+        // ========== ADMIN FUNCTIONS ==========
         function showAdminLogin() {
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('adminLogin').style.display = 'block';
@@ -968,23 +1010,14 @@
                 closePanel('adminLogin');
                 document.getElementById('adminPanel').style.display = 'block';
                 document.getElementById('cashierView').style.opacity = '0.3';
+                updateAdminOverview();
             } else alert('❌ Wrong Password!');
         }
         function logoutAdmin() { closePanel('adminPanel'); document.getElementById('cashierView').style.opacity = '1'; }
         function switchTab(name) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active');
-            ['shifts','products','settings'].forEach(t => document.getElementById('tab-'+t).classList.add('hidden'));
+            ['overview','shifts','products','settings'].forEach(t => document.getElementById('tab-'+t).classList.add('hidden'));
             document.getElementById('tab-'+name).classList.remove('hidden');
-        }
-        function changePassword() {
-            const n = document.getElementById('newPass').value, c = document.getElementById('confirmPass').value;
-            if (!n) { alert('⚠️ Enter new password!'); return; }
-            if (n !== c) { alert('⚠️ Passwords do not match!'); return; }
-            adminPassword = n; localStorage.setItem('adminPass', n); alert('✅ Password updated!');
-        }
-        function updateTicketDisplay() { document.getElementById('currentTicket').textContent = String(ticketNumber + 1).padStart(3, '0'); }
-    </script>
+            if (
 
-</body>
-</html>
 
