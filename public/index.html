@@ -1,164 +1,309 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>MY POS — Cashier</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { margin: 0; padding: 10px; background: #f5f5f5; }
-    .login { max-width: 400px; margin: 100px auto; background: white; padding: 20px; border-radius: 10px; }
-    .pos { display: none; }
-    .products { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
-    .product-btn { padding: 15px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
-    .cart { background: white; padding: 15px; border-radius: 10px; margin-top: 20px; }
-    .total { font-size: 24px; font-weight: bold; color: red; }
-    button { cursor: pointer; padding: 10px; border: none; border-radius: 5px; }
-    .btn-danger { background: #f44336; color: white; }
-    .btn-success { background: #4CAF50; color: white; width: 100%; font-size: 20px; padding: 15px; }
-    .void-btn { background: orange; color: white; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My POS — Burger Station</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f5f5f5;
+            padding: 10px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        .header {
+            background: #ff5722;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0 8px;
+            color: #333;
+            border-bottom: 2px solid #ff5722;
+            padding-bottom: 5px;
+        }
+        .products {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .product {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px 8px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .product:active {
+            background: #388e3c;
+            transform: scale(0.98);
+        }
+        .product strong {
+            font-size: 16px;
+            display: block;
+            margin-top: 4px;
+        }
+        .cart-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        .cart-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+        }
+        .remove-btn {
+            background: #e53935;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .total {
+            font-size: 22px;
+            font-weight: bold;
+            color: #e53935;
+            text-align: right;
+            margin: 15px 0;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-cash {
+            background: #2196f3;
+            color: white;
+        }
+        .btn-clear {
+            background: #e53935;
+            color: white;
+        }
+        .change {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2196f3;
+            margin-top: 10px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 6px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
-<div class="login" id="loginScreen">
-  <h2>🔐 Cashier Login</h2>
-  <input type="text" id="username" placeholder="Username" style="width:100%;padding:10px;margin:5px 0;">
-  <input type="password" id="password" placeholder="Password" style="width:100%;padding:10px;margin:5px 0;">
-  <button onclick="login()" style="width:100%;background:blue;color:white;padding:10px;font-size:18px;">Login</button>
-  <p id="loginError" style="color:red;display:none;">Paki ilagay ang Username!</p>
-</div>
+    <div class="header">
+        🛒 MY POS — Burger Station
+    </div>
 
-<div class="pos" id="posScreen">
-  <h1>🛒 MY POS — Cashier: <span id="cashierName"></span></h1>
-  
-  <h3>Products — Click to Add</h3>
-  <div class="products" id="productList"></div>
-  
-  <div class="cart">
-    <h3>🛒 Cart</h3>
-    <div id="cartItems"></div>
-    <hr>
-    <div class="total">TOTAL: ₱<span id="grandTotal">0.00</span></div>
-    <br>
-    <label>Cash Received: ₱</label>
-    <input type="number" id="cashReceived" placeholder="0.00" oninput="computeChange()">
-    <p>Change: ₱<span id="change">0.00</span></p>
-    <br>
-    <button class="btn-success" onclick="checkout()">✅ PAY / CHECKOUT</button>
-    <button class="void-btn" onclick="requestVoid()">⚠️ REQUEST VOID</button>
-    <button class="btn-danger" onclick="clearCart()">🗑️ CLEAR</button>
-  </div>
-</div>
+    <!-- REGULAR BURGERS -->
+    <div class="section-title">🍔 Regular Burgers</div>
+    <div class="products">
+        <button class="product" data-name="Minute Burger" data-price="43">
+            Minute Burger<br><strong>₱43.00</strong>
+        </button>
+        <button class="product" data-name="Cheesy Burger" data-price="54">
+            Cheesy Burger<br><strong>₱54.00</strong>
+        </button>
+        <button class="product" data-name="Double Minute Burger" data-price="66">
+            Double Minute Burger<br><strong>₱66.00</strong>
+        </button>
+        <button class="product" data-name="Double Cheesy Burger" data-price="82">
+            Double Cheesy Burger<br><strong>₱82.00</strong>
+        </button>
+        <button class="product" data-name="Chicken Time Burger" data-price="52">
+            Chicken Time Burger<br><strong>₱52.00</strong>
+        </button>
+        <button class="product" data-name="Double Chicken Time Burger" data-price="72">
+            Double Chicken Time Burger<br><strong>₱72.00</strong>
+        </button>
+        <button class="product" data-name="Cheesydog" data-price="51">
+            Cheesydog<br><strong>₱51.00</strong>
+        </button>
+    </div>
 
-<script>
-let currentUser = null;
-let cart = [];
-let products = [
-  { id: 1, name: 'Coke 500ml', price: 35 },
-  { id: 2, name: 'Rice 1kg', price: 55 },
-  { id: 3, name: 'Bread', price: 40 },
-  { id: 4, name: 'Egg (pc)', price: 10 },
-  { id: 5, name: 'Water 500ml', price: 20 },
-  { id: 6, name: 'Chips', price: 30 }
-];
+    <!-- PREMIUM BURGERS -->
+    <div class="section-title">🍔 Premium Burgers</div>
+    <div class="products">
+        <button class="product" data-name="Black Pepper Burger" data-price="92">
+            Black Pepper Burger<br><strong>₱92.00</strong>
+        </button>
+        <button class="product" data-name="Beef Shawarma Burger" data-price="94">
+            Beef Shawarma Burger<br><strong>₱94.00</strong>
+        </button>
+        <button class="product" data-name="Bacon Cheeseburger" data-price="99">
+            Bacon Cheeseburger<br><strong>₱99.00</strong>
+        </button>
+        <button class="product" data-name="50 / 50 Chicken Veggie Burger" data-price="89">
+            50/50 Chicken Veggie<br><strong>₱89.00</strong>
+        </button>
+        <button class="product" data-name="All Meat Steak Burger" data-price="145">
+            All Meat Steak Burger<br><strong>₱145.00</strong>
+        </button>
+        <button class="product" data-name="French Onion Franks" data-price="93">
+            French Onion Franks<br><strong>₱93.00</strong>
+        </button>
+        <button class="product" data-name="Beef Hungarian" data-price="114">
+            Beef Hungarian<br><strong>₱114.00</strong>
+        </button>
+    </div>
 
-function login() {
-  const user = document.getElementById('username').value.trim();
-  if (!user) {
-    document.getElementById('loginError').style.display = 'block';
-    return;
-  }
-  currentUser = { username: user, role: 'cashier' };
-  document.getElementById('cashierName').textContent = user;
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('posScreen').style.display = 'block';
-  renderProducts();
-}
+    <!-- CART SECTION -->
+    <div class="cart-section">
+        <div class="cart-title">🛒 Cart</div>
+        <div id="cart-items"></div>
+        <div class="total">TOTAL: ₱<span id="total">0.00</span></div>
 
-function renderProducts() {
-  const list = document.getElementById('productList');
-  list.innerHTML = '';
-  products.forEach(function(p) {
-    list.innerHTML += '<button class="product-btn" onclick="addToCart(' + p.id + ')">' + p.name + '<br>₱' + p.price.toFixed(2) + '</button>';
-  });
-}
+        <div class="input-group">
+            <label for="cash-received">Cash Received: ₱</label>
+            <input type="number" id="cash-received" placeholder="0.00" oninput="calculateChange()">
+        </div>
 
-function addToCart(id) {
-  const product = products.find(function(p) { return p.id === id; });
-  cart.push({...product});
-  updateCart();
-}
+        <div class="change" id="change-display">
+            Change: ₱<span id="change-amount">0.00</span>
+        </div>
 
-function updateCart() {
-  const cartDiv = document.getElementById('cartItems');
-  cartDiv.innerHTML = '';
-  let total = 0;
-  cart.forEach(function(item, index) {
-    total += item.price;
-    cartDiv.innerHTML += '<p>' + item.name + ' — ₱' + item.price.toFixed(2) + ' <button onclick="removeFromCart(' + index + ')" style="color:red;padding:2px;">✕</button></p>';
-  });
-  document.getElementById('grandTotal').textContent = total.toFixed(2);
-}
+        <button class="btn btn-cash" onclick="completeSale()">✅ Complete Sale</button>
+        <button class="btn btn-clear" onclick="clearCart()">🗑️ Clear Cart</button>
+    </div>
 
-function removeFromCart(index) {
-  cart.splice(index, 1);
-  updateCart();
-}
+    <script>
+        let cart = [];
+        let total = 0;
 
-function computeChange() {
-  const total = cart.reduce(function(sum, i) { return sum + i.price; }, 0);
-  const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
-  document.getElementById('change').textContent = (cash - total).toFixed(2);
-}
+        // Add product to cart
+        document.querySelectorAll('.product').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const name = btn.dataset.name;
+                const price = parseFloat(btn.dataset.price);
+                cart.push({ name, price });
+                total += price;
+                updateCart();
+            });
+        });
 
-async function checkout() {
-  const total = cart.reduce(function(sum, i) { return sum + i.price; }, 0);
-  const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
-  if (cart.length === 0) return alert('Walang laman ang cart!');
-  if (cash < total) return alert('Kulang ang pera!');
-  
-  const response = await fetch('/api/transactions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      items: cart, total: total, payment: cash, 
-      change: cash - total, cashier: currentUser.username
-    })
-  });
-  
-  const result = await response.json();
-  alert('✅ SALE SAVED!\nTotal: ₱' + total.toFixed(2) + '\nChange: ₱' + (cash-total).toFixed(2));
-  cart = [];
-  document.getElementById('cashReceived').value = '';
-  updateCart();
-}
+        // Update cart display
+        function updateCart() {
+            const cartEl = document.getElementById('cart-items');
+            cartEl.innerHTML = '';
+            
+            cart.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <span>${item.name} — ₱${item.price.toFixed(2)}</span>
+                    <button class="remove-btn" onclick="removeItem(${index})">×</button>
+                `;
+                cartEl.appendChild(div);
+            });
 
-async function requestVoid() {
-  if (!confirm('Mag-request ng VOID sa Admin?')) return;
-  const transactionId = prompt('Ipasok ang Transaction ID:');
-  const reason = prompt('Bakit kailangan i-void?');
-  if (!transactionId || !reason) return;
-  
-  const response = await fetch('/api/void-request', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      transactionId: transactionId,
-      cashier: currentUser.username,
-      reason: reason
-    })
-  });
-  
-  const result = await response.json();
-  alert(result.message + '\n✅ I-notify mo ang Admin!');
-}
+            document.getElementById('total').textContent = total.toFixed(2);
+            calculateChange();
+        }
 
-function clearCart() {
-  cart = [];
-  document.getElementById('cashReceived').value = '';
-  updateCart();
-}
-</script>
+        // Remove item from cart
+        function removeItem(index) {
+            total -= cart[index].price;
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        // Calculate change
+        function calculateChange() {
+            const cash = parseFloat(document.getElementById('cash-received').value) || 0;
+            const changeEl = document.getElementById('change-display');
+            const amountEl = document.getElementById('change-amount');
+            
+            if (cash >= total && total > 0) {
+                changeEl.style.display = 'block';
+                amountEl.textContent = (cash - total).toFixed(2);
+            } else {
+                changeEl.style.display = 'none';
+            }
+        }
+
+        // Complete sale
+        function completeSale() {
+            const cash = parseFloat(document.getElementById('cash-received').value) || 0;
+            if (cart.length === 0) {
+                alert('⚠️ Cart is empty!');
+                return;
+            }
+            if (cash < total) {
+                alert('⚠️ Insufficient cash!');
+                return;
+            }
+            alert(`✅ Sale Complete!\nTotal: ₱${total.toFixed(2)}\nCash: ₱${cash.toFixed(2)}\nChange: ₱${(cash - total).toFixed(2)}`);
+            clearCart();
+        }
+
+        // Clear cart
+        function clearCart() {
+            cart = [];
+            total = 0;
+            document.getElementById('cash-received').value = '';
+            updateCart();
+        }
+    </script>
+
 </body>
 </html>
 
