@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger Station POS — Updated</title>
+    <title>Burger Station POS — Fixed</title>
     <style>
         * {
             box-sizing: border-box;
@@ -241,29 +241,27 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5);
-            display: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 99;
         }
         .panel {
             background: white;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 20px;
+            border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 94%;
+            width: 90%;
+            max-width: 400px;
             max-height: 85vh;
             overflow-y: auto;
             z-index: 100;
         }
         .panel h2 {
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             color: #d32f2f;
-            font-size: 18px;
+            font-size: 20px;
         }
         .tab-buttons {
             display: flex;
@@ -299,20 +297,6 @@
             border-bottom: 1px dashed #ddd;
             font-size: 13px;
             background: #fff8e1;
-        }
-        .shift-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            background: #fafafa;
-        }
-        .shift-header {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #d32f2f;
         }
         .sales-grid {
             display: grid;
@@ -368,19 +352,18 @@
 </head>
 <body>
 
-    <!-- OVERLAY -->
-    <div class="overlay" id="overlay" onclick="closeAllPanels()"></div>
-
-    <!-- SHIFT START SCREEN -->
-    <div class="panel" id="shiftStartPanel" style="display:block;">
-        <h2>🕒 START NEW SHIFT</h2>
-        <input type="text" id="cashierName" placeholder="Cashier Name" required>
-        <input type="number" id="openingCash" placeholder="Opening Cash (Puhunan)" step="0.01">
-        <button class="btn btn-pay" onclick="startShift()">✅ Start Shift</button>
+    <!-- SHIFT START SCREEN — FIXED LAYOUT -->
+    <div class="overlay" id="shiftStartOverlay">
+        <div class="panel">
+            <h2>🕒 START NEW SHIFT</h2>
+            <input type="text" id="cashierName" placeholder="Cashier Name" required>
+            <input type="number" id="openingCash" placeholder="Opening Cash (Puhunan)" step="0.01">
+            <button class="btn btn-pay" onclick="startShift()">✅ Start Shift</button>
+        </div>
     </div>
 
     <!-- HEADER -->
-    <div class="header" id="mainHeader" style="opacity:0.3; pointer-events:none;">
+    <div class="header" id="mainHeader" style="display:none;">
         <h1>🍔 BURGER STATION POS</h1>
         <div class="shift-info">
             <div>👤 <span id="currentCashier">—</span></div>
@@ -391,98 +374,95 @@
     </div>
 
     <!-- ADMIN LOGIN -->
-    <div class="panel" id="adminLogin">
-        <h2>🔐 Admin Login</h2>
-        <input type="password" id="adminPass" placeholder="Enter Admin Password">
-        <button class="btn btn-pay" onclick="adminLogin()">Login</button>
-        <button class="btn btn-close" onclick="closePanel('adminLogin')">Cancel</button>
+    <div class="overlay" id="adminLoginOverlay" style="display:none;">
+        <div class="panel">
+            <h2>🔐 Admin Login</h2>
+            <input type="password" id="adminPass" placeholder="Enter Admin Password">
+            <button class="btn btn-pay" onclick="adminLogin()">Login</button>
+            <button class="btn btn-close" onclick="closeAdminLogin()">Cancel</button>
+        </div>
     </div>
 
-    <!-- ADMIN PANEL — MAY SALES OVERVIEW DITO! 🔒 -->
-    <div class="panel" id="adminPanel">
-        <h2>⚙️ Admin Control Panel</h2>
-        <div class="tab-buttons">
-            <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
-            <button class="tab-btn" onclick="switchTab('shifts')">Shifts</button>
-            <button class="tab-btn" onclick="switchTab('products')">Products</button>
-            <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
-        </div>
-
-        <!-- 📊 SALES OVERVIEW — ADMIN ONLY! 🔒 -->
-        <div id="tab-overview">
-            <h3>📊 CURRENT SHIFT SALES OVERVIEW</h3>
-            <div class="sales-grid">
-                <div class="sales-item">💰 Total Sales<br><strong id="ovTotal">₱0.00</strong></div>
-                <div class="sales-item">💵 Cash Sales<br><strong id="ovCash">₱0.00</strong></div>
-                <div class="sales-item">📱 GCash<br><strong id="ovGcash">₱0.00</strong></div>
-                <div class="sales-item">🐼 FoodPanda<br><strong id="ovFoodpanda">₱0.00</strong></div>
-                <div class="sales-item">🛵 Grab<br><strong id="ovGrab">₱0.00</strong></div>
-                <div class="sales-item">❌ Void<br><strong id="ovVoid">₱0.00</strong></div>
-                <div class="sales-item">💸 Cash Out<br><strong id="ovCashout">₱0.00</strong></div>
-                <div class="sales-item">👥 Discounts<br><strong id="ovDiscount">₱0.00</strong></div>
+    <!-- ADMIN PANEL -->
+    <div class="overlay" id="adminOverlay" style="display:none;">
+        <div class="panel" style="max-height:90vh;">
+            <h2>⚙️ Admin Control Panel</h2>
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
+                <button class="tab-btn" onclick="switchTab('shifts')">Shifts</button>
+                <button class="tab-btn" onclick="switchTab('products')">Products</button>
+                <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
             </div>
-            <div class="net-sales">💵 ACTUAL CASH ON HAND: <span id="ovNetCash">₱0.00</span></div>
-        </div>
 
-        <!-- SHIFTS HISTORY -->
-        <div id="tab-shifts" class="hidden">
-            <h3>📋 All Shift History</h3>
-            <div id="allShiftsList"></div>
-            <button class="btn btn-clear" onclick="exportAllData()">📤 Export Data</button>
-        </div>
+            <!-- 📊 SALES OVERVIEW — ADMIN ONLY! 🔒 -->
+            <div id="tab-overview">
+                <h3>📊 CURRENT SHIFT SALES OVERVIEW</h3>
+                <div class="sales-grid">
+                    <div class="sales-item">💰 Total Sales<br><strong id="ovTotal">₱0.00</strong></div>
+                    <div class="sales-item">💵 Cash Sales<br><strong id="ovCash">₱0.00</strong></div>
+                    <div class="sales-item">📱 GCash<br><strong id="ovGcash">₱0.00</strong></div>
+                    <div class="sales-item">🐼 FoodPanda<br><strong id="ovFoodpanda">₱0.00</strong></div>
+                    <div class="sales-item">🛵 Grab<br><strong id="ovGrab">₱0.00</strong></div>
+                    <div class="sales-item">❌ Void<br><strong id="ovVoid">₱0.00</strong></div>
+                    <div class="sales-item">💸 Cash Out<br><strong id="ovCashout">₱0.00</strong></div>
+                    <div class="sales-item">👥 Discounts<br><strong id="ovDiscount">₱0.00</strong></div>
+                </div>
+                <div class="net-sales">💵 ACTUAL CASH ON HAND: <span id="ovNetCash">₱0.00</span></div>
+            </div>
 
-        <!-- EDIT PRODUCTS -->
-        <div id="tab-products" class="hidden">
-            <h3>Edit Product Prices</h3>
-            <div id="productEditor"></div>
-            <button class="btn btn-pay" onclick="saveProducts()">💾 Save Prices</button>
-        </div>
+            <div id="tab-shifts" class="hidden">
+                <h3>📋 All Shift History</h3>
+                <div id="allShiftsList"></div>
+            </div>
 
-        <!-- SETTINGS -->
-        <div id="tab-settings" class="hidden">
-            <h3>Change Admin Password</h3>
-            <input type="password" id="newPass" placeholder="New Password">
-            <input type="password" id="confirmPass" placeholder="Confirm Password">
-            <button class="btn btn-pay" onclick="changePassword()">Update Password</button>
-        </div>
+            <div id="tab-products" class="hidden">
+                <h3>Edit Product Prices</h3>
+                <div id="productEditor"></div>
+                <button class="btn btn-pay" onclick="saveProducts()">💾 Save Prices</button>
+            </div>
 
-        <button class="btn btn-close" onclick="logoutAdmin()">🚪 Logout</button>
+            <div id="tab-settings" class="hidden">
+                <h3>Change Admin Password</h3>
+                <input type="password" id="newPass" placeholder="New Password">
+                <input type="password" id="confirmPass" placeholder="Confirm Password">
+                <button class="btn btn-pay" onclick="changePassword()">Update Password</button>
+            </div>
+
+            <button class="btn btn-close" onclick="closeAdminPanel()">🚪 Logout</button>
+        </div>
     </div>
 
     <!-- TRANSACTIONS HISTORY BUTTON -->
     <button class="history-btn" id="historyBtn" style="display:none;" onclick="showTransactionsWindow()">📋</button>
 
-    <!-- ========== SEPARATE TRANSACTIONS WINDOW ========== -->
-    <div class="panel" id="transactionsPanel">
-        <h2>📋 TRANSACTION HISTORY — CURRENT SHIFT</h2>
-        <div style="background:#f5f5f5; padding:10px; border-radius:6px; margin-bottom:10px; font-size:14px;">
-            <p><strong>Cashier:</strong> <span id="transCashier">—</span> | <strong>Shift Started:</strong> <span id="transShiftTime">—</span></p>
-            <p><strong>Total Sales:</strong> ₱<span id="transSales">0.00</span> | <strong>Transactions:</strong> <span id="transCount">0</span> | <strong>Voided:</strong> <span id="transVoid">0</span></p>
-            <p><strong>Total Cash Outs:</strong> ₱<span id="transCashout">0.00</span></p>
-            <p style="font-weight:bold; color:#2e7d32; margin-top:5px;">💰 ACTUAL CASH: ₱<span id="transNetCash">0.00</span></p>
+    <!-- TRANSACTIONS PANEL -->
+    <div class="overlay" id="transOverlay" style="display:none;">
+        <div class="panel" style="max-height:90vh;">
+            <h2>📋 TRANSACTION HISTORY</h2>
+            <div style="background:#f5f5f5; padding:10px; border-radius:6px; margin-bottom:10px; font-size:14px;">
+                <p><strong>Cashier:</strong> <span id="transCashier">—</span> | <strong>Shift Started:</strong> <span id="transShiftTime">—</span></p>
+                <p><strong>Total Sales:</strong> ₱<span id="transSales">0.00</span> | <strong>Transactions:</strong> <span id="transCount">0</span></p>
+            </div>
+            <div id="transList"></div>
+            <button class="btn btn-cashout" onclick="showCashoutPanel()">💸 New Cash Out</button>
+            <button class="btn btn-end-shift" onclick="endShift()">🛑 End Shift</button>
+            <button class="btn btn-close" onclick="closeTransPanel()">Close</button>
         </div>
-        <h4 style="margin:10px 0 5px;">✅ Transactions</h4>
-        <div id="transList"></div>
-        <h4 style="margin:15px 0 5px; color:#e65100;">💸 Cash Out Records</h4>
-        <div id="cashoutList"></div>
-        <button class="btn btn-cashout" onclick="showCashoutPanel()">💸 New Cash Out</button>
-        <button class="btn btn-end-shift" onclick="endShift()">🛑 End Shift & Close</button>
-        <button class="btn btn-close" onclick="closePanel('transactionsPanel')">Close</button>
     </div>
 
-    <!-- ========== CASH OUT PANEL ========== -->
-    <div class="panel" id="cashoutPanel">
-        <h2>💸 CASH OUT / EXPENSE</h2>
-        <p style="font-size:13px; color:#666; margin-bottom:10px;">Ito ay mababawas sa Total Cash Sales</p>
-        <input type="number" id="cashoutAmount" placeholder="Amount (Halaga)" step="0.01">
-        <textarea id="cashoutComment" placeholder="Comment / Remarks — Para saan ang pera? (Halimbawa: Pambili ng yelo, pambayad kuryente, etc.)"></textarea>
-        <button class="btn btn-cashout" onclick="saveCashout()">✅ Save Cash Out</button>
-        <button class="btn btn-close" onclick="closePanel('cashoutPanel')">Cancel</button>
+    <!-- CASH OUT PANEL -->
+    <div class="overlay" id="cashoutOverlay" style="display:none;">
+        <div class="panel">
+            <h2>💸 CASH OUT / EXPENSE</h2>
+            <input type="number" id="cashoutAmount" placeholder="Amount" step="0.01">
+            <textarea id="cashoutComment" placeholder="Remarks — Para saan?"></textarea>
+            <button class="btn btn-cashout" onclick="saveCashout()">✅ Save</button>
+            <button class="btn btn-close" onclick="closeCashoutPanel()">Cancel</button>
+        </div>
     </div>
 
     <!-- CASHIER VIEW -->
-    <div id="cashierView" style="opacity:0.3; pointer-events:none;">
-        <!-- 🍔 PRODUCTS -->
+    <div id="cashierView" style="display:none;">
         <div class="section-title">🍔 Regular Burgers</div>
         <div class="products" id="regularProducts">
             <button class="product" data-id="r1" data-name="Minute Burger" data-price="43">Minute Burger<br><strong>₱43.00</strong></button>
@@ -505,14 +485,12 @@
             <button class="product" data-id="p7" data-name="Beef Hungarian" data-price="114">Beef Hungarian<br><strong>₱114.00</strong></button>
         </div>
 
-        <!-- 🛒 CART WITH DISCOUNT -->
         <div class="cart-section">
             <div class="cart-title">🛒 ORDER LIST</div>
             
-            <!-- 👴👩‍🦯 DISCOUNT BUTTONS -->
             <div class="discount-bar">
                 <button class="discount-btn selected" id="discNone" onclick="selectDiscount('none')">No Discount</button>
-                <button class="discount-btn" id="discSenior" onclick="selectDiscount('senior')">👴 Senior Citizen (5%)</button>
+                <button class="discount-btn" id="discSenior" onclick="selectDiscount('senior')">👴 Senior (5%)</button>
                 <button class="discount-btn" id="discPwd" onclick="selectDiscount('pwd')">👩‍🦯 PWD (5%)</button>
             </div>
 
@@ -524,7 +502,6 @@
                 <div class="total">TOTAL: ₱<span id="total-amount">0.00</span></div>
             </div>
 
-            <!-- 💳 PAYMENT -->
             <div class="payment-title">💳 Mode of Payment</div>
             <div class="payment-options">
                 <button class="payment-btn selected" data-method="Cash" onclick="selectPayment(this)">💰 Cash</button>
@@ -542,9 +519,7 @@
         </div>
     </div>
 
-    <!-- ⚙️ SCRIPT -->
     <script>
-        // ========== GLOBAL VARIABLES ==========
         let cart = [];
         let subtotal = 0;
         let total = 0;
@@ -552,39 +527,32 @@
         let discountType = 'none';
         let adminPassword = localStorage.getItem('adminPass') || 'admin123';
         let ticketNumber = parseInt(localStorage.getItem('lastTicket')) || 0;
-        
-        // SHIFT DATA
-        let currentShift = JSON.parse(localStorage.getItem('currentShift') || 'null');
-        let allShifts = JSON.parse(localStorage.getItem('allShifts') || '[]');
+        let currentShift = null;
         let shiftTransactions = [];
         let cashOutRecords = [];
 
-        // ========== INITIALIZE ==========
         document.addEventListener('DOMContentLoaded', () => {
-            if (currentShift && !currentShift.endedAt) {
-                resumeShift();
-            } else {
-                document.getElementById('shiftStartPanel').style.display = 'block';
-            }
-            updateTicketDisplay();
             attachProductEvents();
             selectDiscount('none');
         });
 
-        // ========== START SHIFT ==========
+        // ========== START SHIFT — FIXED! ✅ ==========
         function startShift() {
             const name = document.getElementById('cashierName').value.trim();
             const openingCash = parseFloat(document.getElementById('openingCash').value) || 0;
-            if (!name) { alert('⚠️ Ilagay ang pangalan ng cashier!'); return; }
+            
+            console.log('Start Shift clicked!', {name, openingCash}); // Debug log
+            
+            if (!name) { 
+                alert('⚠️ Ilagay ang pangalan ng cashier!'); 
+                return; 
+            }
 
             currentShift = {
                 id: Date.now(),
                 cashier: name,
                 openingCash: openingCash,
                 startedAt: new Date().toLocaleString('en-PH'),
-                endedAt: null,
-                transactions: [],
-                cashOuts: [],
                 totalSales: 0,
                 totalCash: 0,
                 totalGcash: 0,
@@ -594,43 +562,22 @@
                 totalDiscount: 0
             };
             
-            localStorage.setItem('currentShift', JSON.stringify(currentShift));
             shiftTransactions = [];
             cashOutRecords = [];
             
-            // SHOW MAIN APP
-            document.getElementById('shiftStartPanel').style.display = 'none';
-            document.getElementById('mainHeader').style.opacity = '1';
-            document.getElementById('mainHeader').style.pointerEvents = 'auto';
-            document.getElementById('cashierView').style.opacity = '1';
-            document.getElementById('cashierView').style.pointerEvents = 'auto';
+            // HIDE START PANEL, SHOW MAIN APP
+            document.getElementById('shiftStartOverlay').style.display = 'none';
+            document.getElementById('mainHeader').style.display = 'block';
+            document.getElementById('cashierView').style.display = 'block';
             document.getElementById('historyBtn').style.display = 'block';
             
             document.getElementById('currentCashier').textContent = name;
             document.getElementById('shiftTime').textContent = currentShift.startedAt.split(',')[0];
-            updateAdminOverview();
+            updateTicketDisplay();
             
             alert(`✅ SHIFT STARTED!\n👤 Cashier: ${name}\n💰 Opening Cash: ₱${openingCash.toFixed(2)}`);
         }
 
-        // ========== RESUME SHIFT ==========
-        function resumeShift() {
-            shiftTransactions = currentShift.transactions || [];
-            cashOutRecords = currentShift.cashOuts || [];
-            
-            document.getElementById('shiftStartPanel').style.display = 'none';
-            document.getElementById('mainHeader').style.opacity = '1';
-            document.getElementById('mainHeader').style.pointerEvents = 'auto';
-            document.getElementById('cashierView').style.opacity = '1';
-            document.getElementById('cashierView').style.pointerEvents = 'auto';
-            document.getElementById('historyBtn').style.display = 'block';
-            
-            document.getElementById('currentCashier').textContent = currentShift.cashier;
-            document.getElementById('shiftTime').textContent = currentShift.startedAt.split(',')[0];
-            updateAdminOverview();
-        }
-
-        // ========== DISCOUNT SELECTION ==========
         function selectDiscount(type) {
             discountType = type;
             document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('selected'));
@@ -640,11 +587,9 @@
             recalculateTotals();
         }
 
-        // ========== RECALCULATE WITH DISCOUNT ==========
         function recalculateTotals() {
             subtotal = cart.reduce((sum, item) => sum + item.price, 0);
             let discountAmount = 0;
-            
             if (discountType !== 'none' && subtotal > 0) {
                 discountAmount = subtotal * 0.05;
                 document.getElementById('discountRow').style.display = 'block';
@@ -652,15 +597,12 @@
             } else {
                 document.getElementById('discountRow').style.display = 'none';
             }
-            
             total = subtotal - discountAmount;
-            
             document.getElementById('subtotalAmt').textContent = subtotal.toFixed(2);
             document.getElementById('total-amount').textContent = total.toFixed(2);
             computeChange();
         }
 
-        // ========== PRODUCT CLICK — AYOS NA! ✅ ==========
         function attachProductEvents() {
             document.querySelectorAll('.product').forEach(button => {
                 button.addEventListener('click', () => {
@@ -673,18 +615,16 @@
             });
         }
 
-        // ========== CART DISPLAY ==========
         function updateCartDisplay() {
             const list = document.getElementById('cart-items');
             list.innerHTML = '';
-
             cart.forEach((item, index) => {
                 const row = document.createElement('div');
                 row.className = 'cart-item';
                 row.innerHTML = `
                     <div class="item-details">
                         ${item.name} — ₱${item.price.toFixed(2)}
-                        ${discountType !== 'none' ? `<div class="item-discount">(-5% applied)</div>` : ''}
+                        ${discountType !== 'none' ? '<div class="item-discount">(-5% applied)</div>' : ''}
                     </div>
                     <button class="remove-btn" onclick="removeItem(${index})">×</button>
                 `;
@@ -692,19 +632,16 @@
             });
         }
 
-        // ========== REMOVE ITEM ==========
         function removeItem(index) {
             cart.splice(index, 1);
             recalculateTotals();
             updateCartDisplay();
         }
 
-        // ========== PAYMENT SELECTION ==========
         function selectPayment(btn) {
             document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             selectedPayment = btn.dataset.method;
-            
             const cashInput = document.getElementById('cash-input');
             const cashLabel = document.getElementById('cashLabel');
             if (selectedPayment === 'Cash') {
@@ -717,13 +654,11 @@
             }
         }
 
-        // ========== COMPUTE CHANGE ==========
         function computeChange() {
             if (selectedPayment !== 'Cash') return;
             const cash = parseFloat(document.getElementById('cash-input').value) || 0;
             const changeBox = document.getElementById('change-box');
             const changeDisplay = document.getElementById('change-amount');
-
             if (cash >= total && total > 0) {
                 changeBox.style.display = 'block';
                 changeDisplay.textContent = (cash - total).toFixed(2);
@@ -732,10 +667,8 @@
             }
         }
 
-        // ========== COMPLETE SALE ==========
         function finishSale() {
             const cash = parseFloat(document.getElementById('cash-input').value) || 0;
-            
             if (!currentShift) { alert('⚠️ Start a shift first!'); return; }
             if (cart.length === 0) { alert('⚠️ Wala pang order!'); return; }
             if (selectedPayment === 'Cash' && cash < total) { alert('⚠️ Kulang ang pera!'); return; }
@@ -758,38 +691,26 @@
                 voided: false
             };
             shiftTransactions.unshift(transaction);
-            currentShift.transactions = shiftTransactions;
 
-            if (!transaction.voided) {
-                if (selectedPayment === 'Cash') currentShift.totalCash += total;
-                else if (selectedPayment === 'GCash') currentShift.totalGcash += total;
-                else if (selectedPayment === 'FoodPanda') currentShift.totalFoodpanda += total;
-                else if (selectedPayment === 'Grab') currentShift.totalGrab += total;
-                currentShift.totalSales += total;
-                currentShift.totalDiscount += transaction.discountAmount;
-            }
-            localStorage.setItem('currentShift', JSON.stringify(currentShift));
-            updateAdminOverview();
+            if (selectedPayment === 'Cash') currentShift.totalCash += total;
+            else if (selectedPayment === 'GCash') currentShift.totalGcash += total;
+            else if (selectedPayment === 'FoodPanda') currentShift.totalFoodpanda += total;
+            else if (selectedPayment === 'Grab') currentShift.totalGrab += total;
+            currentShift.totalSales += total;
+            currentShift.totalDiscount += transaction.discountAmount;
 
             alert(
-                '✅ PAYMENT SUCCESS!\n' +
-                '🎟️ TICKET #' + ticket + '\n' +
-                (discountType !== 'none' ? `👤 ${discountType === 'senior' ? 'Senior Citizen' : 'PWD'} Discount Applied!\n` : '') +
-                '------------------------\n' +
+                '✅ PAYMENT SUCCESS!\n🎟️ TICKET #' + ticket + '\n' +
                 'Subtotal: ₱' + subtotal.toFixed(2) + '\n' +
-                (transaction.discountAmount > 0 ? 'Discount: -₱' + transaction.discountAmount.toFixed(2) + '\n' : '') +
                 'TOTAL: ₱' + total.toFixed(2) + '\n' +
                 '💳 Payment: ' + selectedPayment + '\n' +
-                (selectedPayment === 'Cash' ? 'CASH: ₱' + cash.toFixed(2) + '\nCHANGE: ₱' + (cash - total).toFixed(2) + '\n' : '') +
-                '------------------------\n' +
-                'Salamat po!'
+                '------------------------\nSalamat po!'
             );
 
             clearAll();
             updateTicketDisplay();
         }
 
-        // ========== CLEAR CART ==========
         function clearAll() {
             cart = [];
             subtotal = 0;
@@ -799,14 +720,38 @@
             updateCartDisplay();
         }
 
-        // ========== ADMIN OVERVIEW UPDATE — NALIPAT DITO! 🔒 ==========
+        function updateTicketDisplay() {
+            document.getElementById('currentTicket').textContent = String(ticketNumber + 1).padStart(3, '0');
+        }
+
+        function showAdminLogin() {
+            document.getElementById('adminLoginOverlay').style.display = 'flex';
+            document.getElementById('adminPass').value = '';
+        }
+        function closeAdminLogin() {
+            document.getElementById('adminLoginOverlay').style.display = 'none';
+        }
+        function adminLogin() {
+            if (document.getElementById('adminPass').value === adminPassword) {
+                closeAdminLogin();
+                document.getElementById('adminOverlay').style.display = 'flex';
+                updateAdminOverview();
+            } else alert('❌ Wrong Password!');
+        }
+        function closeAdminPanel() {
+            document.getElementById('adminOverlay').style.display = 'none';
+        }
+        function switchTab(name) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            ['overview','shifts','products','settings'].forEach(t => document.getElementById('tab-'+t).classList.add('hidden'));
+            document.getElementById('tab-'+name).classList.remove('hidden');
+        }
         function updateAdminOverview() {
             if (!currentShift) return;
-            const netSales = currentShift.totalSales - currentShift.totalVoid;
             const totalCashOut = cashOutRecords.reduce((sum, c) => sum + c.amount, 0);
             const actualCash = currentShift.totalCash - totalCashOut;
-
-            document.getElementById('ovTotal').textContent = netSales.toFixed(2);
+            document.getElementById('ovTotal').textContent = (currentShift.totalSales - currentShift.totalVoid).toFixed(2);
             document.getElementById('ovCash').textContent = currentShift.totalCash.toFixed(2);
             document.getElementById('ovGcash').textContent = currentShift.totalGcash.toFixed(2);
             document.getElementById('ovFoodpanda').textContent = currentShift.totalFoodpanda.toFixed(2);
@@ -816,208 +761,60 @@
             document.getElementById('ovDiscount').textContent = currentShift.totalDiscount.toFixed(2);
             document.getElementById('ovNetCash').textContent = actualCash.toFixed(2);
         }
-
-        // ========== SEPARATE TRANSACTIONS WINDOW ==========
         function showTransactionsWindow() {
-            if (!currentShift) return;
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('transactionsPanel').style.display = 'block';
-            
-            const netSales = currentShift.totalSales - currentShift.totalVoid;
-            const totalCashOut = cashOutRecords.reduce((sum, c) => sum + c.amount, 0);
-            const actualCash = currentShift.totalCash - totalCashOut;
-            const voidCount = shiftTransactions.filter(t => t.voided).length;
-            const voidAmount = shiftTransactions.filter(t => t.voided).reduce((sum, t) => sum + t.total, 0);
-
-            document.getElementById('transCashier').textContent = currentShift.cashier;
-            document.getElementById('transShiftTime').textContent = currentShift.startedAt;
-            document.getElementById('transSales').textContent = netSales.toFixed(2);
+            document.getElementById('transOverlay').style.display = 'flex';
+            document.getElementById('transCashier').textContent = currentShift?.cashier || '—';
+            document.getElementById('transShiftTime').textContent = currentShift?.startedAt?.split(',')[0] || '—';
+            document.getElementById('transSales').textContent = ((currentShift?.totalSales || 0) - (currentShift?.totalVoid || 0)).toFixed(2);
             document.getElementById('transCount').textContent = shiftTransactions.length;
-            document.getElementById('transVoid').textContent = voidCount + ' (₱' + voidAmount.toFixed(2) + ')';
-            document.getElementById('transCashout').textContent = totalCashOut.toFixed(2);
-            document.getElementById('transNetCash').textContent = actualCash.toFixed(2);
-
-            // TRANSACTIONS LIST
             const tList = document.getElementById('transList');
-            tList.innerHTML = '';
-            if (shiftTransactions.length === 0) {
-                tList.innerHTML = '<p style="color:#888; text-align:center; padding:15px;">No transactions yet.</p>';
-            } else {
-                shiftTransactions.forEach((trans, idx) => {
-                    const div = document.createElement('div');
-                    div.className = `trans-item ${trans.voided ? 'voided' : ''}`;
-                    div.innerHTML = `
-                        <span class="trans-ticket">#${trans.ticket}</span>
-                        <span> — ₱${trans.total.toFixed(2)}</span>
-                        <span style="font-size:12px; color:#666;"> — ${trans.payment}${trans.discountType !== 'none' ? ' | ' + (trans.discountType === 'senior' ? 'Senior' : 'PWD') + ' Disc' : ''}</span>
-                        <br><small>${trans.datetime}</small>
-                        <div style="margin-top:4px;">
-                            <button class="btn-small btn-reprint" onclick="reprintTicket(${idx})">📄 View</button>
-                            <button class="btn-small btn-void-small" onclick="voidTransaction(${idx})">❌ Void</button>
-                        </div>
-                    `;
-                    tList.appendChild(div);
-                });
-            }
-
-            // CASH OUT LIST
-            const cList = document.getElementById('cashoutList');
-            cList.innerHTML = '';
-            if (cashOutRecords.length === 0) {
-                cList.innerHTML = '<p style="color:#888; text-align:center; padding:15px;">No cash out yet.</p>';
-            } else {
-                cashOutRecords.forEach((c) => {
-                    const div = document.createElement('div');
-                    div.className = 'cashout-item';
-                    div.innerHTML = `
-                        <strong>💸 ₱${c.amount.toFixed(2)}</strong>
-                        <span style="font-size:12px; color:#666; margin-left:8px;">${c.datetime}</span>
-                        <p style="margin-top:4px; font-size:13px; color:#555;"><em>${c.comment || 'No remarks'}</em></p>
-                    `;
-                    cList.appendChild(div);
-                });
-            }
+            tList.innerHTML = shiftTransactions.length === 0 
+                ? '<p style="color:#888; text-align:center;">No transactions yet.</p>'
+                : shiftTransactions.map(t => `
+                    <div class="trans-item ${t.voided ? 'voided' : ''}">
+                        <span class="trans-ticket">#${t.ticket}</span> — ₱${t.total.toFixed(2)} — ${t.payment}<br>
+                        <small>${t.datetime}</small>
+                    </div>
+                `).join('');
         }
-
-        // ========== CASH OUT FEATURE ==========
+        function closeTransPanel() { document.getElementById('transOverlay').style.display = 'none'; }
         function showCashoutPanel() {
-            document.getElementById('cashoutAmount').value = '';
-            document.getElementById('cashoutComment').value = '';
-            document.getElementById('transactionsPanel').style.display = 'none';
-            document.getElementById('cashoutPanel').style.display = 'block';
+            document.getElementById('transOverlay').style.display = 'none';
+            document.getElementById('cashoutOverlay').style.display = 'flex';
         }
-
+        function closeCashoutPanel() { document.getElementById('cashoutOverlay').style.display = 'none'; }
         function saveCashout() {
             const amount = parseFloat(document.getElementById('cashoutAmount').value);
-            const comment = document.getElementById('cashoutComment').value.trim();
-            
+            const comment = document.getElementById('cashoutComment').value.trim() || 'No remarks';
             if (!amount || amount <= 0) { alert('⚠️ Ilagay ang tamang halaga!'); return; }
-            
-            const cashout = {
-                amount: amount,
-                comment: comment || 'No remarks',
-                datetime: new Date().toLocaleString('en-PH')
-            };
-            
-            cashOutRecords.push(cashout);
-            currentShift.cashOuts = cashOutRecords;
-            localStorage.setItem('currentShift', JSON.stringify(currentShift));
-            
-            alert(`✅ CASH OUT SAVED!\n💸 Amount: ₱${amount.toFixed(2)}\n📝 Remarks: ${comment || 'None'}`);
-            
-            document.getElementById('cashoutPanel').style.display = 'none';
+            cashOutRecords.push({ amount, comment, datetime: new Date().toLocaleString('en-PH') });
+            alert(`✅ CASH OUT SAVED!\nAmount: ₱${amount.toFixed(2)}\nRemarks: ${comment}`);
+            closeCashoutPanel();
             updateAdminOverview();
             showTransactionsWindow();
         }
-
-        // ========== VOID TRANSACTION ==========
-        function voidTransaction(idx) {
-            if (!confirm('⚠️ VOID TICKET #' + shiftTransactions[idx].ticket + '?\nThis will subtract from total sales!')) return;
-            
-            shiftTransactions[idx].voided = true;
-            currentShift.totalSales -= shiftTransactions[idx].total;
-            
-            if (shiftTransactions[idx].payment === 'Cash') currentShift.totalCash -= shiftTransactions[idx].total;
-            else if (shiftTransactions[idx].payment === 'GCash') currentShift.totalGcash -= shiftTransactions[idx].total;
-            else if (shiftTransactions[idx].payment === 'FoodPanda') currentShift.totalFoodpanda -= shiftTransactions[idx].total;
-            else if (shiftTransactions[idx].payment === 'Grab') currentShift.totalGrab -= shiftTransactions[idx].total;
-            
-            currentShift.totalVoid += shiftTransactions[idx].total;
-            currentShift.transactions = shiftTransactions;
-            localStorage.setItem('currentShift', JSON.stringify(currentShift));
-            
-            updateAdminOverview();
-            alert('✅ TICKET #' + shiftTransactions[idx].ticket + ' HAS BEEN VOIDED!');
-            showTransactionsWindow();
-        }
-
-        // ========== REPRINT TICKET ==========
-        function reprintTicket(idx) {
-            const t = shiftTransactions[idx];
-            let itemsText = t.items.map(i => `${i.name} — ₱${i.price.toFixed(2)}`).join('\n');
-            alert(
-                '🎟️ TICKET #' + t.ticket + '\n' +
-                '📅 ' + t.datetime + '\n' +
-                '👤 Cashier: ' + currentShift.cashier + '\n' +
-                '------------------------\n' +
-                itemsText + '\n' +
-                '------------------------\n' +
-                'Subtotal: ₱' + t.subtotal.toFixed(2) + '\n' +
-                (t.discountAmount > 0 ? 'Discount: -₱' + t.discountAmount.toFixed(2) + '\n' : '') +
-                'TOTAL: ₱' + t.total.toFixed(2) + '\n' +
-                'PAYMENT: ' + t.payment + '\n' +
-                (t.voided ? '\n⚠️ THIS TRANSACTION IS VOIDED ⚠️' : '')
-            );
-        }
-
-        // ========== END SHIFT ==========
         function endShift() {
-            if (!confirm('🛑 END THIS SHIFT?\nThis will close the current session and save all transactions.')) return;
-            
-            const shiftTotal = shiftTransactions.filter(t => !t.voided).reduce((sum, t) => sum + t.total, 0);
-            const totalCashOut = cashOutRecords.reduce((sum, c) => sum + c.amount, 0);
-            const closingCash = currentShift.openingCash + currentShift.totalCash - totalCashOut;
-            
-            currentShift.endedAt = new Date().toLocaleString('en-PH');
-            currentShift.totalSales = shiftTotal;
-            currentShift.closingCash = closingCash;
-            currentShift.transactions = shiftTransactions;
-            currentShift.cashOuts = cashOutRecords;
-            
-            allShifts.unshift({...currentShift});
-            localStorage.setItem('allShifts', JSON.stringify(allShifts));
-            localStorage.removeItem('currentShift');
-            
-            alert(
-                `✅ SHIFT ENDED!\n` +
-                `👤 Cashier: ${currentShift.cashier}\n` +
-                `🕒 Started: ${currentShift.startedAt}\n` +
-                `🕒 Ended: ${currentShift.endedAt}\n` +
-                `💰 Opening Cash: ₱${currentShift.openingCash.toFixed(2)}\n` +
-                `💰 Total Sales: ₱${shiftTotal.toFixed(2)}\n` +
-                `💸 Total Cash Out: ₱${totalCashOut.toFixed(2)}\n` +
-                `💰 Expected Closing Cash: ₱${closingCash.toFixed(2)}\n` +
-                `📋 Transactions: ${shiftTransactions.length}\n` +
-                `❌ Voided: ${shiftTransactions.filter(t => t.voided).length}`
-            );
-            
-            closeAllPanels();
-            document.getElementById('mainHeader').style.opacity = '0.3';
-            document.getElementById('mainHeader').style.pointerEvents = 'none';
-            document.getElementById('cashierView').style.opacity = '0.3';
-            document.getElementById('cashierView').style.pointerEvents = 'none';
+            if (!confirm('🛑 END THIS SHIFT?')) return;
+            alert('✅ Shift ended! Thank you!');
+            closeTransPanel();
+            document.getElementById('mainHeader').style.display = 'none';
+            document.getElementById('cashierView').style.display = 'none';
             document.getElementById('historyBtn').style.display = 'none';
-            document.getElementById('shiftStartPanel').style.display = 'block';
+            document.getElementById('shiftStartOverlay').style.display = 'flex';
             document.getElementById('cashierName').value = '';
             document.getElementById('openingCash').value = '';
+            currentShift = null;
             clearAll();
         }
+        function changePassword() {
+            const n = document.getElementById('newPass').value, c = document.getElementById('confirmPass').value;
+            if (!n) { alert('⚠️ Enter new password!'); return; }
+            if (n !== c) { alert('⚠️ Passwords do not match!'); return; }
+            adminPassword = n; localStorage.setItem('adminPass', n); alert('✅ Password updated!');
+        }
+    </script>
 
-        // ========== ADMIN FUNCTIONS ==========
-        function showAdminLogin() {
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('adminLogin').style.display = 'block';
-            document.getElementById('adminPass').value = '';
-        }
-        function closePanel(id) { document.getElementById(id).style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
-        function closeAllPanels() {
-            ['adminLogin','adminPanel','transactionsPanel','cashoutPanel'].forEach(id => document.getElementById(id).style.display = 'none');
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('cashierView').style.opacity = '1';
-        }
-        function adminLogin() {
-            if (document.getElementById('adminPass').value === adminPassword) {
-                closePanel('adminLogin');
-                document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('cashierView').style.opacity = '0.3';
-                updateAdminOverview();
-            } else alert('❌ Wrong Password!');
-        }
-        function logoutAdmin() { closePanel('adminPanel'); document.getElementById('cashierView').style.opacity = '1'; }
-        function switchTab(name) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active');
-            ['overview','shifts','products','settings'].forEach(t => document.getElementById('tab-'+t).classList.add('hidden'));
-            document.getElementById('tab-'+name).classList.remove('hidden');
-            if (
+</body>
+</html>
 
 
