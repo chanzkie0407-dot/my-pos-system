@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My POS — Burger Station</title>
+    <title>Burger Station POS</title>
     <style>
         * {
             box-sizing: border-box;
@@ -18,21 +18,35 @@
             margin: 0 auto;
         }
         .header {
-            background: #ff5722;
+            background: #d32f2f;
             color: white;
             padding: 15px;
             text-align: center;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             border-radius: 8px;
             margin-bottom: 15px;
+            position: relative;
+        }
+        .admin-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
         }
         .section-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             margin: 15px 0 8px;
-            color: #333;
-            border-bottom: 2px solid #ff5722;
+            color: #d32f2f;
+            border-bottom: 2px solid #d32f2f;
             padding-bottom: 5px;
         }
         .products {
@@ -42,21 +56,20 @@
             margin-bottom: 20px;
         }
         .product {
-            background: #4caf50;
+            background: #ff9800;
             color: white;
             border: none;
             padding: 12px 8px;
             font-size: 14px;
             border-radius: 8px;
             cursor: pointer;
-            transition: 0.2s;
         }
         .product:active {
-            background: #388e3c;
-            transform: scale(0.98);
+            background: #fb8c00;
+            transform: scale(0.97);
         }
         .product strong {
-            font-size: 16px;
+            font-size: 15px;
             display: block;
             margin-top: 4px;
         }
@@ -71,9 +84,6 @@
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         .cart-item {
             display: flex;
@@ -87,10 +97,10 @@
             background: #e53935;
             color: white;
             border: none;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            font-size: 16px;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -99,17 +109,34 @@
         .total {
             font-size: 22px;
             font-weight: bold;
-            color: #e53935;
+            color: #d32f2f;
             text-align: right;
-            margin: 15px 0;
+            margin: 12px 0;
         }
-        .input-group {
-            margin: 10px 0;
-        }
-        label {
+        .payment-title {
+            font-size: 16px;
             font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
+            margin: 15px 0 8px;
+        }
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .payment-btn {
+            padding: 10px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .payment-btn.selected {
+            border-color: #4caf50;
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-weight: bold;
         }
         input {
             width: 100%;
@@ -117,27 +144,22 @@
             font-size: 16px;
             border: 1px solid #ddd;
             border-radius: 6px;
+            margin: 8px 0;
         }
         .btn {
             width: 100%;
-            padding: 14px;
-            font-size: 18px;
+            padding: 13px;
+            font-size: 17px;
             font-weight: bold;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 8px;
         }
-        .btn-cash {
-            background: #2196f3;
-            color: white;
-        }
-        .btn-clear {
-            background: #e53935;
-            color: white;
-        }
+        .btn-pay { background: #4caf50; color: white; }
+        .btn-clear { background: #757575; color: white; }
         .change {
-            font-size: 20px;
+            font-size: 19px;
             font-weight: bold;
             color: #2196f3;
             margin-top: 10px;
@@ -146,165 +168,398 @@
             border-radius: 6px;
             display: none;
         }
+
+        /* ADMIN PANEL STYLES */
+        .admin-login, .admin-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: none;
+        }
+        .admin-login h2, .admin-panel h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #d32f2f;
+        }
+        .admin-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .admin-row input {
+            flex: 1;
+            margin: 0;
+        }
+        .btn-admin { background: #2196f3; color: white; margin-top: 15px; }
+        .btn-danger { background: #e53935; color: white; }
+        .tab-buttons {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background: #eee;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: #d32f2f;
+            color: white;
+        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
+    <!-- HEADER -->
     <div class="header">
-        🛒 MY POS — Burger Station
+        🍔 BURGER STATION POS
+        <button class="admin-btn" onclick="showAdminLogin()">⚙️ Admin</button>
     </div>
 
-    <!-- REGULAR BURGERS -->
-    <div class="section-title">🍔 Regular Burgers</div>
-    <div class="products">
-        <button class="product" data-name="Minute Burger" data-price="43">
-            Minute Burger<br><strong>₱43.00</strong>
-        </button>
-        <button class="product" data-name="Cheesy Burger" data-price="54">
-            Cheesy Burger<br><strong>₱54.00</strong>
-        </button>
-        <button class="product" data-name="Double Minute Burger" data-price="66">
-            Double Minute Burger<br><strong>₱66.00</strong>
-        </button>
-        <button class="product" data-name="Double Cheesy Burger" data-price="82">
-            Double Cheesy Burger<br><strong>₱82.00</strong>
-        </button>
-        <button class="product" data-name="Chicken Time Burger" data-price="52">
-            Chicken Time Burger<br><strong>₱52.00</strong>
-        </button>
-        <button class="product" data-name="Double Chicken Time Burger" data-price="72">
-            Double Chicken Time Burger<br><strong>₱72.00</strong>
-        </button>
-        <button class="product" data-name="Cheesydog" data-price="51">
-            Cheesydog<br><strong>₱51.00</strong>
-        </button>
+    <!-- ADMIN LOGIN MODAL -->
+    <div class="admin-login" id="adminLogin">
+        <h2>🔐 Admin Login</h2>
+        <input type="password" id="adminPass" placeholder="Enter Admin Password">
+        <button class="btn btn-admin" onclick="adminLogin()">Login</button>
+        <button class="btn btn-clear" onclick="hideAdminLogin()">Back</button>
     </div>
 
-    <!-- PREMIUM BURGERS -->
-    <div class="section-title">🍔 Premium Burgers</div>
-    <div class="products">
-        <button class="product" data-name="Black Pepper Burger" data-price="92">
-            Black Pepper Burger<br><strong>₱92.00</strong>
-        </button>
-        <button class="product" data-name="Beef Shawarma Burger" data-price="94">
-            Beef Shawarma Burger<br><strong>₱94.00</strong>
-        </button>
-        <button class="product" data-name="Bacon Cheeseburger" data-price="99">
-            Bacon Cheeseburger<br><strong>₱99.00</strong>
-        </button>
-        <button class="product" data-name="50 / 50 Chicken Veggie Burger" data-price="89">
-            50/50 Chicken Veggie<br><strong>₱89.00</strong>
-        </button>
-        <button class="product" data-name="All Meat Steak Burger" data-price="145">
-            All Meat Steak Burger<br><strong>₱145.00</strong>
-        </button>
-        <button class="product" data-name="French Onion Franks" data-price="93">
-            French Onion Franks<br><strong>₱93.00</strong>
-        </button>
-        <button class="product" data-name="Beef Hungarian" data-price="114">
-            Beef Hungarian<br><strong>₱114.00</strong>
-        </button>
-    </div>
-
-    <!-- CART SECTION -->
-    <div class="cart-section">
-        <div class="cart-title">🛒 Cart</div>
-        <div id="cart-items"></div>
-        <div class="total">TOTAL: ₱<span id="total">0.00</span></div>
-
-        <div class="input-group">
-            <label for="cash-received">Cash Received: ₱</label>
-            <input type="number" id="cash-received" placeholder="0.00" oninput="calculateChange()">
+    <!-- ADMIN PANEL MODAL -->
+    <div class="admin-panel" id="adminPanel">
+        <h2>⚙️ Admin Settings</h2>
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('products')">Products</button>
+            <button class="tab-btn" onclick="switchTab('sales')">Sales</button>
+            <button class="tab-btn" onclick="switchTab('password')">Password</button>
         </div>
 
-        <div class="change" id="change-display">
-            Change: ₱<span id="change-amount">0.00</span>
+        <!-- EDIT PRODUCTS TAB -->
+        <div id="tab-products">
+            <h3>Edit Product Prices</h3>
+            <div id="productEditor"></div>
+            <button class="btn btn-admin" onclick="saveProducts()">💾 Save Changes</button>
         </div>
 
-        <button class="btn btn-cash" onclick="completeSale()">✅ Complete Sale</button>
-        <button class="btn btn-clear" onclick="clearCart()">🗑️ Clear Cart</button>
+        <!-- SALES REPORT TAB -->
+        <div id="tab-sales" class="hidden">
+            <h3>Daily Sales Report</h3>
+            <p>Total Sales: ₱<span id="totalSales">0.00</span></p>
+            <p>Transactions: <span id="transCount">0</span></p>
+            <button class="btn btn-clear" onclick="clearSales()">Clear Sales</button>
+        </div>
+
+        <!-- CHANGE PASSWORD TAB -->
+        <div id="tab-password" class="hidden">
+            <h3>Change Admin Password</h3>
+            <input type="password" id="newPass" placeholder="New Password">
+            <input type="password" id="confirmPass" placeholder="Confirm Password">
+            <button class="btn btn-admin" onclick="changePassword()">Update Password</button>
+        </div>
+
+        <button class="btn btn-clear" onclick="logoutAdmin()">🚪 Logout</button>
     </div>
 
+    <!-- CASHIER VIEW -->
+    <div id="cashierView">
+        <!-- 🍔 REGULAR BURGERS -->
+        <div class="section-title">🍔 Regular Burgers</div>
+        <div class="products" id="regularProducts">
+            <button class="product" data-id="r1" data-name="Minute Burger" data-price="43">
+                Minute Burger<br><strong>₱43.00</strong>
+            </button>
+            <button class="product" data-id="r2" data-name="Cheesy Burger" data-price="54">
+                Cheesy Burger<br><strong>₱54.00</strong>
+            </button>
+            <button class="product" data-id="r3" data-name="Double Minute Burger" data-price="66">
+                Double Minute Burger<br><strong>₱66.00</strong>
+            </button>
+            <button class="product" data-id="r4" data-name="Double Cheesy Burger" data-price="82">
+                Double Cheesy Burger<br><strong>₱82.00</strong>
+            </button>
+            <button class="product" data-id="r5" data-name="Chicken Time Burger" data-price="52">
+                Chicken Time Burger<br><strong>₱52.00</strong>
+            </button>
+            <button class="product" data-id="r6" data-name="Double Chicken Time Burger" data-price="72">
+                Double Chicken Time Burger<br><strong>₱72.00</strong>
+            </button>
+            <button class="product" data-id="r7" data-name="Cheesydog" data-price="51">
+                Cheesydog<br><strong>₱51.00</strong>
+            </button>
+        </div>
+
+        <!-- 🍔 PREMIUM BURGERS -->
+        <div class="section-title">🍔 Premium Burgers</div>
+        <div class="products" id="premiumProducts">
+            <button class="product" data-id="p1" data-name="Black Pepper Burger" data-price="92">
+                Black Pepper Burger<br><strong>₱92.00</strong>
+            </button>
+            <button class="product" data-id="p2" data-name="Beef Shawarma Burger" data-price="94">
+                Beef Shawarma Burger<br><strong>₱94.00</strong>
+            </button>
+            <button class="product" data-id="p3" data-name="Bacon Cheeseburger" data-price="99">
+                Bacon Cheeseburger<br><strong>₱99.00</strong>
+            </button>
+            <button class="product" data-id="p4" data-name="50/50 Chicken Veggie" data-price="89">
+                50/50 Chicken Veggie<br><strong>₱89.00</strong>
+            </button>
+            <button class="product" data-id="p5" data-name="All Meat Steak Burger" data-price="145">
+                All Meat Steak Burger<br><strong>₱145.00</strong>
+            </button>
+            <button class="product" data-id="p6" data-name="French Onion Franks" data-price="93">
+                French Onion Franks<br><strong>₱93.00</strong>
+            </button>
+            <button class="product" data-id="p7" data-name="Beef Hungarian" data-price="114">
+                Beef Hungarian<br><strong>₱114.00</strong>
+            </button>
+        </div>
+
+        <!-- 🛒 CART & PAYMENT -->
+        <div class="cart-section">
+            <div class="cart-title">🛒 Order List</div>
+            <div id="cart-items"></div>
+            
+            <div class="total">TOTAL: ₱<span id="total-amount">0.00</span></div>
+
+            <!-- 💳 MODE OF PAYMENT -->
+            <div class="payment-title">💳 Mode of Payment</div>
+            <div class="payment-options">
+                <button class="payment-btn selected" data-method="Cash" onclick="selectPayment(this)">💰 Cash</button>
+                <button class="payment-btn" data-method="GCash" onclick="selectPayment(this)">📱 GCash</button>
+                <button class="payment-btn" data-method="FoodPanda" onclick="selectPayment(this)">🐼 FoodPanda</button>
+                <button class="payment-btn" data-method="Grab" onclick="selectPayment(this)">🛵 Grab</button>
+            </div>
+
+            <label id="cashLabel">💰 Cash Received:</label>
+            <input type="number" id="cash-input" placeholder="0.00" oninput="computeChange()">
+
+            <div class="change" id="change-box">
+                🔁 Change: ₱<span id="change-amount">0.00</span>
+            </div>
+
+            <button class="btn btn-pay" onclick="finishSale()">✅ Complete Payment</button>
+            <button class="btn btn-clear" onclick="clearAll()">🗑️ Clear All</button>
+        </div>
+    </div>
+
+    <!-- ⚙️ SCRIPT -->
     <script>
+        // ========== GLOBAL VARIABLES ==========
         let cart = [];
         let total = 0;
+        let selectedPayment = 'Cash';
+        let adminPassword = 'admin123'; // Default — pwede palitan sa Admin Panel
+        let totalSales = parseFloat(localStorage.getItem('totalSales') || '0');
+        let transCount = parseInt(localStorage.getItem('transCount') || '0');
 
-        // Add product to cart
-        document.querySelectorAll('.product').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const name = btn.dataset.name;
-                const price = parseFloat(btn.dataset.price);
-                cart.push({ name, price });
-                total += price;
-                updateCart();
-            });
+        // ========== INITIALIZE ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            attachProductEvents();
+            updateSalesDisplay();
+            updateProductEditor();
         });
 
-        // Update cart display
-        function updateCart() {
-            const cartEl = document.getElementById('cart-items');
-            cartEl.innerHTML = '';
-            
+        // ========== PRODUCT CLICK ==========
+        function attachProductEvents() {
+            document.querySelectorAll('.product').forEach(button => {
+                button.addEventListener('click', () => {
+                    const name = button.dataset.name;
+                    const price = parseFloat(button.dataset.price);
+                    cart.push({ name, price, id: Date.now() });
+                    total += price;
+                    updateCartDisplay();
+                });
+            });
+        }
+
+        // ========== CART DISPLAY ==========
+        function updateCartDisplay() {
+            const list = document.getElementById('cart-items');
+            list.innerHTML = '';
+
             cart.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'cart-item';
-                div.innerHTML = `
+                const row = document.createElement('div');
+                row.className = 'cart-item';
+                row.innerHTML = `
                     <span>${item.name} — ₱${item.price.toFixed(2)}</span>
                     <button class="remove-btn" onclick="removeItem(${index})">×</button>
                 `;
-                cartEl.appendChild(div);
+                list.appendChild(row);
             });
 
-            document.getElementById('total').textContent = total.toFixed(2);
-            calculateChange();
+            document.getElementById('total-amount').textContent = total.toFixed(2);
+            computeChange();
         }
 
-        // Remove item from cart
+        // ========== REMOVE SINGLE ITEM ==========
         function removeItem(index) {
             total -= cart[index].price;
             cart.splice(index, 1);
-            updateCart();
+            updateCartDisplay();
         }
 
-        // Calculate change
-        function calculateChange() {
-            const cash = parseFloat(document.getElementById('cash-received').value) || 0;
-            const changeEl = document.getElementById('change-display');
-            const amountEl = document.getElementById('change-amount');
+        // ========== PAYMENT SELECTION ==========
+        function selectPayment(btn) {
+            document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedPayment = btn.dataset.method;
             
-            if (cash >= total && total > 0) {
-                changeEl.style.display = 'block';
-                amountEl.textContent = (cash - total).toFixed(2);
+            // Show/hide cash input based on payment
+            const cashInput = document.getElementById('cash-input');
+            const cashLabel = document.getElementById('cashLabel');
+            if (selectedPayment === 'Cash') {
+                cashInput.style.display = 'block';
+                cashLabel.style.display = 'block';
             } else {
-                changeEl.style.display = 'none';
+                cashInput.style.display = 'none';
+                cashLabel.style.display = 'none';
+                document.getElementById('change-box').style.display = 'none';
             }
         }
 
-        // Complete sale
-        function completeSale() {
-            const cash = parseFloat(document.getElementById('cash-received').value) || 0;
+        // ========== COMPUTE CHANGE ==========
+        function computeChange() {
+            if (selectedPayment !== 'Cash') return;
+            const cash = parseFloat(document.getElementById('cash-input').value) || 0;
+            const changeBox = document.getElementById('change-box');
+            const changeDisplay = document.getElementById('change-amount');
+
+            if (cash >= total && total > 0) {
+                changeBox.style.display = 'block';
+                changeDisplay.textContent = (cash - total).toFixed(2);
+            } else {
+                changeBox.style.display = 'none';
+            }
+        }
+
+        // ========== COMPLETE SALE ==========
+        function finishSale() {
+            const cash = parseFloat(document.getElementById('cash-input').value) || 0;
+            
             if (cart.length === 0) {
-                alert('⚠️ Cart is empty!');
+                alert('⚠️ Wala pang order!');
                 return;
             }
-            if (cash < total) {
-                alert('⚠️ Insufficient cash!');
+            if (selectedPayment === 'Cash' && cash < total) {
+                alert('⚠️ Kulang ang pera!');
                 return;
             }
-            alert(`✅ Sale Complete!\nTotal: ₱${total.toFixed(2)}\nCash: ₱${cash.toFixed(2)}\nChange: ₱${(cash - total).toFixed(2)}`);
-            clearCart();
+
+            // Update sales
+            totalSales += total;
+            transCount++;
+            localStorage.setItem('totalSales', totalSales);
+            localStorage.setItem('transCount', transCount);
+
+            alert(
+                '✅ PAYMENT SUCCESS!\n' +
+                '💳 Payment: ' + selectedPayment + '\n' +
+                '------------------------\n' +
+                'TOTAL: ₱' + total.toFixed(2) + '\n' +
+                (selectedPayment === 'Cash' ? 'CASH:  ₱' + cash.toFixed(2) + '\nCHANGE:₱' + (cash - total).toFixed(2) + '\n' : '') +
+                '------------------------\n' +
+                'Salamat po!'
+            );
+            clearAll();
         }
 
-        // Clear cart
-        function clearCart() {
+        // ========== CLEAR CART ==========
+        function clearAll() {
             cart = [];
             total = 0;
-            document.getElementById('cash-received').value = '';
-            updateCart();
+            document.getElementById('cash-input').value = '';
+            updateCartDisplay();
+        }
+
+        // ========== ADMIN FUNCTIONS ==========
+        function showAdminLogin() {
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+        function hideAdminLogin() {
+            document.getElementById('adminLogin').style.display = 'none';
+        }
+        function adminLogin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === adminPassword) {
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('cashierView').style.opacity = '0.3';
+                updateSalesDisplay();
+                updateProductEditor();
+            } else {
+                alert('❌ Wrong Password!');
+            }
+        }
+        function logoutAdmin() {
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('cashierView').style.opacity = '1';
+            document.getElementById('adminPass').value = '';
+        }
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-products').classList.add('hidden');
+            document.getElementById('tab-sales').classList.add('hidden');
+            document.getElementById('tab-password').classList.add('hidden');
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+        }
+        function updateSalesDisplay() {
+            document.getElementById('totalSales').textContent = totalSales.toFixed(2);
+            document.getElementById('transCount').textContent = transCount;
+        }
+        function clearSales() {
+            if (confirm('⚠️ Clear all sales data?')) {
+                totalSales = 0;
+                transCount = 0;
+                localStorage.removeItem('totalSales');
+                localStorage.removeItem('transCount');
+                updateSalesDisplay();
+            }
+        }
+        function changePassword() {
+            const newP = document.getElementById('newPass').value;
+            const confirmP = document.getElementById('confirmPass').value;
+            if (!newP) { alert('⚠️ Enter new password!'); return; }
+            if (newP !== confirmP) { alert('⚠️ Passwords do not match!'); return; }
+            adminPassword = newP;
+            alert('✅ Password updated!');
+            document.getElementById('newPass').value = '';
+            document.getElementById('confirmPass').value = '';
+        }
+        function updateProductEditor() {
+            const editor = document.getElementById('productEditor');
+            editor.innerHTML = '';
+            document.querySelectorAll('.product').forEach(btn => {
+                const div = document.createElement('div');
+                div.className = 'admin-row';
+                div.innerHTML = `
+                    <span style="width:140px; font-size:13px;">${btn.dataset.name}</span>
+                    <input type="number" id="edit-${btn.dataset.id}" value="${btn.dataset.price}" style="width:80px;">
+                `;
+                editor.appendChild(div);
+            });
+        }
+        function saveProducts() {
+            document.querySelectorAll('.product').forEach(btn => {
+                const input = document.getElementById('edit-' + btn.dataset.id);
+                if (input) {
+                    const newPrice = parseFloat(input.value);
+                    btn.dataset.price = newPrice;
+                    btn.innerHTML = btn.innerHTML.replace(/₱[\d.]+/, '₱' + newPrice.toFixed(2));
+                }
+            });
+            attachProductEvents(); // Re-attach events
+            alert('✅ Products updated!');
         }
     </script>
 
 </body>
 </html>
- 
+
 
