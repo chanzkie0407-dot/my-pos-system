@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger Station POS — Final</title>
+    <title>Burger Station POS — Shift History</title>
     <style>
         * {
             box-sizing: border-box;
@@ -20,22 +20,28 @@
         .header {
             background: #d32f2f;
             color: white;
-            padding: 12px 15px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
+            padding: 10px 15px;
             border-radius: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             position: relative;
         }
-        .ticket-no {
-            font-size: 14px;
-            background: rgba(255,255,255,0.2);
-            padding: 4px 10px;
-            border-radius: 15px;
-            display: inline-block;
-            margin-top: 5px;
+        .header h1 {
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 5px;
         }
+        .shift-info {
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .ticket-no { font-weight: bold; }
         .admin-btn {
             position: absolute;
             right: 10px;
@@ -44,18 +50,18 @@
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            padding: 5px 10px;
+            padding: 5px 8px;
             border-radius: 5px;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
         }
         .section-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
-            margin: 12px 0 6px;
+            margin: 10px 0 5px;
             color: #d32f2f;
             border-bottom: 2px solid #d32f2f;
-            padding-bottom: 4px;
+            padding-bottom: 3px;
         }
         .products {
             display: grid;
@@ -72,15 +78,8 @@
             border-radius: 8px;
             cursor: pointer;
         }
-        .product:active {
-            background: #fb8c00;
-            transform: scale(0.97);
-        }
-        .product strong {
-            font-size: 15px;
-            display: block;
-            margin-top: 3px;
-        }
+        .product:active { background: #fb8c00; transform: scale(0.97); }
+        .product strong { font-size: 15px; display: block; margin-top: 3px; }
         .cart-section {
             background: white;
             padding: 12px;
@@ -89,7 +88,7 @@
             margin-bottom: 12px;
         }
         .cart-title {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: bold;
             margin-bottom: 8px;
             display: flex;
@@ -169,7 +168,8 @@
         }
         .btn-pay { background: #4caf50; color: white; }
         .btn-clear { background: #757575; color: white; }
-        .btn-void { background: #ff5722; color: white; }
+        .btn-shift { background: #2196f3; color: white; }
+        .btn-end-shift { background: #e53935; color: white; }
         .change {
             font-size: 17px;
             font-weight: bold;
@@ -181,12 +181,19 @@
             display: none;
         }
 
-        /* ADMIN & HISTORY PANELS */
+        /* PANELS — SHIFT, ADMIN, HISTORY */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 99;
+        }
         .panel {
             background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             display: none;
             position: fixed;
             top: 50%;
@@ -203,13 +210,6 @@
             color: #d32f2f;
             font-size: 18px;
         }
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 99;
-        }
         .tab-buttons {
             display: flex;
             gap: 4px;
@@ -218,13 +218,13 @@
         }
         .tab-btn {
             flex: 1;
-            min-width: 80px;
+            min-width: 70px;
             padding: 7px;
             border: none;
             background: #eee;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
         }
         .tab-btn.active { background: #d32f2f; color: white; }
         .hidden { display: none !important; }
@@ -238,9 +238,31 @@
             text-decoration: line-through;
             color: #c62828;
         }
-        .trans-ticket {
+        .trans-ticket { font-weight: bold; color: #d32f2f; }
+        .shift-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+        .shift-header {
+            display: flex;
+            justify-content: space-between;
             font-weight: bold;
+            margin-bottom: 8px;
             color: #d32f2f;
+        }
+        .shift-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 13px;
+        }
+        .shift-summary div {
+            background: white;
+            padding: 6px;
+            border-radius: 4px;
         }
         .btn-small {
             padding: 4px 8px;
@@ -275,6 +297,7 @@
             margin-bottom: 10px;
             font-size: 14px;
         }
+        .disabled { opacity: 0.5; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -282,11 +305,23 @@
     <!-- OVERLAY -->
     <div class="overlay" id="overlay" onclick="closeAllPanels()"></div>
 
+    <!-- SHIFT START SCREEN — UNANG BUKAS NG APP -->
+    <div class="panel" id="shiftStartPanel" style="display:block;">
+        <h2>🕒 START NEW SHIFT</h2>
+        <input type="text" id="cashierName" placeholder="Cashier Name" required>
+        <input type="number" id="openingCash" placeholder="Opening Cash (Puhunan)" step="0.01">
+        <button class="btn btn-shift" onclick="startShift()">✅ Start Shift</button>
+    </div>
+
     <!-- HEADER -->
-    <div class="header">
-        🍔 BURGER STATION POS
-        <div class="ticket-no">🎟️ TICKET #<span id="currentTicket">001</span></div>
-        <button class="admin-btn" onclick="showAdminLogin()">⚙️ Admin</button>
+    <div class="header" id="mainHeader" style="opacity:0.3; pointer-events:none;">
+        <h1>🍔 BURGER STATION POS</h1>
+        <div class="shift-info">
+            <div>👤 <span id="currentCashier">—</span></div>
+            <div>🕒 <span id="shiftTime">—</span></div>
+            <div class="ticket-no">🎟️ #<span id="currentTicket">001</span></div>
+            <button class="admin-btn" onclick="showAdminLogin()">⚙️ Admin</button>
+        </div>
     </div>
 
     <!-- ADMIN LOGIN -->
@@ -301,31 +336,27 @@
     <div class="panel" id="adminPanel">
         <h2>⚙️ Admin Control Panel</h2>
         <div class="tab-buttons">
-            <button class="tab-btn active" onclick="switchTab('products')">Products</button>
-            <button class="tab-btn" onclick="switchTab('history')">Transactions</button>
-            <button class="tab-btn" onclick="switchTab('password')">Settings</button>
+            <button class="tab-btn active" onclick="switchTab('shifts')">Shifts</button>
+            <button class="tab-btn" onclick="switchTab('products')">Products</button>
+            <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
+        </div>
+
+        <!-- SHIFT HISTORY — ADMIN VIEW -->
+        <div id="tab-shifts">
+            <h3>📋 All Shift History</h3>
+            <div id="allShiftsList"></div>
+            <button class="btn btn-clear" onclick="exportAllData()">📤 Export Data</button>
         </div>
 
         <!-- EDIT PRODUCTS -->
-        <div id="tab-products">
+        <div id="tab-products" class="hidden">
             <h3>Edit Product Prices</h3>
             <div id="productEditor"></div>
             <button class="btn btn-pay" onclick="saveProducts()">💾 Save Prices</button>
         </div>
 
-        <!-- TRANSACTION HISTORY + VOID -->
-        <div id="tab-history" class="hidden">
-            <h3>📋 Transaction History</h3>
-            <div class="summary-box">
-                <p><strong>Total Sales:</strong> ₱<span id="netSales">0.00</span></p>
-                <p><strong>Transactions:</strong> <span id="totalTrans">0</span> | <strong>Voided:</strong> <span id="voidCount">0</span></p>
-            </div>
-            <div id="historyList"></div>
-            <button class="btn btn-clear" onclick="clearAllHistory()">🗑️ Clear All History</button>
-        </div>
-
         <!-- SETTINGS -->
-        <div id="tab-password" class="hidden">
+        <div id="tab-settings" class="hidden">
             <h3>Change Admin Password</h3>
             <input type="password" id="newPass" placeholder="New Password">
             <input type="password" id="confirmPass" placeholder="Confirm Password">
@@ -335,22 +366,24 @@
         <button class="btn btn-close" onclick="logoutAdmin()">🚪 Logout</button>
     </div>
 
-    <!-- TRANSACTION HISTORY BUTTON (Cashier Access) -->
-    <button class="history-btn" onclick="showHistory()">📋</button>
+    <!-- TRANSACTION HISTORY BUTTON (Cashier) -->
+    <button class="history-btn" id="historyBtn" style="display:none;" onclick="showHistory()">📋</button>
 
-    <!-- HISTORY PANEL (Cashier View — No Void) -->
+    <!-- HISTORY PANEL — CASHIER VIEW -->
     <div class="panel" id="historyPanel">
-        <h2>📋 Transaction History</h2>
+        <h2>📋 Shift Transaction History</h2>
         <div class="summary-box">
-            <p><strong>Total Sales:</strong> ₱<span id="netSales2">0.00</span></p>
-            <p><strong>Transactions:</strong> <span id="totalTrans2">0</span></p>
+            <p><strong>Cashier:</strong> <span id="histCashier">—</span></p>
+            <p><strong>Shift Sales:</strong> ₱<span id="histSales">0.00</span></p>
+            <p><strong>Transactions:</strong> <span id="histTrans">0</span> | <strong>Voided:</strong> <span id="histVoid">0</span></p>
         </div>
-        <div id="historyList2"></div>
+        <div id="historyList"></div>
+        <button class="btn btn-end-shift" onclick="endShift()">🛑 End Shift & Close</button>
         <button class="btn btn-close" onclick="closePanel('historyPanel')">Close</button>
     </div>
 
     <!-- CASHIER VIEW -->
-    <div id="cashierView">
+    <div id="cashierView" style="opacity:0.3; pointer-events:none;">
         <!-- 🍔 REGULAR BURGERS -->
         <div class="section-title">🍔 Regular Burgers</div>
         <div class="products" id="regularProducts">
@@ -433,21 +466,129 @@
 
     <!-- ⚙️ SCRIPT -->
     <script>
-        // ========== GLOBAL VARIABLES — AUTO SAVE SA PHONE ==========
+        // ========== GLOBAL VARIABLES — AUTO-SAVE ==========
         let cart = [];
         let total = 0;
         let selectedPayment = 'Cash';
         let adminPassword = localStorage.getItem('adminPass') || 'admin123';
         let ticketNumber = parseInt(localStorage.getItem('lastTicket')) || 0;
-        let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+        
+        // SHIFT DATA
+        let currentShift = JSON.parse(localStorage.getItem('currentShift') || 'null');
+        let allShifts = JSON.parse(localStorage.getItem('allShifts') || '[]');
+        let shiftTransactions = []; // per-shift transactions
 
         // ========== INITIALIZE ==========
         document.addEventListener('DOMContentLoaded', () => {
+            if (currentShift && !currentShift.endedAt) {
+                // RESUME EXISTING SHIFT
+                resumeShift();
+            } else {
+                // SHOW SHIFT START SCREEN
+                document.getElementById('shiftStartPanel').style.display = 'block';
+            }
             updateTicketDisplay();
             attachProductEvents();
-            updateHistoryDisplays();
-            updateProductEditor();
         });
+
+        // ========== START NEW SHIFT ==========
+        function startShift() {
+            const name = document.getElementById('cashierName').value.trim();
+            const openingCash = parseFloat(document.getElementById('openingCash').value) || 0;
+            
+            if (!name) { alert('⚠️ Ilagay ang pangalan ng cashier!'); return; }
+
+            currentShift = {
+                id: Date.now(),
+                cashier: name,
+                openingCash: openingCash,
+                startedAt: new Date().toLocaleString('en-PH'),
+                endedAt: null,
+                closingCash: null,
+                transactions: [],
+                totalSales: 0,
+                voidCount: 0
+            };
+            
+            localStorage.setItem('currentShift', JSON.stringify(currentShift));
+            shiftTransactions = [];
+            
+            // HIDE SHIFT START — SHOW MAIN APP
+            document.getElementById('shiftStartPanel').style.display = 'none';
+            document.getElementById('mainHeader').style.opacity = '1';
+            document.getElementById('mainHeader').style.pointerEvents = 'auto';
+            document.getElementById('cashierView').style.opacity = '1';
+            document.getElementById('cashierView').style.pointerEvents = 'auto';
+            document.getElementById('historyBtn').style.display = 'block';
+            
+            // UPDATE DISPLAY
+            document.getElementById('currentCashier').textContent = name;
+            document.getElementById('shiftTime').textContent = currentShift.startedAt.split(',')[0];
+            
+            alert(`✅ SHIFT STARTED!\n👤 Cashier: ${name}\n💰 Opening Cash: ₱${openingCash.toFixed(2)}`);
+        }
+
+        // ========== RESUME EXISTING SHIFT ==========
+        function resumeShift() {
+            shiftTransactions = currentShift.transactions || [];
+            
+            document.getElementById('shiftStartPanel').style.display = 'none';
+            document.getElementById('mainHeader').style.opacity = '1';
+            document.getElementById('mainHeader').style.pointerEvents = 'auto';
+            document.getElementById('cashierView').style.opacity = '1';
+            document.getElementById('cashierView').style.pointerEvents = 'auto';
+            document.getElementById('historyBtn').style.display = 'block';
+            
+            document.getElementById('currentCashier').textContent = currentShift.cashier;
+            document.getElementById('shiftTime').textContent = currentShift.startedAt.split(',')[0];
+        }
+
+        // ========== END SHIFT ==========
+        function endShift() {
+            if (!confirm('🛑 END THIS SHIFT?\nThis will close the current session and save all transactions.')) return;
+            
+            const shiftTotal = shiftTransactions.filter(t => !t.voided).reduce((sum, t) => sum + t.total, 0);
+            const closingCash = currentShift.openingCash + shiftTotal;
+            
+            currentShift.endedAt = new Date().toLocaleString('en-PH');
+            currentShift.totalSales = shiftTotal;
+            currentShift.closingCash = closingCash;
+            currentShift.transactions = shiftTransactions;
+            currentShift.voidCount = shiftTransactions.filter(t => t.voided).length;
+            
+            // SAVE TO ALL SHIFTS HISTORY
+            allShifts.unshift({...currentShift});
+            localStorage.setItem('allShifts', JSON.stringify(allShifts));
+            
+            // CLEAR CURRENT SHIFT
+            localStorage.removeItem('currentShift');
+            currentShift = null;
+            shiftTransactions = [];
+            
+            alert(
+                `✅ SHIFT ENDED!\n` +
+                `👤 Cashier: ${currentShift?.cashier || 'N/A'}\n` +
+                `🕒 Started: ${currentShift?.startedAt || 'N/A'}\n` +
+                `🕒 Ended: ${currentShift.endedAt}\n` +
+                `💰 Opening: ₱${currentShift.openingCash.toFixed(2)}\n` +
+                `💰 Sales: ₱${shiftTotal.toFixed(2)}\n` +
+                `💰 Expected Closing: ₱${closingCash.toFixed(2)}\n` +
+                `📋 Transactions: ${shiftTransactions.length}\n` +
+                `❌ Voided: ${currentShift.voidCount}`
+            );
+            
+            // RESET TO SHIFT START
+            closeAllPanels();
+            document.getElementById('mainHeader').style.opacity = '0.3';
+            document.getElementById('mainHeader').style.pointerEvents = 'none';
+            document.getElementById('cashierView').style.opacity = '0.3';
+            document.getElementById('cashierView').style.pointerEvents = 'none';
+            document.getElementById('historyBtn').style.display = 'none';
+            document.getElementById('shiftStartPanel').style.display = 'block';
+            document.getElementById('cashierName').value = '';
+            document.getElementById('openingCash').value = '';
+            clearAll();
+        }
 
         // ========== TICKET NUMBER ==========
         function updateTicketDisplay() {
@@ -526,25 +667,20 @@
             }
         }
 
-        // ========== COMPLETE SALE — SAVE TRANSACTION ==========
+        // ========== COMPLETE SALE — SAVE TO SHIFT ==========
         function finishSale() {
             const cash = parseFloat(document.getElementById('cash-input').value) || 0;
             
-            if (cart.length === 0) {
-                alert('⚠️ Wala pang order!');
-                return;
-            }
-            if (selectedPayment === 'Cash' && cash < total) {
-                alert('⚠️ Kulang ang pera!');
-                return;
-            }
+            if (!currentShift) { alert('⚠️ Start a shift first!'); return; }
+            if (cart.length === 0) { alert('⚠️ Wala pang order!'); return; }
+            if (selectedPayment === 'Cash' && cash < total) { alert('⚠️ Kulang ang pera!'); return; }
 
             // 🎟️ GENERATE TICKET NUMBER
             ticketNumber++;
             const ticket = String(ticketNumber).padStart(3, '0');
             localStorage.setItem('lastTicket', ticketNumber);
 
-            // 📋 SAVE TRANSACTION TO HISTORY
+            // 📋 SAVE TRANSACTION TO CURRENT SHIFT
             const transaction = {
                 ticket: ticket,
                 items: [...cart],
@@ -555,8 +691,9 @@
                 datetime: new Date().toLocaleString('en-PH'),
                 voided: false
             };
-            transactions.unshift(transaction);
-            localStorage.setItem('transactions', JSON.stringify(transactions));
+            shiftTransactions.unshift(transaction);
+            currentShift.transactions = shiftTransactions;
+            localStorage.setItem('currentShift', JSON.stringify(currentShift));
 
             // ✅ SUCCESS MESSAGE
             alert(
@@ -570,10 +707,9 @@
                 'Salamat po!'
             );
 
-            // 🔄 RESET FOR NEW TRANSACTION
+            // 🔄 RESET
             clearAll();
             updateTicketDisplay();
-            updateHistoryDisplays();
         }
 
         // ========== CLEAR CART ==========
@@ -584,43 +720,23 @@
             updateCartDisplay();
         }
 
-        // ========== HISTORY DISPLAY ==========
-        function updateHistoryDisplays() {
-            const netSales = transactions.filter(t => !t.voided).reduce((sum, t) => sum + t.total, 0);
-            const voidCount = transactions.filter(t => t.voided).length;
+        // ========== SHOW SHIFT HISTORY — CASHIER VIEW ==========
+        function showHistory() {
+            if (!currentShift) return;
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('historyPanel').style.display = 'block';
             
-            // Admin Panel Summary
-            document.getElementById('netSales').textContent = netSales.toFixed(2);
-            document.getElementById('totalTrans').textContent = transactions.length;
-            document.getElementById('voidCount').textContent = voidCount;
+            const shiftTotal = shiftTransactions.filter(t => !t.voided).reduce((sum, t) => sum + t.total, 0);
+            const voidCount = shiftTransactions.filter(t => t.voided).length;
             
-            // Cashier Panel Summary
-            document.getElementById('netSales2').textContent = netSales.toFixed(2);
-            document.getElementById('totalTrans2').textContent = transactions.length;
-
-            // History List — Admin (with Void)
-            const adminList = document.getElementById('historyList');
-            adminList.innerHTML = '';
-            transactions.forEach((trans, idx) => {
-                const div = document.createElement('div');
-                div.className = `trans-item ${trans.voided ? 'voided' : ''}`;
-                div.innerHTML = `
-                    <span class="trans-ticket">#${trans.ticket}</span>
-                    <span> — ₱${trans.total.toFixed(2)}</span>
-                    <span style="font-size:12px; color:#666;"> — ${trans.payment}</span>
-                    <br><small>${trans.datetime}</small>
-                    <div style="margin-top:4px;">
-                        <button class="btn-small btn-reprint" onclick="reprintTicket(${idx})">📄 View</button>
-                        ${!trans.voided ? `<button class="btn-small btn-void-small" onclick="voidTransaction(${idx})">❌ Void</button>` : '<span style="color:red; font-size:12px;">VOIDED</span>'}
-                    </div>
-                `;
-                adminList.appendChild(div);
-            });
-
-            // History List — Cashier (No Void)
-            const cashierList = document.getElementById('historyList2');
-            cashierList.innerHTML = '';
-            transactions.forEach((trans, idx) => {
+            document.getElementById('histCashier').textContent = currentShift.cashier;
+            document.getElementById('histSales').textContent = shiftTotal.toFixed(2);
+            document.getElementById('histTrans').textContent = shiftTransactions.length;
+            document.getElementById('histVoid').textContent = voidCount;
+            
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            shiftTransactions.forEach((trans, idx) => {
                 const div = document.createElement('div');
                 div.className = `trans-item ${trans.voided ? 'voided' : ''}`;
                 div.innerHTML = `
@@ -630,46 +746,25 @@
                     <br><small>${trans.datetime}</small>
                     <button class="btn-small btn-reprint" onclick="reprintTicket(${idx})">📄 View</button>
                 `;
-                cashierList.appendChild(div);
+                list.appendChild(div);
             });
         }
 
-        // ========== REPRINT / VIEW TICKET ==========
+        // ========== REPRINT TICKET ==========
         function reprintTicket(idx) {
-            const t = transactions[idx];
+            const t = shiftTransactions[idx];
             let itemsText = t.items.map(i => `${i.name} — ₱${i.price.toFixed(2)}`).join('\n');
             alert(
                 '🎟️ TICKET #' + t.ticket + '\n' +
                 '📅 ' + t.datetime + '\n' +
+                '👤 Cashier: ' + currentShift.cashier + '\n' +
                 '------------------------\n' +
                 itemsText + '\n' +
                 '------------------------\n' +
                 'TOTAL: ₱' + t.total.toFixed(2) + '\n' +
                 'PAYMENT: ' + t.payment + '\n' +
-                (t.voided ? '\n⚠️ THIS TRANSACTION IS VOIDED ⚠️' : '')
+                (t.voided ? '\n⚠️ VOIDED' : '')
             );
-        }
-
-        // ========== VOID TRANSACTION — ADMIN ONLY ==========
-        function voidTransaction(idx) {
-            if (!confirm('⚠️ VOID TICKET #' + transactions[idx].ticket + '?\nThis will subtract from total sales!')) return;
-            transactions[idx].voided = true;
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-            updateHistoryDisplays();
-            alert('✅ TICKET #' + transactions[idx].ticket + ' HAS BEEN VOIDED!');
-        }
-
-        // ========== CLEAR ALL HISTORY ==========
-        function clearAllHistory() {
-            if (!confirm('⚠️ CLEAR ALL TRANSACTION HISTORY? This cannot be undone!')) return;
-            if (!confirm('⚠️ ARE YOU SURE? ALL DATA WILL BE DELETED!')) return;
-            transactions = [];
-            ticketNumber = 0;
-            localStorage.removeItem('transactions');
-            localStorage.removeItem('lastTicket');
-            updateTicketDisplay();
-            updateHistoryDisplays();
-            alert('✅ ALL HISTORY CLEARED! Ticket # reset to 001');
         }
 
         // ========== ADMIN FUNCTIONS ==========
@@ -677,31 +772,6 @@
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('adminLogin').style.display = 'block';
             document.getElementById('adminPass').value = '';
-        }
-        function hideAdminLogin() {
-            closePanel('adminLogin');
-        }
-        function adminLogin() {
-            const pass = document.getElementById('adminPass').value;
-            if (pass === adminPassword) {
-                closePanel('adminLogin');
-                document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('cashierView').style.opacity = '0.3';
-                updateHistoryDisplays();
-                updateProductEditor();
-            } else {
-                alert('❌ Wrong Password!');
-            }
-        }
-        function logoutAdmin() {
-            closePanel('adminPanel');
-            document.getElementById('cashierView').style.opacity = '1';
-            document.getElementById('adminPass').value = '';
-        }
-        function showHistory() {
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('historyPanel').style.display = 'block';
-            updateHistoryDisplays();
         }
         function closePanel(panelId) {
             document.getElementById(panelId).style.display = 'none';
@@ -715,13 +785,66 @@
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('cashierView').style.opacity = '1';
         }
+        function adminLogin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === adminPassword) {
+                closePanel('adminLogin');
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('cashierView').style.opacity = '0.3';
+                updateAllShiftsList();
+                updateProductEditor();
+            } else {
+                alert('❌ Wrong Password!');
+            }
+        }
+        function logoutAdmin() {
+            closePanel('adminPanel');
+            document.getElementById('cashierView').style.opacity = '1';
+        }
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
+            document.getElementById('tab-shifts').classList.add('hidden');
             document.getElementById('tab-products').classList.add('hidden');
-            document.getElementById('tab-history').classList.add('hidden');
-            document.getElementById('tab-password').classList.add('hidden');
+            document.getElementById('tab-settings').classList.add('hidden');
             document.getElementById('tab-' + tabName).classList.remove('hidden');
+        }
+        function updateAllShiftsList() {
+            const list = document.getElementById('allShiftsList');
+            list.innerHTML = '';
+            if (allShifts.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:#888; padding:20px;">No completed shifts yet.</p>';
+                return;
+            }
+            allShifts.forEach((shift, idx) => {
+                const card = document.createElement('div');
+                card.className = 'shift-card';
+                card.innerHTML = `
+                    <div class="shift-header">
+                        <span>👤 ${shift.cashier}</span>
+                        <span>#${idx + 1}</span>
+                    </div>
+                    <div class="shift-summary">
+                        <div>🕒 Started: ${shift.startedAt.split(',')[0]}</div>
+                        <div>🕒 Ended: ${shift.endedAt ? shift.endedAt.split(',')[0] : 'Ongoing'}</div>
+                        <div>💰 Opening: ₱${shift.openingCash.toFixed(2)}</div>
+                        <div>💰 Sales: ₱${shift.totalSales.toFixed(2)}</div>
+                        <div>💰 Closing: ₱${shift.closingCash.toFixed(2)}</div>
+                        <div>📋 Trans: ${shift.transactions.length} | ❌ Void: ${shift.voidCount}</div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+        function exportAllData() {
+            const data = JSON.stringify(allShifts, null, 2);
+            const blob = new Blob([data], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `shift-report-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            alert('✅ Data exported!');
         }
         function changePassword() {
             const newP = document.getElementById('newPass').value;
