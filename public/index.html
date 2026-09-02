@@ -60,7 +60,7 @@
         .section-title {
             font-size: 15px;
             font-weight: bold;
-            margin: 10px 0 5px;
+            margin: 15px 0 5px;
             color: #d32f2f;
             border-bottom: 2px solid #d32f2f;
             padding-bottom: 3px;
@@ -69,7 +69,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 7px;
-            margin-bottom: 12px;
+            margin-bottom: 5px;
         }
         .product {
             background: #ff9800;
@@ -94,6 +94,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             margin-bottom: 12px;
+            margin-top: 15px;
         }
         .cart-title {
             font-size: 16px;
@@ -271,12 +272,6 @@
             color: #c62828;
         }
         .trans-ticket { font-weight: bold; color: #d32f2f; }
-        .cashout-item {
-            padding: 8px;
-            border-bottom: 1px dashed #ddd;
-            font-size: 13px;
-            background: #fff8e1;
-        }
         .btn-close { background: #757575; color: white; margin-top: 12px; }
     </style>
 </head>
@@ -292,7 +287,7 @@
         </div>
     </div>
 
-    <!-- HEADER — WALANG ADMIN BUTTON ✅ -->
+    <!-- HEADER -->
     <div class="header" id="mainHeader" style="display:none;">
         <h1>🍔 BURGER STATION POS</h1>
         <div class="shift-info">
@@ -331,35 +326,43 @@
 
     <!-- CASHIER VIEW -->
     <div id="cashierView" style="display:none;">
+        <!-- 🍔 REGULAR BURGERS -->
         <div class="section-title">🍔 Regular Burgers</div>
-        <div class="products" id="regularProducts">
-            <button class="product" data-id="r1" data-name="Minute Burger" data-price="43">Minute Burger<br><strong>₱43.00</strong></button>
-            <button class="product" data-id="r2" data-name="Cheesy Burger" data-price="54">Cheesy Burger<br><strong>₱54.00</strong></button>
-            <button class="product" data-id="r3" data-name="Double Minute Burger" data-price="66">Double Minute Burger<br><strong>₱66.00</strong></button>
-            <button class="product" data-id="r4" data-name="Double Cheesy Burger" data-price="82">Double Cheesy Burger<br><strong>₱82.00</strong></button>
-            <button class="product" data-id="r5" data-name="Chicken Time Burger" data-price="52">Chicken Time Burger<br><strong>₱52.00</strong></button>
-            <button class="product" data-id="r6" data-name="Double Chicken Time Burger" data-price="72">Double Chicken Time Burger<br><strong>₱72.00</strong></button>
-            <button class="product" data-id="r7" data-name="Cheesydog" data-price="51">Cheesydog<br><strong>₱51.00</strong></button>
+        <div class="products">
+            <button class="product" data-name="Minute Burger" data-price="43">Minute Burger<br><strong>₱43.00</strong></button>
+            <button class="product" data-name="Cheesy Burger" data-price="54">Cheesy Burger<br><strong>₱54.00</strong></button>
+            <button class="product" data-name="Double Minute Burger" data-price="66">Double Minute Burger<br><strong>₱66.00</strong></button>
+            <button class="product" data-name="Double Cheesy Burger" data-price="82">Double Cheesy Burger<br><strong>₱82.00</strong></button>
+            <button class="product" data-name="Chicken Time Burger" data-price="52">Chicken Time Burger<br><strong>₱52.00</strong></button>
+            <button class="product" data-name="Double Chicken Time Burger" data-price="72">Double Chicken Time Burger<br><strong>₱72.00</strong></button>
         </div>
 
+        <!-- 🍔 PREMIUM BURGERS -->
         <div class="section-title">🍔 Premium Burgers</div>
-        <div class="products" id="premiumProducts">
-            <button class="product" data-id="p1" data-name="Black Pepper Burger" data-price="92">Black Pepper Burger<br><strong>₱92.00</strong></button>
-            <button class="product" data-id="p2" data-name="Beef Shawarma Burger" data-price="94">Beef Shawarma Burger<br><strong>₱94.00</strong></button>
-            <button class="product" data-id="p3" data-name="Bacon Cheeseburger" data-price="99">Bacon Cheeseburger<br><strong>₱99.00</strong></button>
-            <button class="product" data-id="p4" data-name="50/50 Chicken Veggie" data-price="89">50/50 Chicken Veggie<br><strong>₱89.00</strong></button>
-            <button class="product" data-id="p5" data-name="All Meat Steak Burger" data-price="145">All Meat Steak Burger<br><strong>₱145.00</strong></button>
-            <button class="product" data-id="p6" data-name="French Onion Franks" data-price="93">French Onion Franks<br><strong>₱93.00</strong></button>
-            <button class="product" data-id="p7" data-name="Beef Hungarian" data-price="114">Beef Hungarian<br><strong>₱114.00</strong></button>
+        <div class="products">
+            <button class="product" data-name="Black Pepper Burger" data-price="92">Black Pepper Burger<br><strong>₱92.00</strong></button>
+            <button class="product" data-name="Beef Shawarma Burger" data-price="94">Beef Shawarma Burger<br><strong>₱94.00</strong></button>
+            <button class="product" data-name="Bacon Cheeseburger" data-price="99">Bacon Cheeseburger<br><strong>₱99.00</strong></button>
+            <button class="product" data-name="50/50 Chicken Veggie" data-price="89">50/50 Chicken Veggie<br><strong>₱89.00</strong></button>
+            <button class="product" data-name="All Meat Steak Burger" data-price="145">All Meat Steak Burger<br><strong>₱145.00</strong></button>
         </div>
 
+        <!-- 🌭 HOTDOG — HIWALAY NA! ✅ -->
+        <div class="section-title">🌭 Hotdogs</div>
+        <div class="products">
+            <button class="product" data-name="Cheesydog" data-price="51">Cheesydog<br><strong>₱51.00</strong></button>
+            <button class="product" data-name="French Onion Franks" data-price="93">French Onion Franks<br><strong>₱93.00</strong></button>
+            <button class="product" data-name="Beef Hungarian" data-price="114">Beef Hungarian<br><strong>₱114.00</strong></button>
+        </div>
+
+        <!-- 🛒 CART & PAYMENT -->
         <div class="cart-section">
             <div class="cart-title">🛒 ORDER LIST</div>
             
             <div class="discount-bar">
-                <button class="discount-btn selected" id="discNone" onclick="selectDiscount('none')">No Discount</button>
-                <button class="discount-btn" id="discSenior" onclick="selectDiscount('senior')">👴 Senior (5%)</button>
-                <button class="discount-btn" id="discPwd" onclick="selectDiscount('pwd')">👩‍🦯 PWD (5%)</button>
+                <button class="discount-btn selected" onclick="selectDiscount('none')">No Discount</button>
+                <button class="discount-btn" onclick="selectDiscount('senior')">👴 Senior (5%)</button>
+                <button class="discount-btn" onclick="selectDiscount('pwd')">👩‍🦯 PWD (5%)</button>
             </div>
 
             <div id="cart-items"></div>
@@ -378,7 +381,7 @@
                 <button class="payment-btn" data-method="Grab" onclick="selectPayment(this)">🛵 Grab</button>
             </div>
 
-            <label id="cashLabel">💰 Cash Received:</label>
+            <label>💰 Cash Received:</label>
             <input type="number" id="cash-input" placeholder="0.00" oninput="computeChange()">
             <div class="change" id="change-box">🔁 Change: ₱<span id="change-amount">0.00</span></div>
 
@@ -443,9 +446,7 @@
         function selectDiscount(type) {
             discountType = type;
             document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('selected'));
-            if (type === 'none') document.getElementById('discNone').classList.add('selected');
-            else if (type === 'senior') document.getElementById('discSenior').classList.add('selected');
-            else if (type === 'pwd') document.getElementById('discPwd').classList.add('selected');
+            if (type === 'none') event.target.classList.add('selected');
             recalculateTotals();
         }
 
@@ -505,13 +506,10 @@
             btn.classList.add('selected');
             selectedPayment = btn.dataset.method;
             const cashInput = document.getElementById('cash-input');
-            const cashLabel = document.getElementById('cashLabel');
             if (selectedPayment === 'Cash') {
                 cashInput.style.display = 'block';
-                cashLabel.style.display = 'block';
             } else {
                 cashInput.style.display = 'none';
-                cashLabel.style.display = 'none';
                 document.getElementById('change-box').style.display = 'none';
             }
         }
@@ -596,7 +594,7 @@
             tList.innerHTML = shiftTransactions.length === 0 
                 ? '<p style="color:#888; text-align:center;">No transactions yet.</p>'
                 : shiftTransactions.map(t => `
-                    <div class="trans-item ${t.voided ? 'voided' : ''}">
+                    <div class="trans-item">
                         <span class="trans-ticket">#${t.ticket}</span> — ₱${t.total.toFixed(2)} — ${t.payment}<br>
                         <small>${t.datetime}</small>
                     </div>
