@@ -751,5 +751,148 @@ function renderStockTable() {
     tbody.innerHTML = stocks.map((item, idx) => {
         let status = 'status-active', statusText = 'In Stock';
         if (item.qty <= 0) { status = 'status-out'; statusText = 'OUT OF STOCK'; }
-        else if (item.qty <= item.reorderLevel) { status = 'status-low'; statusText = 'LOW'; }
-        return `<tr><td><strong>${item.name}</strong></td><td>${item.unit}</td><td>${item.qty}</td><td>${item.reorderLevel}</td><td>₱${item.cost.toFixed(2)}</td><td><span class="status-badge ${status}">${status
+        else if (item.qty <= item.reorderLevel) { status = 'status-low'; statusText = 'LOW STOCK'; }
+        return `<tr><td>${item.name}</td><td>${item.unit||'pc'}</td><td>${item.qty}</td><td>${item.reorderLevel||5}</td><td>₱${(item.cost||0).toFixed(2)}</td><td><span class="status-badge ${status}">${statusText
+Text</span></td><td><button class="btn btn-sm btn-primary" onclick="editStock(${idx})">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteStock(${idx})">Delete</button></td></tr>`;
+    }).join('');
+    document.getElementById('stockTotalItems').textContent = stocks.length;
+    document.getElementById('stockLowItems').textContent = stocks.filter(i => i.qty <= (i.reorderLevel||5) && i.qty > 0).length;
+    document.getElementById('stockOutItems').textContent = stocks.filter(i => i.qty <= 0).length;
+    const totalValue = stocks.reduce((s,i) => s + (i.qty * (i.cost||0)), 0);
+    document.getElementById('stockValue').textContent = totalValue.toFixed(2);
+}
+
+function openStockModal() {
+    const name = prompt('Enter Item Name:');
+    if(!name) return;
+    const qty = parseFloat(prompt('Enter Quantity:')) || 0;
+    const unit = prompt('Enter Unit (pc/kg/pack):') || 'pc';
+    const reorder = parseFloat(prompt('Enter Reorder Level:')) || 5;
+    const cost = parseFloat(prompt('Enter Cost per Unit:')) || 0;
+    stocks.push({ name, qty, unit, reorderLevel: reorder, cost });
+    localStorage.setItem('stocks', JSON.stringify(stocks));
+    renderStockTable();
+}
+
+function deleteStock(idx) {
+    if(!confirm('Delete this stock item?')) return;
+    stocks.splice(idx, 1);
+    localStorage.setItem('stocks', JSON.stringify(stocks));
+    renderStockTable();
+}
+
+function editStock(idx) {
+    const item = stocks[idx];
+    const newQty = parseFloat(prompt('Enter New Quantity:', item.qty)) || item.qty;
+    const newReorder = parseFloat(prompt('Enter New Reorder Level:', item.reorderLevel)) || item.reorderLevel;
+    const newCost = parseFloat(prompt('Enter New Cost:', item.cost)) || item.cost;
+    stocks[idx] = { ...item, qty: newQty, reorderLevel: newReorder, cost: newCost };
+    localStorage.setItem('stocks', JSON.stringify(stocks));
+    renderStockTable();
+}
+
+function saveDelivery() {
+    const itemIdx = document.getElementById('deliverItem').value;
+    const qty = parseFloat(document.getElementById('deliverQty').value) || 0;
+    const supplier = document.getElementById('deliverSupplier').value.trim() || '—';
+    if(itemIdx === '' || qty <= 0) return alert('⚠️ Fill all fields!');
+    stocks[itemIdx].qty += qty;
+    localStorage.setItem('stocks', JSON.stringify(stocks));
+    renderStockTable();
+    alert(`✅ Delivery Saved!\nAdded ${qty} × ${stocks[itemIdx].name}`);
+    document.getElementById('deliverQty').value = '';
+    document.getElementById('deliverSupplier').value = '';
+    document.getElementById('deliverRemarks').value = '';
+}
+
+function saveTransOut() {
+    const itemIdx = document.getElementById('transOutItem').value;
+    const qty = parseFloat(document.getElementById('transOutQty').value) || 0;
+    const sendTo = document.getElementById('transOutTo').value.trim();
+    if(itemIdx === '' || qty <= 0 || !sendTo) return alert('⚠️ Fill all fields!');
+    if(stocks[itemIdx].qty < qty) return alert('⚠️ Not enough stock!');
+    stocks[itemIdx].qty -= qty;
+    localStorage.setItem('stocks', JSON.stringify(stocks));
+    renderStockTable();
+    alert(`✅ Trans-Out Saved!\nSent ${qty} × ${stocks[itemIdx].name} to ${sendTo}`);
+}
+
+function saveTransIn() {
+    const itemIdx = document.getElementById('transInItem').value;
+    const qty = parseFloat(document.getElementById('transInQty').value) || 0;
+    const from = document.getElementById('transInFrom').value.trim();
+    if(itemIdx === '' || qty <= 0 || !from) return alert('⚠️ Fill all fields!');
+    stocks[itemIdx].qty += qty;
+    localStorage.setItem('stocks', JSON.stringify(stocks));
+    renderStockTable();
+    alert(`✅ Trans-In Saved!\nReceived ${qty} × ${stocks[itemIdx].name} from ${from}`);
+}
+
+function voidEntireOrder() {
+    if(cart.length === 0) return alert('⚠️ No items to void!');
+    if(!confirm('⚠️ Void entire current order?')) return;
+    voidLogs.unshift({
+        datetime: new Date().toLocaleString('en-PH'),
+        item: 'ENTIRE ORDER — Ticket #' + ticketNumber,
+        qty: cart.reduce((s,i)=>s+i.qty,0),
+        amount: cart.reduce((s,i)=>s+i.price*i.qty,0),
+        voidedBy: currentSession.name,
+        shift: currentSession.shift || 'ADMIN',
+        reason: prompt('Enter reason for void:') || 'No reason given'
+    });
+    localStorage.setItem('voidLogs', JSON.stringify(voidLogs));
+    renderVoidLog();
+    cart = []; updateCartDisplay();
+    alert('✅ Order Voided!');
+}
+
+function renderVoidLog() {
+    const tbody = document.getElementById('voidLogBody');
+    if(voidLogs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No void records...</td></tr>';
+        return;
+    }
+    tbody.innerHTML = voidLogs.map(v => `<tr><td>${v.datetime}</td><td>${v.item}</td><td>${v.qty}</td><td>₱${v.amount.toFixed(2)}</td><td>${v.voidedBy}</td><td>${v.shift.toUpperCase()}</td><td>${v.reason}</td></tr>`).join('');
+}
+
+function generateCashOut() {
+    const shiftSales = transactions.filter(t => t.shift === currentSession.shift).reduce((s,t)=>s+t.total,0);
+    const cashOnHand = currentSession.openingCash + shiftSales;
+    const comment = prompt('Cash Out — Enter Remarks/Comments:') || '—';
+    alert(`💰 CASH OUT REPORT\n────────────────────\nOpening Cash: ₱${currentSession.openingCash.toFixed(2)}\nShift Sales:  ₱${shiftSales.toFixed(2)}\nCASH ON HAND: ₱${cashOnHand.toFixed(2)}\nRemarks: ${comment}`);
+}
+
+function endShift() {
+    if(!confirm('🔒 End current shift?')) return;
+    const shiftSales = transactions.filter(t => t.shift === currentSession.shift).reduce((s,t)=>s+t.total,0);
+    alert(`🔒 SHIFT ENDED!\n────────────────────\nCashier: ${currentSession.name}\nShift: ${currentSession.shift.toUpperCase()}\nOpening: ₱${currentSession.openingCash.toFixed(2)}\nSales: ₱${shiftSales.toFixed(2)}\nTotal Cash: ₱${(currentSession.openingCash + shiftSales).toFixed(2)}`);
+    logout();
+}
+
+function changeAdminPassword() {
+    const newPass = document.getElementById('newAdminPass').value.trim();
+    const confirmPass = document.getElementById('confirmAdminPass').value.trim();
+    if(!newPass || !confirmPass) return alert('⚠️ Enter both fields!');
+    if(newPass !== confirmPass) return alert('⚠️ Passwords do not match!');
+    localStorage.setItem('adminPassword', newPass);
+    alert('✅ Admin Password Changed!');
+    document.getElementById('newAdminPass').value = '';
+    document.getElementById('confirmAdminPass').value = '';
+}
+
+window.onload = function() {
+    setTimeout(() => {
+        const deliverSelect = document.getElementById('deliverItem');
+        const transOutSelect = document.getElementById('transOutItem');
+        const transInSelect = document.getElementById('transInItem');
+        if(deliverSelect) stocks.forEach((s,i)=>{
+            deliverSelect.innerHTML += `<option value="${i}">${s.name} (${s.qty})</option>`;
+            transOutSelect.innerHTML += `<option value="${i}">${s.name} (${s.qty})</option>`;
+            transInSelect.innerHTML += `<option value="${i}">${s.name} (${s.qty})</option>`;
+        });
+    }, 100);
+};
+</script>
+
+</body>
+</html>
