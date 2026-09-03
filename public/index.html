@@ -8,8 +8,11 @@
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: #f7f7f7; min-height: 100vh; }
     .hidden { display: none !important; }
-    button { cursor: pointer; border: none; border-radius: 8px; font-size: 15px; }
-    input, select { border: 2px solid #ddd; border-radius: 8px; padding: 12px; font-size: 16px; width: 100%; }
+    button { cursor: pointer; border: none; border-radius: 8px; font-size: 14px; }
+    input, select, textarea { border: 2px solid #ddd; border-radius: 8px; padding: 10px; font-size: 15px; width: 100%; }
+    textarea { resize: vertical; min-height: 70px; }
+    small { font-size: 12px; color: #777; }
+
     /* LOGIN SCREEN */
     .login-screen {
       position: fixed; inset: 0; background: linear-gradient(135deg, #00a000, #007000);
@@ -23,88 +26,113 @@
     .login-box button { width: 100%; padding: 14px; background: #00a000; color: white; font-weight: bold; margin-top: 10px; }
     .login-box button.gray { background: #eee; color: #333; }
     .divider { height: 1px; background: #ddd; margin: 15px 0; }
+
     /* MAIN LAYOUT */
     .app-layout { display: flex; flex-direction: column; min-height: 100vh; }
     .top-bar {
-      background: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
+      background: white; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100;
       flex-wrap: wrap; gap: 8px;
     }
-    .top-bar h1 { font-size: 18px; color: #008000; }
-    .top-bar .user { font-size: 13px; color: #555; }
-    .nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-    .nav-btn { padding: 8px 14px; background: #f0f0f0; color: #333; font-size: 14px; }
+    .top-bar h1 { font-size: 17px; color: #008000; }
+    .top-bar .user { font-size: 12px; color: #555; }
+    .nav-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+    .nav-btn { padding: 7px 11px; background: #f0f0f0; color: #333; font-size: 13px; }
     .nav-btn.active { background: #00a000; color: white; }
+    .nav-btn.danger { background: #ffebee; color: #c62828; }
+
     /* POS VIEW */
     .pos-container { display: flex; flex-direction: column; }
     @media (min-width: 900px) {
       .pos-container { flex-direction: row; }
     }
+
     /* PRODUCTS AREA */
-    .products-area { flex: 1; padding: 15px; }
-    .cat-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-    .cat-tab { padding: 10px 16px; background: white; border: 2px solid #eee; white-space: nowrap; }
+    .products-area { flex: 1; padding: 12px; }
+    .cat-tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
+    .cat-tab { padding: 9px 14px; background: white; border: 2px solid #eee; white-space: nowrap; font-size: 14px; }
     .cat-tab.active { background: #00a000; color: white; border-color: #00a000; }
-    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
     .product-card {
-      background: white; border-radius: 12px; padding: 15px; text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06); cursor: pointer;
+      background: white; border-radius: 10px; padding: 12px; text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer;
     }
     .product-card:active { transform: scale(0.97); }
-    .product-name { font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #333; }
-    .product-price { color: #008000; font-size: 20px; font-weight: bold; }
+    .product-name { font-weight: bold; font-size: 14px; margin-bottom: 6px; color: #333; }
+    .product-price { color: #008000; font-size: 18px; font-weight: bold; }
+
     /* CART AREA */
     .cart-area {
-      background: white; border-top: 1px solid #eee; padding: 15px;
+      background: white; border-top: 1px solid #eee; padding: 12px;
     }
     @media (min-width: 900px) {
       .cart-area { width: 360px; border-top: none; border-left: 1px solid #eee; }
     }
-    .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-    .cart-header h3 { font-size: 17px; }
-    .clear-btn { background: #ffebee; color: #c62828; padding: 8px 12px; font-size: 13px; }
-    .cart-list { max-height: 280px; overflow-y: auto; margin-bottom: 15px; }
+    .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+    .cart-header h3 { font-size: 16px; }
+    .clear-btn { background: #ffebee; color: #c62828; padding: 7px 11px; font-size: 13px; }
+    .cart-list { max-height: 240px; overflow-y: auto; margin-bottom: 12px; }
     .cart-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid #f0f0f0;
-      gap: 8px; flex-wrap: wrap;
+      padding: 9px 0; border-bottom: 1px solid #f0f0f0; gap: 6px; flex-wrap: wrap;
     }
-    .item-info { display: flex; align-items: center; gap: 10px; }
+    .item-info { display: flex; align-items: center; gap: 9px; }
     .qty-badge {
-      background: #e8f5e9; color: #008000; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 14px; flex-shrink: 0;
+      background: #e8f5e9; color: #008000; padding: 3px 9px; border-radius: 16px; font-weight: bold; font-size: 13px; flex-shrink: 0;
     }
     .item-name { font-size: 14px; }
     .item-price { font-weight: bold; color: #333; flex-shrink: 0; }
-    .remove-btn { color: #e53935; font-size: 20px; padding: 0 8px; background: none; flex-shrink: 0; }
+    .remove-btn { color: #e53935; font-size: 19px; padding: 0 7px; background: none; flex-shrink: 0; }
     .total-row {
-      display: flex; justify-content: space-between; padding: 12px 0; border-top: 2px solid #eee;
-      font-size: 22px; font-weight: bold; margin-bottom: 15px;
+      display: flex; justify-content: space-between; padding: 10px 0; border-top: 2px solid #eee;
+      font-size: 20px; font-weight: bold; margin-bottom: 12px;
     }
-    .payment-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-    .pay-btn { padding: 12px; background: #f5f5f5; color: #333; font-weight: bold; }
+    .payment-buttons { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 10px; }
+    .pay-btn { padding: 10px; background: #f5f5f5; color: #333; font-weight: bold; font-size: 13px; }
     .pay-btn.selected { background: #e8f5e9; color: #008000; border: 2px solid #00a000; }
-    .cash-row { margin-bottom: 12px; }
-    .cash-row label { font-size: 14px; color: #555; margin-bottom: 6px; display: block; }
+    .cash-row { margin-bottom: 10px; }
+    .cash-row label { font-size: 14px; color: #555; margin-bottom: 5px; display: block; }
     .change-box {
-      background: #e3f2fd; padding: 12px; border-radius: 8px; text-align: center;
-      font-size: 18px; font-weight: bold; color: #0d47a1; margin-bottom: 15px; display: none;
+      background: #e3f2fd; padding: 10px; border-radius: 8px; text-align: center;
+      font-size: 16px; font-weight: bold; color: #0d47a1; margin-bottom: 12px; display: none;
     }
-    .action-buttons { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .pay-now-btn { padding: 14px; background: #00a000; color: white; font-size: 17px; font-weight: bold; }
+    .action-buttons { display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .pay-now-btn { padding: 12px; background: #00a000; color: white; font-size: 16px; font-weight: bold; }
+    .cashout-btn { background: #ff9800; color: white; }
+    .void-btn { background: #9c27b0; color: white; }
+
     /* ADMIN PAGES */
-    .admin-page { padding: 15px; display: none; }
+    .admin-page { padding: 12px; display: none; }
     .admin-page.active { display: block; }
     .page-card {
-      background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      overflow-x: auto;
+      background: white; border-radius: 10px; padding: 16px; margin-bottom: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow-x: auto;
     }
-    .page-card h3 { margin-bottom: 15px; color: #333; font-size: 17px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px; }
-    th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+    .page-card h3 { margin-bottom: 12px; color: #333; font-size: 16px; }
+    .page-card h4 { margin:12px 0 8px; font-size:14px; color:#444; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; min-width: 650px; }
+    th, td { padding: 9px 8px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
     th { background: #f9f9f9; font-weight: bold; color: #555; }
-    .add-btn { background: #00a000; color: white; padding: 10px 16px; margin-bottom: 15px; }
-    .empty-msg { text-align: center; color: #999; padding: 30px; }
+    .add-btn { background: #00a000; color: white; padding: 9px 14px; margin: 4px 6px 8px 0; }
+    .add-btn.blue { background: #1976d2; }
+    .add-btn.orange { background: #ff9800; }
+    .empty-msg { text-align: center; color: #999; padding: 25px; }
+    .tag { display:inline-block; padding:2px 8px; border-radius:12px; font-size:12px; font-weight:bold; }
+    .tag.cash { background:#e8f5e9; color:#2e7d32; }
+    .tag.gcash { background:#e3f2fd; color:#1565c0; }
+    .tag.grab { background:#fff3e0; color:#e65100; }
+    .tag.fp { background:#f3e5f5; color:#7b1fa2; }
+    .tag.void { background:#ffebee; color:#c62828; }
+    .tag.transin { background:#e8f5e9; color:#2e7d32; }
+    .tag.transout { background:#fff3e0; color:#e65100; }
+    .tag.error { background:#ffebee; color:#b71c1c; }
+    .row-divider { margin:12px 0; height:1px; background:#eee; }
+    .void-cell button { padding:4px 8px; font-size:12px; background:#f3e5f5; color:#7b1fa2; }
+    .summary-box { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-bottom:12px; }
+    .summary-card { padding:12px; border-radius:8px; }
+    .summary-card.green { background:#e8f5e9; color:#1b5e20; }
+    .summary-card.red { background:#ffebee; color:#b71c1c; }
+    .summary-card.blue { background:#e3f2fd; color:#0d47a1; }
   </style>
 </head>
 <body>
@@ -140,6 +168,7 @@
     </div>
   </div>
 </div>
+
 <!-- MAIN APPLICATION -->
 <div class="app-layout hidden" id="mainApp">
   <!-- TOP NAVIGATION -->
@@ -148,13 +177,17 @@
       <h1>🍔 Burger POS</h1>
       <p class="user" id="userDisplay">—</p>
     </div>
-    <div class="nav-buttons">
+    <div class="nav-buttons" id="mainNav">
       <button class="nav-btn active" onclick="switchMainView('pos')">🛒 POS</button>
-      <button class="nav-btn" onclick="switchMainView('transactions')">📊 Sales</button>
-      <button class="nav-btn" onclick="switchMainView('stocks')">📦 Stocks</button>
+      <button class="nav-btn" id="nav-mytrans" onclick="switchMainView('mytransactions')">📋 My Transactions</button>
+      <button class="nav-btn hidden" id="nav-sales" onclick="switchMainView('sales')">📊 Sales</button>
+      <button class="nav-btn hidden" id="nav-stocks" onclick="switchMainView('stocks')">📦 Stocks</button>
+      <button class="nav-btn hidden" id="nav-reports" onclick="switchMainView('reports')">📋 Reports</button>
+      <button class="nav-btn hidden" id="nav-errors" onclick="switchMainView('errors')">⚠️ Errors</button>
       <button class="nav-btn gray" onclick="logoutSystem()">🚪 Logout</button>
     </div>
   </div>
+
   <!-- POS VIEW -->
   <div id="view-pos" class="pos-container">
     <div class="products-area">
@@ -169,7 +202,9 @@
     <div class="cart-area">
       <div class="cart-header">
         <h3>🛒 ORDER — Ticket #<span id="ticketNumber">001</span></h3>
-        <button class="clear-btn" onclick="clearFullCart()">🗑️ Clear All</button>
+        <div style="display:flex;gap:6px;">
+          <button class="clear-btn" onclick="clearFullCart()">🗑️ Clear</button>
+        </div>
       </div>
       <div class="cart-list" id="cartList">
         <p class="empty-msg">Tap products to add to order</p>
@@ -179,8 +214,10 @@
         <span>₱<span id="grandTotal">0.00</span></span>
       </div>
       <div class="payment-buttons">
-        <button class="pay-btn selected" id="payCash" onclick="selectPaymentMethod('Cash', this)">💵 Cash</button>
-        <button class="pay-btn" id="payGcash" onclick="selectPaymentMethod('GCash', this)">📱 GCash</button>
+        <button class="pay-btn selected" data-pay="Cash" onclick="selectPaymentMethod('Cash', this)">💵 Cash</button>
+        <button class="pay-btn" data-pay="GCash" onclick="selectPaymentMethod('GCash', this)">📱 GCash</button>
+        <button class="pay-btn" data-pay="Grab" onclick="selectPaymentMethod('Grab', this)">🛵 Grab</button>
+        <button class="pay-btn" data-pay="FoodPanda" onclick="selectPaymentMethod('FoodPanda', this)">🐼 FoodPanda</button>
       </div>
       <div class="cash-row">
         <label>Cash Received:</label>
@@ -191,13 +228,26 @@
       </div>
       <div class="action-buttons">
         <button class="pay-now-btn" onclick="finalizeSale()">✅ COMPLETE SALE</button>
+        <button class="pay-now-btn cashout-btn" onclick="openCashOutModal()">💰 CASH OUT</button>
       </div>
     </div>
   </div>
-  <!-- TRANSACTIONS VIEW -->
-  <div id="view-transactions" class="admin-page">
+
+  <!-- CASHIER: MY TRANSACTIONS -->
+  <div id="view-mytransactions" class="admin-page">
     <div class="page-card">
-      <h3>📊 Sales / Transaction History</h3>
+      <h3>📋 My Transactions — Ticket # Reference</h3>
+      <div class="summary-box">
+        <div class="summary-card blue">
+          <div>Total Sales This Shift</div>
+          <div style="font-size:20px;font-weight:bold;">₱<span id="myShiftTotal">0.00</span></div>
+        </div>
+        <div class="summary-card red">
+          <div>Voided Transactions</div>
+          <div style="font-size:20px;font-weight:bold;"><span id="myVoidCount">0</span></div>
+        </div>
+      </div>
+      <p style="font-size:13px; color:#555; margin:8px 0;">📌 Give the <strong>Ticket #</strong> to Admin if you need a transaction voided. Voided transactions are automatically excluded from your sales total.</p>
       <table>
         <thead>
           <tr>
@@ -205,68 +255,216 @@
             <th>Date & Time</th>
             <th>Items</th>
             <th>Total Amount</th>
-            <th>Payment Method</th>
-            <th>Cashier</th>
+            <th>Payment</th>
+            <th>Status</th>
           </tr>
         </thead>
-        <tbody id="transactionsBody">
-          <tr><td colspan="6" class="empty-msg">No transactions yet. Start selling!</td></tr>
+        <tbody id="myTransBody">
+          <tr><td colspan="6" class="empty-msg">No transactions yet.</td></tr>
         </tbody>
       </table>
     </div>
   </div>
+
+  <!-- ADMIN: SALES / TRANSACTIONS VIEW -->
+  <div id="view-sales" class="admin-page">
+    <div class="page-card">
+      <h3>📊 Sales Overview & Void Management</h3>
+      <div class="summary-box">
+        <div class="summary-card green">
+          <div>✅ Today's Sales (Excl. Void)</div>
+          <div style="font-size:20px;font-weight:bold;" id="dailySalesTotal">₱0.00</div>
+        </div>
+        <div class="summary-card blue">
+          <div>Shift Sales (Excl. Void)</div>
+          <div style="font-size:20px;font-weight:bold;" id="shiftSalesTotal">₱0.00</div>
+        </div>
+        <div class="summary-card red">
+          <div>❌ Voided Amount</div>
+          <div style="font-size:20px;font-weight:bold;" id="voidTotal">₱0.00</div>
+        </div>
+      </div>
+      <h4>All Transactions — Click VOID to cancel (will NOT affect cashier's sales)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket #</th>
+            <th>Date & Time</th>
+            <th>Items</th>
+            <th>Total Amount</th>
+            <th>Payment</th>
+            <th>Cashier</th>
+            <th>Shift</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="transactionsBody">
+          <tr><td colspan="8" class="empty-msg">No transactions yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- STOCKS VIEW -->
   <div id="view-stocks" class="admin-page">
     <div class="page-card">
       <h3>📦 Inventory / Stocks</h3>
-      <button class="add-btn" onclick="addNewStock()">➕ Add New Stock Item</button>
+      <div style="margin-bottom:10px;">
+        <button class="add-btn" onclick="openStockModal('in')">📥 Stock In / Delivery</button>
+        <button class="add-btn blue" onclick="openStockModal('transin')">➡️ Trans-In</button>
+        <button class="add-btn orange" onclick="openStockModal('transout')">⬅️ Trans-Out</button>
+      </div>
       <table>
         <thead>
           <tr>
             <th>Item Name</th>
             <th>Quantity</th>
             <th>Cost Price</th>
+            <th>Last Update</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody id="stocksBody">
-          <tr><td colspan="4" class="empty-msg">No stock items yet. Click Add to start.</td></tr>
+          <tr><td colspan="5" class="empty-msg">No stock items yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="page-card">
+      <h3>📜 Stock Movement Log</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Qty</th>
+            <th>Remarks / From-To</th>
+            <th>User</th>
+          </tr>
+        </thead>
+        <tbody id="stockLogBody">
+          <tr><td colspan="6" class="empty-msg">No stock movements yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REPORTS VIEW -->
+  <div id="view-reports" class="admin-page">
+    <div class="page-card">
+      <h3>💰 Cash Out Reports</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Cashier</th>
+            <th>Shift</th>
+            <th>Amount</th>
+            <th>Reason / Remarks</th>
+          </tr>
+        </thead>
+        <tbody id="cashoutBody">
+          <tr><td colspan="5" class="empty-msg">No cash out records.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="page-card">
+      <h3>📱 GCash Transactions</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Ticket #</th>
+            <th>Amount</th>
+            <th>Cashier</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="gcashBody">
+          <tr><td colspan="5" class="empty-msg">No GCash transactions.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="page-card">
+      <h3>🛵 Grab & 🐼 FoodPanda Orders</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Platform</th>
+            <th>Ticket #</th>
+            <th>Amount</th>
+            <th>Cashier</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="onlineBody">
+          <tr><td colspan="6" class="empty-msg">No online orders.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ERROR REPORTS VIEW -->
+  <div id="view-errors" class="admin-page">
+    <div class="page-card">
+      <h3>⚠️ Error Reports (Sold Out-of-Stock)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Item Sold</th>
+            <th>Shift</th>
+            <th>Cashier</th>
+            <th>Ticket #</th>
+          </tr>
+        </thead>
+        <tbody id="errorsBody">
+          <tr><td colspan="5" class="empty-msg">No error reports. Good inventory!</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+
+<!-- MODALS -->
+<div id="modalOverlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:15px;">
+  <div id="modalContent" style="background:white;border-radius:12px;padding:20px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;"></div>
+</div>
+
 <script>
 // ============= DATA & CONFIG =============
 const PRODUCTS = {
   burgers: [
-    {name:'Minute Burger', price:43},
-    {name:'Cheesy Burger', price:54},
-    {name:'Double Minute Burger', price:66},
-    {name:'Double Cheesy Burger', price:82},
-    {name:'Chicken Time Burger', price:52},
-    {name:'Double Chicken Time Burger', price:72}
+    {name:'Minute Burger', price:43, stockQty:50},
+    {name:'Cheesy Burger', price:54, stockQty:50},
+    {name:'Double Minute Burger', price:66, stockQty:50},
+    {name:'Double Cheesy Burger', price:82, stockQty:50},
+    {name:'Chicken Time Burger', price:52, stockQty:50},
+    {name:'Double Chicken Time Burger', price:72, stockQty:50}
   ],
   hotdogs: [
-    {name:'Cheesydog', price:51},
-    {name:'French Onion Franks', price:93},
-    {name:'Beef Hungarian', price:114}
+    {name:'Cheesydog', price:51, stockQty:50},
+    {name:'French Onion Franks', price:93, stockQty:30},
+    {name:'Beef Hungarian', price:114, stockQty:20}
   ],
   premium: [
-    {name:'Black Pepper Burger', price:92},
-    {name:'Beef Shawarma Burger', price:94},
-    {name:'Bacon Cheeseburger', price:99},
-    {name:'50/50 Chicken Veggie Burger', price:89},
-    {name:'All Meat Steak Burger', price:145}
+    {name:'Black Pepper Burger', price:92, stockQty:30},
+    {name:'Beef Shawarma Burger', price:94, stockQty:30},
+    {name:'Bacon Cheeseburger', price:99, stockQty:25},
+    {name:'50/50 Chicken Veggie Burger', price:89, stockQty:25},
+    {name:'All Meat Steak Burger', price:145, stockQty:15}
   ],
   drinks: [
-    {name:'Soft Drink Regular', price:15},
-    {name:'Soft Drink Large', price:20},
-    {name:'Iced Tea', price:18},
-    {name:'Bottled Water', price:10}
+    {name:'Soft Drink Regular', price:15, stockQty:100},
+    {name:'Soft Drink Large', price:20, stockQty:100},
+    {name:'Iced Tea', price:18, stockQty:80},
+    {name:'Bottled Water', price:10, stockQty:100}
   ]
 };
 const SHIFT_PASSCODES = { morning:'1111', swing:'2222', graveyard:'3333' };
+const SHIFT_LABELS = { morning:'Morning', swing:'Swing', graveyard:'Graveyard' };
+
 // STATE VARIABLES
 let activeUser = { loggedIn:false, type:'', name:'', shift:'' };
 let currentCategory = 'burgers';
@@ -275,7 +473,11 @@ let selectedPayment = 'Cash';
 let ticketNumber = parseInt(localStorage.getItem('posTicketCounter') || '1');
 let transactions = JSON.parse(localStorage.getItem('posTransactions') || '[]');
 let stocks = JSON.parse(localStorage.getItem('posStocks') || '[]');
+let stockLog = JSON.parse(localStorage.getItem('posStockLog') || '[]');
+let cashoutRecords = JSON.parse(localStorage.getItem('posCashout') || '[]');
+let errorReports = JSON.parse(localStorage.getItem('posErrorReports') || '[]');
 let adminPassword = localStorage.getItem('posAdminPass') || 'admin123';
+
 // ============= LOGIN SYSTEM =============
 function showLoginForm() {
   const type = document.getElementById('loginType').value;
@@ -300,12 +502,25 @@ function processAdminLogin() {
 function launchMainApp() {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('mainApp').classList.remove('hidden');
-  document.getElementById('userDisplay').textContent = `${activeUser.name} | ${activeUser.type}${activeUser.shift ? ' | ' + activeUser.shift.toUpperCase() + ' SHIFT' : ''}`;
+  document.getElementById('userDisplay').textContent = `${activeUser.name} | ${activeUser.type}${activeUser.shift ? ' | ' + SHIFT_LABELS[activeUser.shift] + ' SHIFT' : ''}`;
   document.getElementById('ticketNumber').textContent = String(ticketNumber).padStart(3, '0');
-  
+
+  // Show/hide navigation based on role
+  const isAdmin = activeUser.type === 'admin';
+  document.getElementById('nav-mytrans').classList.toggle('hidden', isAdmin);
+  document.getElementById('nav-sales').classList.toggle('hidden', !isAdmin);
+  document.getElementById('nav-stocks').classList.toggle('hidden', !isAdmin);
+  document.getElementById('nav-reports').classList.toggle('hidden', !isAdmin);
+  document.getElementById('nav-errors').classList.toggle('hidden', !isAdmin);
+
   renderProducts();
-  renderTransactions();
-  renderStocks();
+  if (isAdmin) {
+    renderSales();
+    renderStocksPage();
+    renderReports();
+  } else {
+    renderMyTransactions();
+  }
 }
 function logoutSystem() {
   if (!confirm('🚪 Are you sure you want to logout?')) return;
@@ -313,6 +528,7 @@ function logoutSystem() {
   cart = [];
   location.reload();
 }
+
 // ============= PRODUCTS & CART =============
 function changeCategory(cat, btnEl) {
   currentCategory = cat;
@@ -380,10 +596,14 @@ function clearFullCart() {
   cart = [];
   updateCartDisplay();
 }
+
 // ============= PAYMENT & SALE =============
 function selectPaymentMethod(method, btnEl) {
   selectedPayment = method;
-  document.querySelectorAll('.pay-btn').forEach(btn => btn.classList.remove('selected'));
+  document.querySelectorAll('.pay-btn').forEach(btn => {
+    btn.classList.remove('selected');
+    btn.style.border = 'none';
+  });
   btnEl.classList.add('selected');
   document.getElementById('changeDisplay').style.display = 'none';
 }
@@ -404,94 +624,912 @@ function finalizeSale() {
   if (total <= 0) return alert('⚠️ Cart is empty! Add items first.');
   const cash = parseFloat(document.getElementById('cashReceivedInput').value) || 0;
   if (selectedPayment === 'Cash' && cash < total) return alert('⚠️ Insufficient cash amount!');
-  // Save transaction
+
+  const saleDate = new Date();
+  const saleDateStr = saleDate.toLocaleDateString('en-PH');
+
+  // ✅ Check Stock & Log Errors
+  cart.forEach(cartItem => {
+    const prodStock = findStockItem(cartItem.name);
+    const qtyAvail = prodStock ? prodStock.quantity : 0;
+    if (qtyAvail < cartItem.quantity) {
+      errorReports.unshift({
+        datetime: saleDate.toLocaleString('en-PH'),
+        date: saleDateStr,
+        item: cartItem.name,
+        soldQty: cartItem.quantity,
+        availableQty: qtyAvail,
+        shift: SHIFT_LABELS[activeUser.shift || ''] || 'ADMIN',
+        cashier: activeUser.name,
+        ticket: ticketNumber
+      });
+    }
+    if (prodStock) {
+      prodStock.quantity = Math.max(0, prodStock.quantity - cartItem.quantity);
+    }
+  });
+  localStorage.setItem('posErrorReports', JSON.stringify(errorReports));
+
+  // ✅ Save Transaction
   transactions.unshift({
     ticket: ticketNumber,
-    datetime: new Date().toLocaleString('en-PH'),
+    datetime: saleDate.toLocaleString('en-PH'),
+    date: saleDateStr,
     items: [...cart],
     total: total,
     paymentMethod: selectedPayment,
     cashier: activeUser.name,
-    shift: activeUser.shift
+    shift: SHIFT_LABELS[activeUser.shift || ''] || 'ADMIN',
+    void: false
   });
   localStorage.setItem('posTransactions', JSON.stringify(transactions));
-  // Increment ticket
+
+  // ✅ Increment Ticket
   localStorage.setItem('posTicketCounter', ++ticketNumber);
   document.getElementById('ticketNumber').textContent = String(ticketNumber).padStart(3, '0');
+
   alert(`✅ SALE COMPLETED!\n━━━━━━━━━━━━━━━━━\nTicket #${ticketNumber - 1}\nTotal: ₱${total.toFixed(2)}\nPayment: ${selectedPayment}\n${selectedPayment === 'Cash' ? `Cash: ₱${cash.toFixed(2)}\nChange: ₱${(cash - total).toFixed(2)}` : ''}\n━━━━━━━━━━━━━━━━━`);
-  // Reset cart
+
   cart = [];
   updateCartDisplay();
-  renderTransactions();
+  if (activeUser.type === 'admin') { renderSales(); renderReports(); renderStocksPage(); }
+  else { renderMyTransactions(); }
 }
+
+// ============= CASHIER: MY TRANSACTIONS VIEW =============
+function renderMyTransactions() {
+  // Show ONLY transactions by current cashier
+  const myTrans = transactions.filter(t => t.cashier === activeUser.name);
+  
+  // Calculate totals — EXCLUDE VOIDED
+  let shiftTotal = 0, voidCount = 0;
+  myTrans.forEach(t => {
+    if (t.void) voidCount++;
+    else shiftTotal += t.total;
+  });
+
+  document.getElementById('myShiftTotal').textContent = shiftTotal.toFixed(2);
+  document.getElementById('myVoidCount').textContent = voidCount;
+
+  const tbody = document.getElementById('myTransBody');
+  if (myTrans.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">No transactions yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = myTrans.map(t => {
+    let tagClass = 'cash';
+    if (t.paymentMethod === 'GCash') tagClass = 'gcash';
+    else if (t.paymentMethod === 'Grab') tagClass = 'grab';
+    else if (t.paymentMethod === 'FoodPanda') tagClass = 'fp';
+    if (t.void) tagClass = 'void';
+
+    return `
+    <tr>
+      <td><strong>#${String(t.ticket).padStart(3, '0')}</strong></td>
+      <td>${t.datetime}</td>
+      <td>${t.items.length} item(s)</td>
+      <td><strong>₱${t.total.toFixed(2)}</strong></td>
+      <td><span class="tag ${tagClass}">${t.paymentMethod}</span></td>
+      <td>${t.void ? '<span class="tag void">❌ VOIDED — EXCLUDED</span>' : '✅ COUNTED'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ============= ADMIN: VOID TRANSACTION =============
+function voidTransaction(ticketNum) {
+  if (!confirm(`⚠️ VOID TRANSACTION #${String(ticketNum).padStart(3, '0')}?\n\n• This transaction will be EXCLUDED from sales totals.\n• Cashier will NOT be short.\n• Stock will NOT be auto-restored.`)) return;
+  
+  const trans = transactions.find(t => t.ticket === ticketNum);
+  if (trans) {
+    trans.void = true;
+    localStorage.setItem('posTransactions', JSON.stringify(transactions));
+    alert(`✅ TRANSACTION #${String(ticketNum).padStart(3, '0')} HAS BEEN VOIDED.\n\n✅ Cashier's sales total has been adjusted — NO SHORTAGE.`);
+    renderSales();
+    renderReports();
+  } else {
+    alert('❌ Transaction not found!');
+  }
+}
+
 // ============= VIEWS SWITCH =============
 function switchMainView(viewName) {
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
   event.target.classList.add('active');
-  document.getElementById('view-pos').style.display = viewName === 'pos' ? '' : 'none';
-  document.getElementById('view-transactions').classList.toggle('active', viewName === 'transactions');
-  document.getElementById('view-stocks').classList.toggle('active', viewName === 'stocks');
+  
+  // Hide all views
+  document.getElementById('view-pos').style.display = 'none';
+  document.getElementById('view-mytransactions').classList.remove('active');
+  document.getElementById('view-sales').classList.remove('active');
+  document.getElementById('view-stocks').classList.remove('active');
+  document.getElementById('view-reports').classList.remove('active');
+  document.getElementById('view-errors').classList.remove('active');
+
+  // Show selected view
+  if (viewName === 'pos') document.getElementById('view-pos').style.display = '';
+  else if (viewName === 'mytransactions') { document.getElementById('view-mytransactions').classList.add('active'); renderMyTransactions(); }
+  else if (viewName === 'sales') { document.getElementById('view-sales').classList.add('active'); renderSales(); }
+  else if (viewName === 'stocks') { document.getElementById('view-stocks').classList.add('active'); renderStocksPage(); }
+  else if (viewName === 'reports') { document.getElementById('view-reports').classList.add('active'); renderReports(); }
+  else if (viewName === 'errors') { document.getElementById('view-errors').classList.add('active'); renderErrors(); }
 }
-// ============= TRANSACTIONS =============
-function renderTransactions() {
+
+// ============= ADMIN: SALES / SHIFT & DAILY =============
+function renderSales() {
+  const today = new Date().toLocaleDateString('en-PH');
+  let dailyTotal = 0, shiftTotal = 0, voidedTotal = 0;
+
+  transactions.forEach(t => {
+    if (t.void) {
+      voidedTotal += t.total;
+      return; // ✅ EXCLUDE VOIDED from sales totals
+    }
+    if (t.date === today) dailyTotal += t.total;
+    if (activeUser.shift && t.shift === SHIFT_LABELS[activeUser.shift]) shiftTotal += t.total;
+  });
+
+  document.getElementById('dailySalesTotal').textContent = '₱' + dailyTotal.toFixed(2);
+  document.getElementById('shiftSalesTotal').textContent = '₱' + shiftTotal.toFixed(2);
+  document.getElementById('voidTotal').textContent = '₱' + voidedTotal.toFixed(2);
+
   const tbody = document.getElementById('transactionsBody');
   if (transactions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">No transactions yet. Start selling!</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-msg">No transactions yet.</td></tr>';
     return;
   }
-  tbody.innerHTML = transactions.map(t => `
+
+  tbody.innerHTML = transactions.map(t => {
+    let tagClass = 'cash';
+    if (t.paymentMethod === 'GCash') tagClass = 'gcash';
+    else if (t.paymentMethod === 'Grab') tagClass = 'grab';
+    else if (t.paymentMethod === 'FoodPanda') tagClass = 'fp';
+    if (t.void) tagClass = 'void';
+
+    return `
     <tr>
-      <td>#${String(t.ticket).padStart(3, '0')}</td>
+      <td><strong>#${String(t.ticket).padStart(3, '0')}</strong></td>
       <td>${t.datetime}</td>
       <td>${t.items.length} item(s)</td>
       <td><strong>₱${t.total.toFixed(2)}</strong></td>
-      <td>${t.paymentMethod}</td>
+      <td><span class="tag ${tagClass}">${t.paymentMethod}</span></td>
       <td>${t.cashier}</td>
-    </tr>
-  `).join('');
+      <td>${t.shift}</td>
+      <td class="void-cell">
+        ${t.void ? '<span class="tag void">❌ VOIDED</span>' : `<button onclick="voidTransaction(${t.ticket})">VOID</button>`}
+      </td>
+    </tr>`;
+  }).join('');
 }
-// ============= STOCKS =============
-function renderStocks() {
+
+// ============= STOCK HELPERS =============
+function findStockItem(name) {
+  return stocks.find(s => s.name.trim().toLowerCase() === name.trim().toLowerCase());
+}
+function saveStocks() {
+  localStorage.setItem('posStocks', JSON.stringify(stocks));
+  localStorage.setItem('posStockLog', JSON.stringify(stockLog));
+}
+function openStockModal(moveType) {
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  let title = '';
+  let typeLabel = '';
+  if (moveType === 'in') { title = '📥 Stock In / Delivery'; typeLabel = 'Delivery / Purchase'; }
+  else if (moveType === 'transin') { title = '➡️ Transfer-IN (From Other Store)'; typeLabel = 'Trans-In'; }
+  else if (moveType === 'transout') { title = '⬅️ Transfer-OUT (To Other Store)'; typeLabel = 'Trans-Out'; }
+
+  content.innerHTML = `
+    <h3 style="margin-bottom:12px;">${title}</h3>
+    <label style="font-size:14px;color:#555;">Item Name</label>
+    <input type="text" id="stk-name" placeholder="e.g. Minute Burger" style="margin:4px 0 10px;">
+    <label style="font-size:14px;color:#555;">Quantity</label>
+    <input type="number" id="stk-qty" placeholder="0" style="margin:4px 0 10px;">
+    ${moveType !== 'in' ? `<label style="font-size:14px;color:#555;">${moveType==='transin'?'From Store':'To Store'}</label>
+    <input type="text" id="stk-rem" placeholder="Store name / Remarks" style="margin:4px 0 10px;">` : ''}
+    ${moveType==='in'?`<label style="font-size:14px;color:#555;">Cost Price (per unit)</label>
+    <input type="number" step="0.01" id="stk-cost" placeholder="0.00" style="margin:4px 0 10px;">`:''}
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button onclick="submitStockMove('${moveType}','${typeLabel}')" style="flex:1;background:#00a000;color:white;padding:10px;">✅ Save</button>
+      <button onclick="closeModal()" style="flex:1;background:#eee;padding:10px;">Cancel</button>
+    </div>
+  `;
+  overlay.classList.remove('hidden');
+}
+function submitStockMove(moveType, typeLabel) {
+  const name = document.getElementById('stk-name').value.trim();
+  const qty = parseFloat(document.getElementById('stk-qty').value) || 0;
+  const rem = document.getElementById('stk-rem') ? document.getElementById('stk-rem').value.trim() : (moveType==='in'?'Delivery':'');
+  const cost = document.getElementById('stk-cost') ? parseFloat(document.getElementById('stk-cost').value) || 0 : 0;
+  if (!name || qty <= 0) return alert('⚠️ Please enter valid Item Name and Quantity.');
+
+  const existing = findStockItem(name);
+  const dt = new Date().toLocaleString('en-PH');
+  if (moveType === 'in' || moveType === 'transin') {
+    if (existing) existing.quantity += qty;
+    else stocks.push({ name, quantity:qty, cost:cost || existing?.cost || 0, lastUpdate:dt });
+  } else {
+    if (!existing) return alert('❌ Item not found in stock!');
+    existing.quantity = Math.max(0, existing.quantity - qty);
+  }
+
+  stockLog.unshift({ datetime:dt, name, type:typeLabel, qty, remarks:rem, user:activeUser.name });
+  saveStocks();
+  closeModal();
+  renderStocksPage();
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+}
+
+function renderStocksPage() {
   const tbody = document.getElementById('stocksBody');
   if (stocks.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">No stock items yet. Click Add to start.</td></tr>';
-    return;
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-msg">No
+hidden" id="nav-errors" onclick="switchMainView('errors')">⚠️ Errors</button>
+      <button class="nav-btn gray" onclick="logoutSystem()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- POS VIEW -->
+  <div id="view-pos" class="pos-container">
+    <div class="products-area">
+      <div class="cat-tabs">
+        <button class="cat-tab active" onclick="changeCategory('burgers', this)">🍔 Burgers</button>
+        <button class="cat-tab" onclick="changeCategory('hotdogs', this)">🌭 Hotdogs</button>
+        <button class="cat-tab" onclick="changeCategory('premium', this)">⭐ Premium</button>
+        <button class="cat-tab" onclick="changeCategory('drinks', this)">🥤 Drinks</button>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+    <div class="cart-area">
+      <div class="cart-header">
+        <h3>🛒 ORDER — Ticket #<span id="ticketNumber">001</span></h3>
+        <div style="display:flex;gap:6px;">
+          <button class="clear-btn" onclick="clearFullCart()">🗑️ Clear</button>
+        </div>
+      </div>
+      <div class="cart-list" id="cartList">
+        <p class="empty-msg">Tap products to add to order</p>
+      </div>
+      <div class="total-row">
+        <span>TOTAL:</span>
+        <span>₱<span id="grandTotal">0.00</span></span>
+      </div>
+      <div class="payment-buttons">
+        <button class="pay-btn selected" data-pay="Cash" onclick="selectPaymentMethod('Cash', this)">💵 Cash</button>
+        <button class="pay-btn" data-pay="GCash" onclick="selectPaymentMethod('GCash', this)">📱 GCash</button>
+        <button class="pay-btn" data-pay="Grab" onclick="selectPaymentMethod('Grab', this)">🛵 Grab</button>
+        <button class="pay-btn" data-pay="FoodPanda" onclick="selectPaymentMethod('FoodPanda', this)">🐼 FoodPanda</button>
+      </div>
+      <div class="cash-row">
+        <label>Cash Received:</label>
+        <input type="number" id="cashReceivedInput" placeholder="0.00" oninput="calculateChange()">
+      </div>
+      <div class="change-box" id="changeDisplay">
+        CHANGE: ₱<span id="changeAmount">0.00</span>
+      </div>
+      <div class="action-buttons">
+        <button class="pay-now-btn" onclick="finalizeSale()">✅ COMPLETE SALE</button>
+        <button class="pay-now-btn cashout-btn" onclick="openCashOutModal()">💰 CASH OUT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASHIER: MY TRANSACTIONS -->
+  <div id="view-mytransactions" class="admin-page">
+    <div class="page-card">
+      <h3>📋 My Transactions — Ticket # Reference</h3>
+      <div class="summary-box">
+        <div class="summary-card blue">
+          <div>Total Sales This Shift</div>
+          <div style="font-size:20px;font-weight:bold;">₱<span id="myShiftTotal">0.00</span></div>
+        </div>
+        <div class="summary-card red">
+          <div>Voided Transactions</div>
+          <div style="font-size:20px;font-weight:bold;"><span id="myVoidCount">0</span></div>
+        </div>
+      </div>
+      <p style="font-size:13px; color:#555; margin:8px 0;">📌 Give the <strong>Ticket #</strong> to Admin if you need a transaction voided. Voided transactions are automatically excluded from your sales total.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket #</th>
+            <th>Date & Time</th>
+            <th>Items</th>
+            <th>Total Amount</th>
+            <th>Payment</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="myTransBody">
+          <tr><td colspan="6" class="empty-msg">No transactions yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ADMIN: SALES / TRANSACTIONS VIEW -->
+  <div id="view-sales" class="admin-page">
+    <div class="page-card">
+      <h3>📊 Sales Overview & Void Management</h3>
+      <div class="summary-box">
+        <div class="summary-card green">
+          <div>✅ Today's Sales (Excl. Void)</div>
+          <div style="font-size:20px;font-weight:bold;" id="dailySalesTotal">₱0.00</div>
+        </div>
+        <div class="summary-card blue">
+          <div>Shift Sales (Excl. Void)</div>
+          <div style="font-size:20px;font-weight:bold;" id="shiftSalesTotal">₱0.00</div>
+        </div>
+        <div class="summary-card red">
+          <div>❌ Voided Amount</div>
+          <div style="font-size:20px;font-weight:bold;" id="voidTotal">₱0.00</div>
+        </div>
+      </div>
+      <h4>All Transactions — Click VOID to cancel (will NOT affect cashier's sales)</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket #</th>
+            <th>Date & Time</th>
+            <th>Items</th>
+            <th>Total Amount</th>
+            <th>Payment</th>
+            <th>Cashier</th>
+            <th>Shift</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="transactionsBody">
+          <tr><td colspan="8" class="empty-msg">No transactions yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STOCKS VIEW -->
+  <div id="view-stocks" class="admin-page">
+    <div class="page-card">
+      <h3>📦 Inventory / Stocks</h3>
+      <div style="margin-bottom:10px;">
+        <button class="add-btn" onclick="openStockModal('in')">📥 Stock In / Delivery</button>
+        <button class="add-btn blue" onclick="openStockModal('transin')">➡️ Trans-In</button>
+        <button class="add-btn orange" onclick="openStockModal('transout')">⬅️ Trans-Out</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Cost Price</th>
+            <th>Last Update</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="stocksBody">
+          <tr><td colspan="5" class="empty-msg">No stock items yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="page-card">
+      <h3>📜 Stock Movement Log</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Qty</th>
+            <th>Remarks / From-To</th>
+            <th>User</th>
+          </tr>
+        </thead>
+        <tbody id="stockLogBody">
+          <tr><td colspan="6" class="empty-msg">No stock movements yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REPORTS VIEW -->
+  <div id="view-reports" class="admin-page">
+    <div class="page-card">
+      <h3>💰 Cash Out Reports</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Cashier</th>
+            <th>Shift</th>
+            <th>Amount</th>
+            <th>Reason / Remarks</th>
+          </tr>
+        </thead>
+        <tbody id="cashoutBody">
+          <tr><td colspan="5" class="empty-msg">No cash out records.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="page-card">
+      <h3>📱 GCash Transactions</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Ticket #</th>
+            <th>Amount</th>
+            <th>Cashier</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="gcashBody">
+          <tr><td colspan="5" class="empty-msg">No GCash transactions.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="page-card">
+      <h3>🛵 Grab & 🐼 FoodPanda Orders</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Platform</th>
+            <th>Ticket #</th>
+            <th>Amount</th>
+            <th>Cashier</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="onlineBody">
+          <tr><td colspan="6" class="empty-msg">No online orders.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ERROR REPORTS VIEW -->
+  <div id="view-errors" class="admin-page">
+    <div class="page-card">
+      <h3>⚠️ Error Reports (Sold Out-of-Stock)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Item Sold</th>
+            <th>Shift</th>
+            <th>Cashier</th>
+            <th>Ticket #</th>
+          </tr>
+        </thead>
+        <tbody id="errorsBody">
+          <tr><td colspan="5" class="empty-msg">No error reports. Good inventory!</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="modalOverlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:15px;">
+  <div id="modalContent" style="background:white;border-radius:12px;padding:20px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;"></div>
+</div>
+
+<script>
+// ============= DATA & CONFIG =============
+const PRODUCTS = {
+  burgers: [
+    {name:'Minute Burger', price:43, stockQty:50},
+    {name:'Cheesy Burger', price:54, stockQty:50},
+    {name:'Double Minute Burger', price:66, stockQty:50},
+    {name:'Double Cheesy Burger', price:82, stockQty:50},
+    {name:'Chicken Time Burger', price:52, stockQty:50},
+    {name:'Double Chicken Time Burger', price:72, stockQty:50}
+  ],
+  hotdogs: [
+    {name:'Cheesydog', price:51, stockQty:50},
+    {name:'French Onion Franks', price:93, stockQty:30},
+    {name:'Beef Hungarian', price:114, stockQty:20}
+  ],
+  premium: [
+    {name:'Black Pepper Burger', price:92, stockQty:30},
+    {name:'Beef Shawarma Burger', price:94, stockQty:30},
+    {name:'Bacon Cheeseburger', price:99, stockQty:25},
+    {name:'50/50 Chicken Veggie Burger', price:89, stockQty:25},
+    {name:'All Meat Steak Burger', price:145, stockQty:15}
+  ],
+  drinks: [
+    {name:'Soft Drink Regular', price:15, stockQty:100},
+    {name:'Soft Drink Large', price:20, stockQty:100},
+    {name:'Iced Tea', price:18, stockQty:80},
+    {name:'Bottled Water', price:10, stockQty:100}
+  ]
+};
+const SHIFT_PASSCODES = { morning:'1111', swing:'2222', graveyard:'3333' };
+const SHIFT_LABELS = { morning:'Morning', swing:'Swing', graveyard:'Graveyard' };
+
+// STATE VARIABLES
+let activeUser = { loggedIn:false, type:'', name:'', shift:'' };
+let currentCategory = 'burgers';
+let cart = [];
+let selectedPayment = 'Cash';
+let ticketNumber = parseInt(localStorage.getItem('posTicketCounter') || '1');
+let transactions = JSON.parse(localStorage.getItem('posTransactions') || '[]');
+let stocks = JSON.parse(localStorage.getItem('posStocks') || '[]');
+let stockLog = JSON.parse(localStorage.getItem('posStockLog') || '[]');
+let cashoutRecords = JSON.parse(localStorage.getItem('posCashout') || '[]');
+let errorReports = JSON.parse(localStorage.getItem('posErrorReports') || '[]');
+let adminPassword = localStorage.getItem('posAdminPass') || 'admin123';
+
+// ============= LOGIN SYSTEM =============
+function showLoginForm() {
+  const type = document.getElementById('loginType').value;
+  document.getElementById('cashierLoginForm').classList.toggle('hidden', type !== 'cashier');
+  document.getElementById('adminLoginForm').classList.toggle('hidden', type !== 'admin');
+}
+function processCashierLogin() {
+  const shift = document.getElementById('shiftSelect').value;
+  const passcode = document.getElementById('passcodeInput').value.trim();
+  const name = document.getElementById('cashierNameInput').value.trim();
+  if (!shift || !passcode || !name) return alert('⚠️ Please fill in ALL fields!');
+  if (passcode !== SHIFT_PASSCODES[shift]) return alert('❌ Wrong passcode! Please check your shift.');
+  activeUser = { loggedIn:true, type:'cashier', name:name, shift:shift };
+  launchMainApp();
+}
+function processAdminLogin() {
+  const pass = document.getElementById('adminPassInput').value.trim();
+  if (pass !== adminPassword) return alert('❌ Wrong admin password!');
+  activeUser = { loggedIn:true, type:'admin', name:'ADMIN', shift:'' };
+  launchMainApp();
+}
+function launchMainApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('userDisplay').textContent = `${activeUser.name} | ${activeUser.type}${activeUser.shift ? ' | ' + SHIFT_LABELS[activeUser.shift] + ' SHIFT' : ''}`;
+  document.getElementById('ticketNumber').textContent = String(ticketNumber).padStart(3, '0');
+
+  const isAdmin = activeUser.type === 'admin';
+  document.getElementById('nav-mytrans').classList.toggle('hidden', isAdmin);
+  document.getElementById('nav-sales').classList.toggle('hidden', !isAdmin);
+  document.getElementById('nav-stocks').classList.toggle('hidden', !isAdmin);
+  document.getElementById('nav-reports').classList.toggle('hidden', !isAdmin);
+  document.getElementById('nav-errors').classList.toggle('hidden', !isAdmin);
+
+  renderProducts();
+  if (isAdmin) {
+    renderSales();
+    renderStocksPage();
+    renderReports();
+    renderErrors();
+  } else {
+    renderMyTransactions();
   }
-  tbody.innerHTML = stocks.map((item, index) => `
-    <tr>
-      <td>${item.name}</td>
-      <td>${item.quantity || 0}</td>
-      <td>₱${(item.cost || 0).toFixed(2)}</td>
-      <td>
-        <button onclick="editStockItem(${index})" style="background:#e8f5e9;color:#008000;padding:5px 10px;margin-right:5px;border-radius:4px;">Edit</button>
-        <button onclick="deleteStockItem(${index})" style="background:#ffebee;color:#c62828;padding:5px 10px;border-radius:4px;">Del</button>
-      </td>
-    </tr>
-  `).join('');
 }
-function addNewStock() {
-  const name = prompt('Enter Item Name:');
-  if (!name) return;
-  const qty = parseFloat(prompt('Enter Quantity:') || '0');
-  const cost = parseFloat(prompt('Enter Cost Price:') || '0');
-  stocks.push({ name:name, quantity:qty, cost:cost });
-  localStorage.setItem('posStocks', JSON.stringify(stocks));
-  renderStocks();
+function logoutSystem() {
+  if (!confirm('🚪 Are you sure you want to logout?')) return;
+  activeUser = { loggedIn:false, type:'', name:'', shift:'' };
+  cart = [];
+  location.reload();
 }
-function editStockItem(index) {
-  const item = stocks[index];
-  const newQty = parseFloat(prompt('Enter New Quantity:', item.quantity) || item.quantity);
-  const newCost = parseFloat(prompt('Enter New Cost:', item.cost || 0) || item.cost);
-  stocks[index] = { ...item, quantity:newQty, cost:newCost };
-  localStorage.setItem('posStocks', JSON.stringify(stocks));
-  renderStocks();
+
+// ============= PRODUCTS & CART =============
+function changeCategory(cat, btnEl) {
+  currentCategory = cat;
+  document.querySelectorAll('.cat-tab').forEach(tab => tab.classList.remove('active'));
+  btnEl.classList.add('active');
+  renderProducts();
 }
-function deleteStockItem(index) {
-  if (!confirm('⚠️ Delete this stock item?')) return;
-  stocks.splice(index, 1);
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = '';
+  PRODUCTS[currentCategory].forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `<div class="product-name">${item.name}</div><div class="product-price">₱${item.price}</div>`;
+    card.onclick = () => addToCart(item);
+    grid.appendChild(card);
+  });
+}
+function addToCart(item) {
+  const existing = cart.find(c => c.name === item.name);
+  existing ? existing.quantity++ : cart.push({...item, quantity:1});
+  updateCartDisplay();
+}
+function updateCartDisplay() {
+  const list = document.getElementById('cartList');
+  if (cart.length === 0) {
+    list.innerHTML = '<p class="empty-msg">Tap products to add to order</p>';
+  } else {
+    list.innerHTML = cart.map((it, i) => `
+      <div class="cart-item">
+        <div class="item-info"><span class="qty-badge">${it.quantity}x</span><span class="item-name">${it.name}</span></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="item-price">₱${(it.price*it.quantity).toFixed(2)}</span>
+          <button class="remove-btn" onclick="removeFromCart(${i})">×</button>
+        </div>
+      </div>`).join('');
+  }
+  const total = cart.reduce((s, it) => s + it.price*it.quantity, 0);
+  document.getElementById('grandTotal').textContent = total.toFixed(2);
+  document.getElementById('cashReceivedInput').value = '';
+  document.getElementById('changeDisplay').style.display = 'none';
+}
+function removeFromCart(idx) {
+  cart[idx].quantity > 1 ? cart[idx].quantity-- : cart.splice(idx,1);
+  updateCartDisplay();
+}
+function clearFullCart() {
+  if (!cart.length) return;
+  if (confirm('🗑️ Clear entire order?')) { cart = []; updateCartDisplay(); }
+}
+
+// ============= PAYMENT & SALE =============
+function selectPaymentMethod(method, btn) {
+  selectedPayment = method;
+  document.querySelectorAll('.pay-btn').forEach(b=>{b.classList.remove('selected');b.style.border='none'});
+  btn.classList.add('selected');
+  document.getElementById('changeDisplay').style.display = 'none';
+}
+function calculateChange() {
+  const total = cart.reduce((s,it)=>s+it.price*it.quantity,0);
+  const cash = parseFloat(document.getElementById('cashReceivedInput').value)||0;
+  const box = document.getElementById('changeDisplay');
+  if (selectedPayment==='Cash' && cash>=total && total>0) {
+    box.style.display='block';
+    document.getElementById('changeAmount').textContent = (cash-total).toFixed(2);
+  } else { box.style.display='none'; }
+}
+function finalizeSale() {
+  const total = cart.reduce((s,it)=>s+it.price*it.quantity,0);
+  if (total<=0) return alert('⚠️ Cart is empty!');
+  const cash = parseFloat(document.getElementById('cashReceivedInput').value)||0;
+  if (selectedPayment==='Cash' && cash<total) return alert('⚠️ Insufficient cash!');
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-PH');
+
+  // Check stock
+  cart.forEach(it=>{
+    const stk = findStockItem(it.name);
+    if (stk && stk.quantity < it.quantity) {
+      errorReports.unshift({
+        datetime: now.toLocaleString('en-PH'), date: dateStr,
+        item: it.name, soldQty: it.quantity, availQty: stk.quantity,
+        shift: SHIFT_LABELS[activeUser.shift]||'ADMIN', cashier: activeUser.name, ticket: ticketNumber
+      });
+      localStorage.setItem('posErrorReports', JSON.stringify(errorReports));
+    }
+    if (stk) stk.quantity = Math.max(0, stk.quantity - it.quantity);
+  });
+  saveStocks();
+
+  transactions.unshift({
+    ticket: ticketNumber, datetime: now.toLocaleString('en-PH'), date: dateStr,
+    items: [...cart], total, paymentMethod: selectedPayment,
+    cashier: activeUser.name, shift: SHIFT_LABELS[activeUser.shift]||'ADMIN', void: false
+  });
+  localStorage.setItem('posTransactions', JSON.stringify(transactions));
+  localStorage.setItem('posTicketCounter', ++ticketNumber);
+  document.getElementById('ticketNumber').textContent = String(ticketNumber).padStart(3,'0');
+
+  alert(`✅ SALE COMPLETED!\n━━━━━━━━━━━━━━━━━\nTicket #${String(ticketNumber-1).padStart(3,'0')}\nTotal: ₱${total.toFixed(2)}\nPayment: ${selectedPayment}\n${selectedPayment==='Cash'?`Cash: ₱${cash.toFixed(2)}\nChange: ₱${(cash-total).toFixed(2)}`:''}`);
+  cart=[]; updateCartDisplay();
+  activeUser.type==='admin' ? (renderSales(), renderReports(), renderStocksPage(), renderErrors()) : renderMyTransactions();
+}
+
+// ============= CASHIER: MY TRANSACTIONS =============
+function renderMyTransactions() {
+  const myTrans = transactions.filter(t => t.cashier === activeUser.name);
+  let shiftTotal=0, voidCount=0;
+  myTrans.forEach(t => { if(t.void) voidCount++; else shiftTotal += t.total; });
+  document.getElementById('myShiftTotal').textContent = shiftTotal.toFixed(2);
+  document.getElementById('myVoidCount').textContent = voidCount;
+
+  const tbody = document.getElementById('myTransBody');
+  if (!myTrans.length) return tbody.innerHTML='<tr><td colspan="6" class="empty-msg">No transactions yet.</td></tr>';
+  tbody.innerHTML = myTrans.map(t => {
+    let cls='cash'; if(t.paymentMethod==='GCash')cls='gcash'; else if(t.paymentMethod==='Grab')cls='grab'; else if(t.paymentMethod==='FoodPanda')cls='fp';
+    if(t.void)cls='void';
+    return `<tr>
+      <td><strong>#${String(t.ticket).padStart(3,'0')}</strong></td>
+      <td>${t.datetime}</td>
+      <td>${t.items.length} item(s)</td>
+      <td><strong>₱${t.total.toFixed(2)}</strong></td>
+      <td><span class="tag ${cls}">${t.paymentMethod}</span></td>
+      <td>${t.void?'<span class="tag void">❌ VOIDED — EXCLUDED</span>':'✅ COUNTED'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ============= ADMIN: VOID TRANSACTION =============
+function voidTransaction(ticketNum) {
+  if (!confirm(`⚠️ VOID TRANSACTION #${String(ticketNum).padStart(3,'0')}?\n• EXCLUDED from sales\n• Cashier NOT short\n• Stock NOT auto-restored`)) return;
+  const tr = transactions.find(x=>x.ticket===ticketNum);
+  if (tr) {
+    tr.void=true;
+    localStorage.setItem('posTransactions', JSON.stringify(transactions));
+    alert(`✅ TRANSACTION #${String(ticketNum).padStart(3,'0')} VOIDED.\nCashier adjusted — NO SHORTAGE.`);
+    renderSales(); renderReports();
+  } else alert('❌ Not found!');
+}
+
+// ============= VIEW SWITCHING =============
+function switchMainView(name) {
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('view-pos').style.display='none';
+  document.getElementById('view-mytransactions').classList.remove('active');
+  document.getElementById('view-sales').classList.remove('active');
+  document.getElementById('view-stocks').classList.remove('active');
+  document.getElementById('view-reports').classList.remove('active');
+  document.getElementById('view-errors').classList.remove('active');
+
+  if (name==='pos') document.getElementById('view-pos').style.display='';
+  else if (name==='mytransactions') { document.getElementById('view-mytransactions').classList.add('active'); renderMyTransactions(); }
+  else if (name==='sales') { document.getElementById('view-sales').classList.add('active'); renderSales(); }
+  else if (name==='stocks') { document.getElementById('view-stocks').classList.add('active'); renderStocksPage(); }
+  else if (name==='reports') { document.getElementById('view-reports').classList.add('active'); renderReports(); }
+  else if (name==='errors') { document.getElementById('view-errors').classList.add('active'); renderErrors(); }
+}
+
+// ============= ADMIN: SALES =============
+function renderSales() {
+  const today = new Date().toLocaleDateString('en-PH');
+  let daily=0, shiftT=0, voided=0;
+  transactions.forEach(t=>{
+    if (t.void) { voided+=t.total; return; }
+    if (t.date===today) daily+=t.total;
+    if (activeUser.shift && t.shift === SHIFT_LABELS[activeUser.shift]) shiftT += t.total;
+  });
+  document.getElementById('dailySalesTotal').textContent='₱'+daily.toFixed(2);
+  document.getElementById('shiftSalesTotal').textContent='₱'+shiftT.toFixed(2);
+  document.getElementById('voidTotal').textContent='₱'+voided.toFixed(2);
+
+  const tbody = document.getElementById('transactionsBody');
+  if (!transactions.length) return tbody.innerHTML='<tr><td colspan="8" class="empty-msg">No transactions yet.</td></tr>';
+  tbody.innerHTML = transactions.map(t=>{
+    let cls='cash'; if(t.paymentMethod==='GCash')cls='gcash'; else if(t.paymentMethod==='Grab')cls='grab'; else if(t.paymentMethod==='FoodPanda')cls='fp';
+    if(t.void)cls='void';
+    return `<tr>
+      <td><strong>#${String(t.ticket).padStart(3,'0')}</strong></td>
+      <td>${t.datetime}</td>
+      <td>${t.items.length} item(s)</td>
+      <td><strong>₱${t.total.toFixed(2)}</strong></td>
+      <td><span class="tag ${cls}">${t.paymentMethod}</span></td>
+      <td>${t.cashier}</td>
+      <td>${t.shift}</td>
+      <td class="void-cell">${t.void?'<span class="tag void">❌ VOIDED</span>':`<button onclick="voidTransaction(${t.ticket})">VOID</button>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ============= STOCKS HELPERS =============
+function findStockItem(name) {
+  return stocks.find(s => s.name.trim().toLowerCase() === name.trim().toLowerCase());
+}
+function saveStocks() {
   localStorage.setItem('posStocks', JSON.stringify(stocks));
-  renderStocks();
+  localStorage.setItem('posStockLog', JSON.stringify(stockLog));
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+}
+function openStockModal(moveType) {
+  let title='', typeLabel='';
+  if (moveType==='in'){title='📥 Stock In / Delivery';typeLabel='Delivery / Purchase';}
+  else if (moveType==='transin'){title='➡️ Transfer-IN';typeLabel='Trans-In';}
+  else if (moveType==='transout'){title='⬅️ Transfer-OUT';typeLabel='Trans-Out';}
+
+  document.getElementById('modalContent').innerHTML = `
+    <h3 style="margin-bottom:12px;">${title}</h3>
+    <label>Item Name</label><input type="text" id="stk-name" placeholder="e.g. Minute Burger">
+    <label>Quantity</label><input type="number" id="stk-qty" placeholder="0">
+    ${moveType!=='in'?`<label>${moveType==='transin'?'From Store':'To Store'}</label><input type="text" id="stk-rem">`:''}
+    ${moveType==='in'?`<label>Cost Price per unit</label><input type="number" step="0.01" id="stk-cost">`:''}
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button onclick="submitStockMove('${moveType}','${typeLabel}')" style="flex:1; background:#00a000; color:white; padding:10px;">Save</button>
+      <button onclick="closeModal()" style="flex:1; background:#eee; padding:10px;">Cancel</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function submitStockMove(moveType, typeLabel) {
+  const name = document.getElementById('stk-name').value.trim();
+  const qty = parseFloat(document.getElementById('stk-qty').value)||0;
+  const rem = document.getElementById('stk-rem')?.value?.trim() || (moveType==='in'?'Delivery':'');
+  const cost = document.getElementById('stk-cost')?parseFloat(document.getElementById('stk-cost').value)||0:0;
+  if (!name || qty<=0) return alert('⚠️ Enter valid name and quantity.');
+
+  const existing = findStockItem(name);
+  const dt = new Date().toLocaleString('en-PH');
+  if (moveType==='in' || moveType==='transin') {
+    existing ? existing.quantity += qty : stocks.push({name, quantity:qty, cost: cost||existing?.cost||0, lastUpdate:dt});
+  } else {
+    if (!existing) return alert('❌ Item not found!');
+    existing.quantity = Math.max(0, existing.quantity - qty);
+  }
+  stockLog.unshift({datetime:dt, name, type:typeLabel, qty, remarks:rem, user:activeUser.name});
+  saveStocks(); closeModal(); renderStocksPage();
+}
+function renderStocksPage() {
+  const tbody = document.getElementById('stocksBody');
+  if (!stocks.length) return tbody.innerHTML='<tr><td colspan="5" class="empty-msg">No stock items yet.</td></tr>';
+  tbody.innerHTML = stocks.map(s=>`<tr>
+    <td><strong>${s.name}</strong></td>
+    <td>${s.quantity}</td>
+    <td>₱${(s.cost||0).toFixed(2)}</td>
+    <td>${s.lastUpdate||'-'}</td>
+    <td><button onclick="openEditStock('${s.name}')" style="padding:3px 8px; font-size:12px;">Edit</button></td>
+  </tr>`).join('');
+
+  const logBody = document.getElementById('stockLogBody');
+  if (!stockLog.length) return logBody.innerHTML='<tr><td colspan="6" class="empty-msg">No movements yet.</td></tr>';
+  logBody.innerHTML = stockLog.map(l=>`<tr>
+    <td>${l.datetime}</td><td>${l.name}</td><td>${l.type}</td><td>${l.qty}</td><td>${l.remarks||'-'}</td><td>${l.user}</td>
+  </tr>`).join('');
+}
+
+// ============= CASH OUT =============
+function openCashOutModal() {
+  document.getElementById('modalContent').innerHTML = `
+    <h3 style="margin-bottom:12px;">💰 Cash Out</h3>
+    <label>Amount</label><input type="number" step="0.01" id="co-amt" placeholder="0.00">
+    <label>Remarks / Reason</label><textarea id="co-rem" placeholder="e.g. Petty cash, change fund..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button onclick="submitCashOut()" style="flex:1; background:#ff9800; color:white; padding:10px;">Submit</button>
+      <button onclick="closeModal()" style="flex:1; background:#eee; padding:10px;">Cancel</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function submitCashOut() {
+  const amt = parseFloat(document.getElementById('co-amt').value)||0;
+  const rem = document.getElementById('co-rem').value.trim() || '-';
+  if (amt<=0) return alert('⚠️ Enter valid amount.');
+  cashoutRecords.unshift({
+    datetime: new Date().toLocaleString('en-PH'), amount:amt, remarks:rem,
+    cashier:activeUser.name, shift: SHIFT_LABELS[activeUser.shift]||'ADMIN'
+  });
+  localStorage.setItem('posCashout', JSON.stringify(cashoutRecords));
+  alert(`✅ Cash Out recorded: ₱${amt.toFixed(2)}`);
+  closeModal();
+  if (activeUser.type==='admin') renderReports();
+}
+
+// ============= REPORTS =============
+function renderReports() {
+  // Cash Out
+  let body = document.getElementById('cashoutBody');
+  if (!cashoutRecords.length) body.innerHTML='<tr><td colspan="5" class="empty-msg">No cash out records.</td></tr>';
+  else body.innerHTML = cashoutRecords.map(r=>`<tr>
+    <td>${r.datetime}</td><td>${r.cashier}</td><td>${r.shift}</td><td><strong>₱${r.amount.toFixed(2)}</strong></td><td>${r.remarks}</td>
+  </tr>`).join('');
+
+  // GCash
+  const gTrans = transactions.filter(t=>t.paymentMethod==='GCash');
+  body = document.getElementById('gcashBody');
+  if (!gTrans.length) body.innerHTML='<tr><td colspan="5" class="empty-msg">No GCash transactions.</td></tr>';
+  else body.innerHTML = gTrans.map(t=>`<tr>
+    <td>${t.datetime}</td><td>#${String(t.ticket).padStart(3,'0')}</td><td><strong>₱${t.total.toFixed(2)}</strong></td><td>${t.cashier}</td>
+    <td>${t.void?'<span class="tag void">VOIDED</span>':'✅ Active'}</td>
+  </tr>`).join('');
+
+  // Grab / FoodPanda
+  const oTrans = transactions.filter(t=>t.paymentMethod==='Grab'||t.paymentMethod==='FoodPanda');
+  body = document.getElementById('onlineBody');
+  if (!oTrans.length) body.innerHTML='<tr><td colspan="6" class="empty-msg">No online orders.</td></tr>';
+  else body.innerHTML = oTrans.map(t=>`<tr>
+    <td>${t.datetime}</td><td>${t.paymentMethod}</td><td>#${String(t.ticket).padStart(3,'0')}</td><td><strong>₱${t.total.toFixed(2)}</strong></td><td>${t.cashier}</td>
+    <td>${t.void?'<span class="tag void">VOIDED</span>':'✅ Active'}</td>
+  </tr>`).join('');
+}
+
+// ============= ERRORS =============
+function renderErrors() {
+  const body = document.getElementById('errorsBody');
+  if (!errorReports.length) body.innerHTML='<tr><td colspan="5" class="empty-msg">No error reports. Good inventory!</td></tr>';
+  else body.innerHTML = errorReports.map(e=>`<tr>
+    <td>${e.datetime}</td><td>${e.item} (sold:${e.soldQty}, avail:${e.availQty})</td><td>${e.shift}</td><td>${e.cashier}</td><td>#${String(e.ticket).padStart(3,'0')}</td>
+  </tr>`).join('');
 }
 </script>
 </body>
 </html>
+  
