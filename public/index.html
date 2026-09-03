@@ -53,6 +53,7 @@ th{background:#f9f9f9}
 .stk-row div{flex:1}
 .lbl{font-size:13px;color:#555;font-weight:bold}
 .eq{font-size:20px;font-weight:bold;color:#008000;text-align:center;padding-top:20px}
+.hint{font-size:12px;color:#888;margin-top:-6px;margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -67,15 +68,12 @@ th{background:#f9f9f9}
   <option value="admin">Admin</option>
 </select>
 
+<!-- CASHIER LOGIN — HINDI NA PILII NG SHIFT, PASSCODE ANG MAGSASABI -->
 <div id="cform" class="hidden">
-<select id="shift">
-  <option value="">-- Select Shift --</option>
-  <option value="morning">Morning (6AM–2PM)</option>
-  <option value="swing">Swing (2PM–10PM)</option>
-  <option value="graveyard">Graveyard (10PM–6AM)</option>
-</select>
-<input type="password" id="pass" placeholder="Passcode" maxlength="4">
 <input type="text" id="name" placeholder="Cashier Name">
+<input type="password" id="pass" placeholder="Passcode" maxlength="4" oninput="autoDetectShift(this.value)">
+<div class="hint" id="shifthint">ⓘ Enter Passcode: 1111=Morning | 2222=Swing | 3333=Graveyard</div>
+<div style="font-weight:bold;margin:6px 0;color:#008000" id="detectedshift"></div>
 <button class="btn-green" onclick="loginCashier()">✅ Start Shift</button>
 </div>
 
@@ -164,7 +162,7 @@ th{background:#f9f9f9}
 <table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Cashier</th><th>Shift</th><th>Action</th></tr></thead><tbody id="stbody"></tbody></table>
 </div>
 
-<!-- ADMIN — ✅ LAHAT NG PRODUKTO LAGING NAKIKITA SA STOCKS ON HAND -->
+<!-- ADMIN — STOCKS ON HAND — LAHAT NG PRODUKTO LAGING NAKIKITA -->
 <div id="vstocks" class="hidden" style="padding:10px">
 <h3>📦 Stocks On Hand — ALL PRODUCTS</h3>
 <div class="stk-box">
@@ -266,8 +264,12 @@ const PROD = {
   ]
 };
 
-const PASS = {morning:'1111',swing:'2222',graveyard:'3333'};
-const LAB = {morning:'Morning',swing:'Swing',graveyard:'Graveyard'};
+// ============= PASSCODE → SHIFT RULES =============
+const PASS = {
+  '1111': {id:'morning',label:'Morning (6AM–2PM)'},
+  '2222': {id:'swing',label:'Swing (2PM–10PM)'},
+  '3333': {id:'graveyard',label:'Graveyard (10PM–6AM)'}
+};
 const ADMIN_PASS = 'admin123';
 
 // ============= STATE =============
@@ -290,11 +292,9 @@ function allProducts(){
   return list.sort((a,b)=>a.n.localeCompare(b.n));
 }
 
-// ============= ✅ IMPORTANT: SHOW ALL PRODUCTS IN STOCKS ON HAND =============
-// EVERY product ALWAYS appears — whether updated or NOT
+// ============= GET ALL PRODUCTS WITH STOCK =============
 function getStockAllProducts(){
   return allProducts().map(prod=>{
-    // Find if stock was updated before; if not → use initial stock
     const saved = stk.find(s=>s.n.trim().toLowerCase() === prod.n.trim().toLowerCase());
     return {
       n: prod.n,
@@ -314,30 +314,41 @@ function SAVE(){
   localStorage.setItem('priceLog',JSON.stringify(priceLog));
 }
 
+// ============= AUTO-DETECT SHIFT AS PASSCODE IS TYPED =============
+function autoDetectShift(pass){
+  const info = PASS[pass];
+  document.getElementById('detectedshift').textContent = info ? '✅ Shift: ' + info.label : '';
+}
+
 // ============= LOGIN =============
 function showForm(t){
   document.getElementById('cform').classList.toggle('hidden',t!=='cashier');
   document.getElementById('aform').classList.toggle('hidden',t!=='admin');
+  document.getElementById('detectedshift').textContent='';
 }
+
 function loginCashier(){
-  const s=document.getElementById('shift').value;
   const p=document.getElementById('pass').value.trim();
   const n=document.getElementById('name').value.trim();
-  if(!s||!p||!n)return alert('⚠️ Fill all fields!');
-  if(PASS[s]!==p)return alert('❌ Wrong passcode!');
-  user={logged:true,type:'cashier',name:n,shift:s,startTime:new Date()};
+  const shiftInfo = PASS[p];
+  
+  if(!n||!p)return alert('⚠️ Enter Name and Passcode!');
+  if(!shiftInfo)return alert('❌ Wrong passcode! Use:\n1111=Morning\n2222=Swing\n3333=Graveyard');
+  
+  user={logged:true,type:'cashier',name:n,shift:shiftInfo.id,shiftLabel:shiftInfo.label,startTime:new Date()};
   start();
 }
+
 function loginAdmin(){
   if(document.getElementById('apass').value.trim()!==ADMIN_PASS)return alert('❌ Wrong admin password!');
-  user={logged:true,type:'admin',name:'ADMIN',shift:'',startTime:new Date()};
+  user={logged:true,type:'admin',name:'ADMIN',shift:'',shiftLabel:'Admin',startTime:new Date()};
   start();
 }
+
 function start(){
   document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  const shiftLabel = user.shift ? LAB[user.shift]+' Shift' : 'Admin';
-  document.getElementById('user').textContent = `${shiftLabel} | ${user.name}`;
+  document.getElementById('user').textContent = `${user.shiftLabel} | ${user.name}`;
   document.getElementById('tic').textContent = String(tic).padStart(3,'0');
 
   const adm = user.type === 'admin';
@@ -359,6 +370,7 @@ function start(){
     renderMyTrans();renderShiftInfo();
   }
 }
+
 function logout(){if(confirm('🚪 Logout?'))location.reload()}
 
 // ============= CASHIER — PRODUCTS & CART =============
@@ -420,7 +432,6 @@ function checkout(){
   const dt = new Date().toLocaleString('en-PH');
   const d = new Date().toLocaleDateString('en-PH');
 
-  // Deduct stock — get from ALL products first
   const allStk = getStockAllProducts();
   cart.forEach(x=>{
     const found = allStk.find(s=>s.n.trim().toLowerCase() === x.n.trim().toLowerCase());
@@ -430,15 +441,11 @@ function checkout(){
         stockAlerts.unshift({
           dt: dt, date: d,
           item: x.n, soldQty: x.q, availQty: currQty,
-          cashier: user.name, shift: LAB[user.shift]||'ADMIN', ticket: tic
+          cashier: user.name, shift: user.shiftLabel, ticket: tic
         });
       }
-      // Save new qty to stk array
       let saved = stk.find(s=>s.n.trim().toLowerCase() === x.n.trim().toLowerCase());
-      if(!saved){
-        saved = {n:x.n,qty:0,dt:dt};
-        stk.push(saved);
-      }
+      if(!saved){saved={n:x.n,qty:0,dt:dt};stk.push(saved);}
       saved.qty = Math.max(0, currQty - x.q);
       saved.dt = dt;
     }
@@ -447,7 +454,7 @@ function checkout(){
   trans.unshift({
     tic: tic, dt: dt, date: d,
     items: [...cart], total: t, pay: pay,
-    who: user.name, shift: LAB[user.shift]||'ADMIN', voided: false
+    who: user.name, shift: user.shiftLabel, voided: false
   });
   tic++; SAVE();
 
@@ -483,7 +490,7 @@ function showView(v){
 // ============= CASHIER VIEWS =============
 function renderShiftInfo(){
   document.getElementById('sname').textContent = user.name;
-  document.getElementById('sshift').textContent = LAB[user.shift];
+  document.getElementById('sshift').textContent = user.shiftLabel;
   document.getElementById('sstart').textContent = user.startTime.toLocaleString('en-PH');
   document.getElementById('stic').textContent = String(tic).padStart(3,'0');
 }
@@ -512,7 +519,7 @@ function renderAllSales(){
   trans.forEach(x=>{
     if(x.voided){vsum+=x.total;return;}
     if(x.date===td)dsum+=x.total;
-    if(x.shift && x.shift!=='ADMIN')ssum+=x.total;
+    if(x.shift && x.shift!=='Admin')ssum+=x.total;
   });
   document.getElementById('dsale').textContent = dsum.toFixed(2);
   document.getElementById('ssale').textContent = ssum.toFixed(2);
@@ -568,13 +575,10 @@ function renderPriceLog(){
   document.getElementById('pricelog').innerHTML = priceLog.length ? priceLog.map(x=>`<tr><td>${x.item}</td><td>₱${x.oldPrice}</td><td><strong>₱${x.newPrice}</strong></td><td>${x.dt}</td><td>${x.who}</td></tr>`).join('') : '<tr><td colspan="5" class="empty">No price changes yet</td></tr>';
 }
 
-// ============= ✅ ADMIN — STOCKS ON HAND: ALL PRODUCTS ALWAYS SHOW =============
+// ============= ADMIN — STOCKS ON HAND =============
 function renderStocks(){
-  // GET ALL PRODUCTS — use saved stock or initial stock if never updated
   const allStocks = getStockAllProducts();
   document.getElementById('stkbody').innerHTML = allStocks.length ? allStocks.map(x=>`<tr><td><strong>${x.n}</strong></td><td>${x.qty}</td><td>${x.dt}</td></tr>`).join('') : '<tr><td colspan="3" class="empty">No products</td></tr>';
-
-  // Render movement log below
   document.getElementById('logbody').innerHTML = stklog.length ? stklog.map(x=>`<tr><td>${x.dt}</td><td>${x.n}</td><td>${x.type}</td><td>${x.q}</td><td>${x.who}</td></tr>`).join('') : '<tr><td colspan="5" class="empty">No movements yet</td></tr>';
 }
 
@@ -616,7 +620,6 @@ function stockModal(t){
 function calcStockTotal(){
   const n = document.getElementById('selItem').value;
   if(!n){document.getElementById('curr').value='';document.getElementById('newtotal').textContent='0';return;}
-  // Get current stock from ALL products logic
   const allStocks = getStockAllProducts();
   const found = allStocks.find(x=>x.n.trim().toLowerCase() === n.trim().toLowerCase());
   const currQty = found ? found.qty : 0;
@@ -642,7 +645,6 @@ function saveStockUpdate(){
   if(stockUpdateType==='delivery'||stockUpdateType==='transin') newQty = currQty + q;
   else newQty = Math.max(0, currQty - q);
 
-  // Save to stk array
   let saved = stk.find(s=>s.n.trim().toLowerCase() === n.trim().toLowerCase());
   if(!saved) saved = {n:n,qty:0,dt:dt};
   saved.qty = newQty;
@@ -686,7 +688,7 @@ function saveCO(){
   const a=+document.getElementById('coamt').value||0;
   const r=document.getElementById('corem').value.trim();
   if(a<=0)return alert('⚠️ Enter valid amount');
-  cashout.unshift({dt:new Date().toLocaleString('en-PH'),amt:a,rem:r,who:user.name,shift:'Cashier'});
+  cashout.unshift({dt:new Date().toLocaleString('en-PH'),amt:a,rem:r,who:user.name,shift:user.shiftLabel});
   SAVE();alert(`✅ Cash Out saved: ₱${a.toFixed(2)}`);closeMod();
 }
 
