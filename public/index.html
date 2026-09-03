@@ -1,898 +1,536 @@
 <!DOCTYPE html>
-<html lang="tl">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MINUTE BURGER POS — FULL WORKING</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        html, body { height: 100%; overflow: hidden; background: #f5f5f5; }
-        :root {
-            --primary: #00a000; --primary-dark: #008000; --danger: #e53935;
-            --warning: #ff9800; --blue: #1976d2; --bg: #f5f5f5; --card: #fff;
-            --border: #ddd; --text: #333; --text-light: #666;
-            --trans-in: #2196f3; --trans-out: #ff5722;
-        }
-        .app { display: flex; height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; }
-        .hidden { display: none !important; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Burger Shop POS — Updated</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: #f7f7f7; min-height: 100vh; }
+    .hidden { display: none !important; }
+    button { cursor: pointer; border: none; border-radius: 8px; font-size: 15px; }
+    input, select { border: 2px solid #ddd; border-radius: 8px; padding: 12px; font-size: 16px; width: 100%; }
 
-        .lock-screen {
-            position: fixed; inset: 0;
-            background: linear-gradient(135deg, #00a000, #006600);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 99999; padding: 20px;
-        }
-        .lock-box {
-            background: white; padding: 30px; border-radius: 16px;
-            width: 100%; max-width: 400px; text-align: center;
-        }
-        .lock-box h2 { color: var(--primary-dark); margin-bottom: 10px; }
-        .shift-info { background: #f5f5f5; padding: 12px; border-radius: 8px; margin: 15px 0; }
-        .lock-box input {
-            width: 100%; padding: 14px; font-size: 20px; text-align: center;
-            border: 2px solid var(--border); border-radius: 8px;
-            margin-bottom: 15px; letter-spacing: 8px; font-weight: bold;
-        }
-        .lock-btn {
-            width: 100%; padding: 14px; font-size: 16px; font-weight: bold;
-            border: none; border-radius: 8px; background: var(--primary); color: white; cursor: pointer;
-        }
-        .lock-error { color: var(--danger); margin-top: 12px; display: none; }
+    /* LOGIN SCREEN */
+    .login-screen {
+      position: fixed; inset: 0; background: linear-gradient(135deg, #00a000, #007000);
+      display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 999;
+    }
+    .login-box {
+      background: white; padding: 25px; border-radius: 16px; width: 100%; max-width: 380px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .login-box h2 { text-align: center; color: #008000; margin-bottom: 20px; font-size: 22px; }
+    .login-box p { text-align: center; color: #666; margin-bottom: 15px; font-size: 14px; }
+    .login-box button { width: 100%; padding: 14px; background: #00a000; color: white; font-weight: bold; margin-top: 10px; }
+    .login-box button.gray { background: #eee; color: #333; }
+    .divider { height: 1px; background: #ddd; margin: 15px 0; }
 
-        .login-screen {
-            position: fixed; inset: 0;
-            background: linear-gradient(135deg, #00a000, #006600);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 9999; padding: 20px;
-        }
-        .login-box {
-            background: white; padding: 30px; border-radius: 16px;
-            width: 100%; max-width: 420px;
-        }
-        .login-box h2 { text-align: center; color: var(--primary-dark); margin-bottom: 20px; }
-        .login-box p { text-align: center; color: var(--text-light); margin-bottom: 15px; }
-        .login-btn {
-            width: 100%; padding: 14px; font-size: 17px; font-weight: bold;
-            border: none; border-radius: 8px; background: var(--primary); color: white;
-            cursor: pointer; margin-bottom: 10px;
-        }
-        .login-btn.secondary { background: #f0f0f0; color: var(--text); }
-        .login-box input, .login-box select {
-            width: 100%; padding: 14px; font-size: 16px;
-            border: 2px solid var(--border); border-radius: 8px; margin-bottom: 12px;
-        }
-        .passcode-hint {
-            background: #fff8e1; padding: 12px; border-radius: 8px;
-            margin-bottom: 15px; font-size: 14px; color: #856404; line-height: 1.8;
-        }
-        .login-note { text-align: center; color: #888; margin-top: 15px; }
+    /* MAIN LAYOUT */
+    .app-layout { display: flex; flex-direction: column; min-height: 100vh; }
+    .top-bar {
+      background: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100;
+    }
+    .top-bar h1 { font-size: 18px; color: #008000; }
+    .top-bar .user { font-size: 13px; color: #555; }
+    .nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav-btn { padding: 8px 14px; background: #f0f0f0; color: #333; font-size: 14px; }
+    .nav-btn.active { background: #00a000; color: white; }
 
-        .sidebar {
-            width: 220px; background: var(--card); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column;
-        }
-        .sidebar-header { background: var(--primary); color: white; padding: 15px; }
-        .sidebar-menu { flex: 1; padding: 10px 0; }
-        .menu-item {
-            padding: 14px 18px; cursor: pointer; display: flex; align-items: center; gap: 10px;
-        }
-        .menu-item:hover, .menu-item.active { background: #e6f9e6; color: var(--primary-dark); }
-        .menu-item.danger:hover { background: #ffebee; color: var(--danger); }
-        .sidebar-footer { padding: 15px; border-top: 1px solid var(--border); font-size: 12px; }
-        .shift-badge {
-            display: inline-block; padding: 4px 10px; border-radius: 12px;
-            font-size: 11px; font-weight: bold; margin-left: 8px;
-        }
-        .badge-morning { background: #fff3e0; color: #e65100; }
-        .badge-swing { background: #fff8e1; color: #827717; }
-        .badge-graveyard { background: #e8eaf6; color: #283593; }
+    /* POS VIEW */
+    .pos-container { display: flex; flex-direction: column; }
+    @media (min-width: 900px) {
+      .pos-container { flex-direction: row; }
+    }
 
-        .menu-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .menu-header {
-            padding: 15px 20px; background: white; border-bottom: 1px solid var(--border);
-            font-weight: bold; display: flex; justify-content: space-between;
-            flex-wrap: wrap; gap: 8px;
-        }
-        .tabs { display: flex; background: white; border-bottom: 1px solid var(--border); overflow-x: auto; }
-        .tab {
-            padding: 12px 16px; border: none; background: transparent; cursor: pointer;
-            border-bottom: 3px solid transparent; white-space: nowrap;
-        }
-        .tab.active { border-bottom-color: var(--primary); color: var(--primary-dark); font-weight: bold; }
-        .products-wrapper { flex: 1; padding: 15px; background: var(--bg); overflow-y: auto; }
-        .products-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;
-        }
-        .product-card {
-            background: white; border-radius: 10px; overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08); cursor: pointer;
-        }
-        .product-card:active { transform: scale(0.97); }
-        .product-icon {
-            height: 100px; background: linear-gradient(135deg, #ffcc66, #ff9900);
-            display: flex; align-items: center; justify-content: center; font-size: 40px; color: white;
-        }
-        .product-info { padding: 10px; }
-        .product-name { font-weight: 600; margin-bottom: 5px; min-height: 36px; line-height: 1.3; }
-        .product-price { font-weight: bold; color: var(--primary-dark); font-size: 18px; }
+    /* PRODUCTS AREA */
+    .products-area { flex: 1; padding: 15px; }
+    .cat-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+    .cat-tab { padding: 10px 16px; background: white; border: 2px solid #eee; white-space: nowrap; }
+    .cat-tab.active { background: #00a000; color: white; border-color: #00a000; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .product-card {
+      background: white; border-radius: 12px; padding: 15px; text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06); cursor: pointer;
+    }
+    .product-card:active { transform: scale(0.97); }
+    .product-name { font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #333; }
+    .product-price { color: #008000; font-size: 20px; font-weight: bold; }
 
-        .order-panel {
-            width: 340px; background: white; border-left: 1px solid var(--border);
-            display: flex; flex-direction: column;
-        }
-        .order-header {
-            padding: 15px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; font-weight: bold;
-        }
-        .clear-btn { color: var(--danger); cursor: pointer; }
-        .order-items { flex: 1; padding: 15px; overflow-y: auto; min-height: 0; }
-        .empty-msg { text-align: center; color: #999; padding: 40px 20px; }
-        .order-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 0; border-bottom: 1px solid #eee; gap: 8px;
-        }
-        .qty-badge {
-            background: #eee; width: 28px; height: 28px; border-radius: 4px;
-            display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;
-        }
-        .item-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
-        .item-name { font-size: 14px; font-weight: 500; }
-        .item-remove { color: var(--danger); font-size: 20px; cursor: pointer; margin-left: 8px; flex-shrink: 0; }
-        .order-footer { padding: 15px; border-top: 1px solid var(--border); flex-shrink: 0; }
-        .total-row { display: flex; justify-content: space-between; font-size: 24px; font-weight: bold; padding: 10px 0; }
-        .total-amount { color: var(--primary-dark); }
-        .pay-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-        .pay-btn {
-            padding: 12px; border: 2px solid var(--border); background: white;
-            border-radius: 8px; cursor: pointer; font-weight: 500;
-        }
-        .pay-btn.selected { border-color: var(--primary); background: #e6f9e6; color: var(--primary-dark); font-weight: bold; }
-        .cash-label { font-size: 14px; margin-bottom: 6px; display: block; }
-        .cash-input {
-            width: 100%; padding: 12px; font-size: 18px;
-            border: 2px solid var(--border); border-radius: 8px; margin-bottom: 10px; text-align: right;
-        }
-        .change-box {
-            background: #e3f2fd; padding: 12px; border-radius: 8px;
-            font-size: 16px; font-weight: bold; color: #1565c0;
-            margin-bottom: 12px; display: none;
-        }
-        .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .hold-btn, .charge-btn {
-            padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; color: white; cursor: pointer;
-        }
-        .hold-btn { background: var(--warning); }
-        .charge-btn { background: var(--primary); }
+    /* CART AREA */
+    .cart-area {
+      background: white; border-top: 1px solid #eee; padding: 15px;
+    }
+    @media (min-width: 900px) {
+      .cart-area { width: 360px; border-top: none; border-left: 1px solid #eee; }
+    }
+    .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .cart-header h3 { font-size: 17px; }
+    .clear-btn { background: #ffebee; color: #c62828; padding: 8px 12px; font-size: 13px; }
+    .cart-list { max-height: 280px; overflow-y: auto; margin-bottom: 15px; }
+    .cart-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .item-info { display: flex; align-items: center; gap: 10px; }
+    .qty-badge {
+      background: #e8f5e9; color: #008000; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 14px;
+    }
+    .item-name { font-size: 14px; }
+    .item-price { font-weight: bold; color: #333; }
+    .remove-btn { color: #e53935; font-size: 20px; padding: 0 8px; background: none; }
+    .total-row {
+      display: flex; justify-content: space-between; padding: 12px 0; border-top: 2px solid #eee;
+      font-size: 22px; font-weight: bold; margin-bottom: 15px;
+    }
+    .payment-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .pay-btn { padding: 12px; background: #f5f5f5; color: #333; font-weight: bold; }
+    .pay-btn.selected { background: #e8f5e9; color: #008000; border: 2px solid #00a000; }
+    .cash-row { margin-bottom: 12px; }
+    .cash-row label { font-size: 14px; color: #555; margin-bottom: 6px; display: block; }
+    .change-box {
+      background: #e3f2fd; padding: 12px; border-radius: 8px; text-align: center;
+      font-size: 18px; font-weight: bold; color: #0d47a1; margin-bottom: 15px; display: none;
+    }
+    .action-buttons { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .pay-now-btn { padding: 14px; background: #00a000; color: white; font-size: 17px; font-weight: bold; }
 
-        .admin-container {
-            flex: 1; display: flex; flex-direction: column; overflow: hidden;
-            background: var(--bg); min-width: 0; min-height: 0;
-        }
-        .admin-header {
-            background: white; border-bottom: 1px solid var(--border);
-            padding: 15px 20px; display: flex; justify-content: space-between;
-            align-items: center; flex-wrap: wrap; gap: 10px; flex-shrink: 0;
-        }
-        .admin-header h2 { font-size: 20px; color: var(--text); }
-        .admin-content { flex: 1; overflow-y: auto; padding: 20px; min-height: 0; }
-        .admin-card {
-            background: white; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-            padding: 20px; margin-bottom: 20px;
-        }
-        .admin-card h3 {
-            font-size: 17px; margin-bottom: 15px; color: var(--text);
-            padding-bottom: 10px; border-bottom: 1px solid #eee;
-        }
-        .admin-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px;
-        }
-        .stat-card {
-            background: linear-gradient(135deg, #f9f9f9, #fff);
-            border-left: 4px solid var(--primary); padding: 15px; border-radius: 8px;
-        }
-        .stat-card.danger-border { border-left-color: var(--danger); }
-        .stat-card.warning-border { border-left-color: var(--warning); }
-        .stat-card.trans-in-border { border-left-color: var(--trans-in); }
-        .stat-card.trans-out-border { border-left-color: var(--trans-out); }
-        .stat-label { font-size: 13px; color: var(--text-light); margin-bottom: 5px; }
-        .stat-value { font-size: 22px; font-weight: bold; color: var(--text); }
-        .table-wrapper { overflow-x: auto; margin: 0 -5px; padding: 0 5px; }
-        table {
-            width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px;
-        }
-        th, td {
-            padding: 12px 10px; text-align: left;
-            border-bottom: 1px solid #eee; font-size: 14px;
-        }
-        th { background: #f9f9f9; font-weight: 600; color: var(--text-light); }
-        .btn {
-            padding: 10px 16px; border: none; border-radius: 6px;
-            font-size: 14px; font-weight: 500; cursor: pointer; margin-right: 8px; margin-bottom: 8px;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-warning { background: var(--warning); color: white; }
-        .btn-blue { background: var(--blue); color: white; }
-        .btn-trans-in { background: var(--trans-in); color: white; }
-        .btn-trans-out { background: var(--trans-out); color: white; }
-        .btn-sm { padding: 6px 12px; font-size: 13px; }
-        input, select {
-            padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px;
-            font-size: 14px; margin-right: 8px; margin-bottom: 10px; max-width: 100%;
-        }
-        .form-row {
-            display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; margin-bottom: 12px;
-        }
-        .form-group { flex: 1; min-width: 180px; }
-        .form-group label { display: block; font-size: 13px; color: var(--text-light); margin-bottom: 5px; }
-        .status-badge {
-            display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;
-        }
-        .status-active { background: #e8f5e9; color: #2e7d32; }
-        .status-low { background: #fff3e0; color: #e65100; }
-        .status-out { background: #ffebee; color: #c62828; }
-
-        @media (max-width: 768px) {
-            .app { flex-direction: column; }
-            .sidebar { width: 100%; flex-direction: row; }
-            .sidebar-menu { display: flex; overflow-x: auto; }
-            .sidebar-footer { display: none; }
-            .order-panel { width: 100%; }
-        }
-    </style>
+    /* ADMIN PAGES */
+    .admin-page { padding: 15px; display: none; }
+    .admin-page.active { display: block; }
+    .page-card {
+      background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .page-card h3 { margin-bottom: 15px; color: #333; font-size: 17px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+    th { background: #f9f9f9; font-weight: bold; color: #555; }
+    .add-btn { background: #00a000; color: white; padding: 10px 16px; margin-bottom: 15px; }
+    .empty-msg { text-align: center; color: #999; padding: 30px; }
+  </style>
 </head>
 <body>
 
-<div class="lock-screen hidden" id="lockScreen">
-    <div class="lock-box">
-        <h2>🔐 POS LOCKED</h2>
-        <p>Screen was locked due to inactivity/sleep</p>
-        <div class="shift-info">
-            🧑‍💼 Cashier: <span id="lockCashierName">—</span><br>
-            🕒 Current Shift: <span id="lockShiftName">—</span>
-        </div>
-        <input type="password" id="lockPasscodeInput" placeholder="Enter 4-Digit Passcode" maxlength="4" autocomplete="off">
-        <button class="lock-btn" onclick="unlockPOS()">🔓 UNLOCK & CONTINUE</button>
-        <div class="lock-error" id="lockErrorMsg">❌ Incorrect passcode! Try again.</div>
-    </div>
-</div>
-
+<!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
-    <div class="login-box">
-        <h2>🍔 MINUTE BURGER POS</h2>
-        <p>Select Access Type to Continue</p>
+  <div class="login-box">
+    <h2>🍔 BURGER SHOP POS</h2>
+    <p>Login to start using the system</p>
+    
+    <select id="loginType" onchange="showLoginForm()">
+      <option value="">-- Select Login Type --</option>
+      <option value="cashier">💰 Cashier Login</option>
+      <option value="admin">🔐 Admin Login</option>
+    </select>
 
-        <button class="login-btn" onclick="showCashierLogin()">💰 CASHIER / POS</button>
-        <button class="login-btn" onclick="showAdminLogin()">🔐 ADMINISTRATOR</button>
-
-        <div id="cashierLoginForm" class="hidden" style="margin-top:20px;">
-            <h3 style="text-align:center; color:var(--primary-dark); margin-bottom:15px;">🕒 Cashier Shift Login</h3>
-            <div class="passcode-hint">
-                <strong>🔑 Shift Passcodes:</strong><br>
-                🌅 Morning (6AM–2PM) = <strong>1111</strong><br>
-                🌞 Swing (2PM–10PM) = <strong>2222</strong><br>
-                🌙 Graveyard (10PM–6AM) = <strong>3333</strong>
-            </div>
-            <select id="shiftSelect">
-                <option value="">-- Select Your Shift --</option>
-                <option value="morning">🌅 Morning Shift (6:00 AM – 2:00 PM)</option>
-                <option value="swing">🌞 Swing Shift (2:00 PM – 10:00 PM)</option>
-                <option value="graveyard">🌙 Graveyard Shift (10:00 PM – 6:00 AM)</option>
-            </select>
-            <input type="password" id="shiftPasscode" placeholder="Enter Shift Passcode (4 digits)" maxlength="4">
-            <input type="text" id="cashierName" placeholder="Your Full Name" required>
-            <input type="number" id="openingCash" placeholder="Opening Cash / Puhunan" step="0.01">
-            <button class="login-btn" onclick="verifyCashierLogin()">✅ START SHIFT</button>
-        </div>
-
-        <div id="adminLoginForm" class="hidden" style="margin-top:20px;">
-            <input type="password" id="adminPass" placeholder="Enter Admin Password — Default: admin123">
-            <button class="login-btn" onclick="loginAdmin()">🔐 LOGIN AS ADMIN</button>
-        </div>
-
-        <div class="login-note">
-            <strong>Admin Password:</strong> admin123<br>
-            <em>Change in Settings anytime!</em>
-        </div>
+    <!-- CASHIER LOGIN -->
+    <div id="cashierLoginForm" class="hidden">
+      <div class="divider"></div>
+      <select id="shiftSelect">
+        <option value="">-- Select Your Shift --</option>
+        <option value="morning">🌅 Morning (6AM–2PM) — Pass: 1111</option>
+        <option value="swing">🌞 Swing (2PM–10PM) — Pass: 2222</option>
+        <option value="graveyard">🌙 Graveyard (10PM–6AM) — Pass: 3333</option>
+      </select>
+      <input type="password" id="passcodeInput" placeholder="Enter 4-Digit Passcode" maxlength="4">
+      <input type="text" id="cashierNameInput" placeholder="Your Full Name">
+      <button onclick="processCashierLogin()">✅ Start Shift</button>
     </div>
+
+    <!-- ADMIN LOGIN -->
+    <div id="adminLoginForm" class="hidden">
+      <div class="divider"></div>
+      <input type="password" id="adminPassInput" placeholder="Admin Password (Default: admin123)">
+      <button onclick="processAdminLogin()">🔐 Login as Admin</button>
+    </div>
+  </div>
 </div>
 
-<div class="app hidden" id="mainApp">
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h1>🍔 M. BURGER <span id="currentShiftBadge" class="shift-badge badge-morning hidden">—</span></h1>
-            <p id="currentDate">—</p>
-        </div>
-        <div class="sidebar-menu">
-            <div class="menu-item active" data-view="pos" onclick="switchView('pos')">🛒 POS</div>
-            <div class="menu-item" data-view="transactions" onclick="switchView('transactions')">📊 Transactions</div>
-            <div class="menu-item" data-view="reports" onclick="switchView('reports')">📈 Cash Out</div>
-            <div class="menu-item" data-view="void" onclick="switchView('void')">❌ Void</div>
-            <div class="menu-item" data-view="stocks" onclick="switchView('stocks')">📦 Stocks</div>
-            <div class="menu-item" data-view="delivery" onclick="switchView('delivery')">🚚 Delivery</div>
-            <div class="menu-item" data-view="transfer" onclick="switchView('transfer')">🔄 Transfers</div>
-            <div class="menu-item" data-view="settings" onclick="switchView('settings')">⚙️ Settings</div>
-            <div class="menu-item danger" onclick="logout()">🚪 Logout</div>
-        </div>
-        <div class="sidebar-footer">
-            <p id="userLabel">User: —</p>
-            <p id="roleLabel">Role: —</p>
-            <p id="shiftLabel">Shift: —</p>
-        </div>
+<!-- MAIN APPLICATION -->
+<div class="app-layout hidden" id="mainApp">
+  <!-- TOP NAVIGATION -->
+  <div class="top-bar">
+    <div>
+      <h1>🍔 Burger POS</h1>
+      <p class="user" id="userDisplay">—</p>
+    </div>
+    <div class="nav-buttons">
+      <button class="nav-btn active" onclick="switchMainView('pos')">🛒 POS</button>
+      <button class="nav-btn" onclick="switchMainView('transactions')">📊 Sales</button>
+      <button class="nav-btn" onclick="switchMainView('stocks')">📦 Stocks</button>
+      <button class="nav-btn gray" onclick="logoutSystem()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- POS VIEW -->
+  <div id="view-pos" class="pos-container">
+    <div class="products-area">
+      <div class="cat-tabs">
+        <button class="cat-tab active" onclick="changeCategory('burgers', this)">🍔 Burgers</button>
+        <button class="cat-tab" onclick="changeCategory('hotdogs', this)">🌭 Hotdogs</button>
+        <button class="cat-tab" onclick="changeCategory('premium', this)">⭐ Premium</button>
+        <button class="cat-tab" onclick="changeCategory('drinks', this)">🥤 Drinks</button>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
     </div>
 
-    <div class="menu-section" id="view-pos">
-        <div class="menu-header">
-            <span>📋 MENU — Cashier: <span id="posCashierName">—</span></span>
-            <span>Ticket #<span id="ticketNo">001</span></span>
-        </div>
-        <div class="tabs">
-            <button class="tab active" data-cat="burgers" onclick="changeTab('burgers')">🍔 SULIT</button>
-            <button class="tab" data-cat="chicken" onclick="changeTab('chicken')">🍗 CHICKEN TIME</button>
-            <button class="tab" data-cat="premium" onclick="changeTab('premium')">⭐ PREMIUM</button>
-            <button class="tab" data-cat="hotdogs" onclick="changeTab('hotdogs')">🌭 HOTDOGS</button>
-            <button class="tab" data-cat="drinks" onclick="changeTab('drinks')">🥤 DRINKS</button>
-            <button class="tab" data-cat="extras" onclick="changeTab('extras')">🧂 EXTRAS</button>
-        </div>
-        <div class="products-wrapper">
-            <div class="products-grid" id="productsGrid"></div>
-        </div>
-        <div class="order-panel">
-            <div class="order-header">
-                <span>🛒 ORDER</span>
-                <span class="clear-btn" onclick="clearAll()">🗑️ Clear</span>
-            </div>
-            <div class="order-items" id="orderItems">
-                <div class="empty-msg">Tap products to add to order</div>
-            </div>
-            <div class="order-footer">
-                <div class="total-row">
-                    <span>TOTAL:</span>
-                    <span class="total-amount">₱<span id="totalAmt">0.00</span></span>
-                </div>
-                <div class="pay-buttons">
-                    <button class="pay-btn selected" onclick="selectPayment(this, 'Cash')">💵 CASH</button>
-                    <button class="pay-btn" onclick="selectPayment(this, 'GCash')">📱 GCash</button>
-                </div>
-                <label class="cash-label">Cash Received:</label>
-                <input type="number" id="cashReceived" class="cash-input" placeholder="0.00" oninput="computeChange()">
-                <div class="change-box" id="change-box">
-                    CHANGE: ₱<span id="changeAmt">0.00</span>
-                </div>
-                <div class="action-buttons">
-                    <button class="hold-btn">⏸️ HOLD</button>
-                    <button class="charge-btn" onclick="completeSale()">✅ PAY / SAVE</button>
-                </div>
-            </div>
-        </div>
+    <div class="cart-area">
+      <div class="cart-header">
+        <h3>🛒 ORDER — Ticket #<span id="ticketNumber">001</span></h3>
+        <button class="clear-btn" onclick="clearFullCart()">🗑️ Clear All</button>
+      </div>
+      <div class="cart-list" id="cartList">
+        <p class="empty-msg">Tap products to add to order</p>
+      </div>
+      <div class="total-row">
+        <span>TOTAL:</span>
+        <span>₱<span id="grandTotal">0.00</span></span>
+      </div>
+      <div class="payment-buttons">
+        <button class="pay-btn selected" id="payCash" onclick="selectPaymentMethod('Cash', this)">💵 Cash</button>
+        <button class="pay-btn" id="payGcash" onclick="selectPaymentMethod('GCash', this)">📱 GCash</button>
+      </div>
+      <div class="cash-row">
+        <label>Cash Received:</label>
+        <input type="number" id="cashReceivedInput" placeholder="0.00" oninput="calculateChange()">
+      </div>
+      <div class="change-box" id="changeDisplay">
+        CHANGE: ₱<span id="changeAmount">0.00</span>
+      </div>
+      <div class="action-buttons">
+        <button class="pay-now-btn" onclick="finalizeSale()">✅ COMPLETE SALE</button>
+      </div>
     </div>
+  </div>
 
-    <div class="admin-container hidden" id="view-transactions">
-        <div class="admin-header"><h2>📊 TRANSACTIONS</h2></div>
-        <div class="admin-content">
-            <div class="admin-card">
-                <h3>📈 Overview</h3>
-                <div class="admin-grid">
-                    <div class="stat-card"><div class="stat-label">Total Sales</div><div class="stat-value">₱<span id="dashTotalSales">0.00</span></div></div>
-                    <div class="stat-card danger-border"><div class="stat-label">Transactions</div><div class="stat-value" id="dashTransCount">0</div></div>
-                    <div class="stat-card warning-border"><div class="stat-label">Shift Sales</div><div class="stat-value">₱<span id="dashShiftSales">0.00</span></div></div>
-                    <div class="stat-card"><div class="stat-label">Items Sold</div><div class="stat-value" id="dashItemsSold">0</div></div>
-                </div>
-            </div>
-            <div class="admin-card">
-                <h3>📋 Transaction History</h3>
-                <div class="table-wrapper">
-                    <table><thead><tr><th>Ticket #</th><th>Date/Time</th><th>Cashier</th><th>Shift</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
-                    <tbody id="transBody"><tr><td colspan="8" style="text-align:center;color:#999;padding:30px;">No transactions yet...</td></tr></tbody></table>
-                </div>
-            </div>
-        </div>
+  <!-- TRANSACTIONS VIEW -->
+  <div id="view-transactions" class="admin-page">
+    <div class="page-card">
+      <h3>📊 Sales / Transaction History</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket #</th>
+            <th>Date & Time</th>
+            <th>Items</th>
+            <th>Total Amount</th>
+            <th>Payment Method</th>
+            <th>Cashier</th>
+          </tr>
+        </thead>
+        <tbody id="transactionsBody">
+          <tr><td colspan="6" class="empty-msg">No transactions yet. Start selling!</td></tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 
-    <div class="admin-container hidden" id="view-reports">
-        <div class="admin-header"><h2>📈 CASH OUT & REPORTS</h2></div>
-        <div class="admin-content">
-            <div class="admin-card">
-                <h3>💰 Current Shift Cash Position</h3>
-                <div class="admin-grid">
-                    <div class="stat-card"><div class="stat-label">Opening Cash</div><div class="stat-value">₱<span id="rptOpening">0.00</span></div></div>
-                    <div class="stat-card"><div class="stat-label">Shift Sales</div><div class="stat-value">₱<span id="rptSales">0.00</span></div></div>
-                    <div class="stat-card warning-border"><div class="stat-label">Cash on Hand</div><div class="stat-value">₱<span id="rptOnHand">0.00</span></div></div>
-                    <div class="stat-card danger-border"><div class="stat-label">Cash Out</div><div class="stat-value">₱<span id="rptCashOut">0.00</span></div></div>
-                </div>
-                <div style="margin-top:20px;">
-                    <button class="btn btn-primary" onclick="generateCashOut()">💰 Cash Out Report</button>
-                    <button class="btn btn-blue" onclick="endShift()">🔒 End Shift</button>
-                </div>
-            </div>
-        </div>
+  <!-- STOCKS VIEW -->
+  <div id="view-stocks" class="admin-page">
+    <div class="page-card">
+      <h3>📦 Inventory / Stocks</h3>
+      <button class="add-btn" onclick="addNewStock()">➕ Add New Stock Item</button>
+      <table>
+        <thead>
+          <tr>
+            <th>Item Name</th>
+            <th>Quantity</th>
+            <th>Cost Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="stocksBody">
+          <tr><td colspan="4" class="empty-msg">No stock items yet. Click Add to start.</td></tr>
+        </tbody>
+      </table>
     </div>
-
-    <div class="admin-container hidden" id="view-void">
-        <div class="admin-header"><h2>❌ VOID TRANSACTIONS</h2></div>
-        <div class="admin-content">
-            <div class="admin-card">
-                <h3>⚠️ Void Current Order</h3>
-                <div id="voidOrderList"><p style="color:#999;">No items to void...</p></div>
-                <div style="margin-top:20px;"><button class="btn btn-danger" onclick="voidEntireOrder()">🗑️ Void Entire Order</button></div>
-            </div>
-            <div class="admin-card">
-                <h3>📋 Void History Log</h3>
-                <div class="table-wrapper">
-                    <table><thead><tr><th>Date/Time</th><th>Item/Ticket</th><th>Qty</th><th>Amount</th><th>Voided By</th><th>Shift</th><th>Reason</th></tr></thead>
-                    <tbody id="voidLogBody"><tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No void records...</td></tr></tbody></table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="admin-container hidden" id="view-stocks">
-        <div class="admin-header">
-            <h2>📦 INVENTORY / STOCKS</h2>
-            <button class="btn btn-primary" onclick="openStockModal()">➕ Add Stock Item</button>
-        </div>
-        <div class="admin-content">
-            <div class="admin-card">
-                <h3>📊 Stock Summary</h3>
-                <div class="admin-grid">
-                    <div class="stat-card"><div class="stat-label">Total Items</div><div class="stat-value" id="stockTotalItems">0</div></div>
-                    <div class="stat-card warning-border"><div class="stat-label">Low Stock</div><div class="stat-value" id="stockLowItems">0</div></div>
-                    <div class="stat-card danger-border"><div class="stat-label">Out of Stock</div><div class="stat-value" id="stockOutItems">0</div></div>
-                    <div class="stat-card"><div class="stat-label">Stock Value</div><div class="stat-value">₱<span id="stockValue">0.00</span></div></div>
-                </div>
-            </div>
-            <div class="admin-card">
-                <h3>📋 Current Stock List</h3>
-                <div class="table-wrapper">
-                    <table><thead><tr><th>Item</th><th>Unit</th><th>Qty</th><th>Reorder Lvl</th><th>Cost</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody id="stockBody"><tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No stock items yet...</td></tr></tbody></table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="admin-container hidden" id="view-delivery">
-        <div class="admin-header"><h2>🚚 STOCK DELIVERY</h2></div>
-        <div class="admin-content">
-            <div class="admin-card">
-                <h3>📥 Record New Delivery</h3>
-                <div class="form-row">
-                    <div class="form-group"><label>Item</label><select id="deliverItem"><option value="">-- Select Item --</option></select></div>
-                    <div class="form-group"><label>Qty Delivered</label><input type="number" id="deliverQty" placeholder="0"></div>
-                    <div class="form-group"><label>Supplier</label><input type="text" id="deliverSupplier" placeholder="Supplier name"></div>
-                    <div class="form-group"><label>Remarks</label><input type="text" id="deliverRemarks" placeholder="Remarks"></div>
-                </div>
-                <button class="btn btn-primary" onclick="saveDelivery()">✅ Save Delivery</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="admin-container hidden" id="view-transfer">
-        <div class="admin-header"><h2>🔄 STOCK TRANSFERS</h2></div>
-        <div class="admin-content">
-            <div class="admin-card">
-                <h3 style="color:var(--trans-out);">📤 TRANS‑OUT</h3>
-                <div class="form-row">
-                    <div class="form-group"><label>Item to Transfer OUT</label><select id="transOutItem"><option value="">-- Select Item --</option></select></div>
-                    <div class="form-group"><label>Quantity</label><input type="number" id="transOutQty" placeholder="0"></div>
-                    <div class="form-group"><label>Send To</label><input type="text" id="transOutTo" placeholder="Branch name"></div>
-                    <div class="form-group"><label>Reference #</label><input type="text" id="transOutRef" placeholder="Reference"></div>
-                </div>
-                <button class="btn btn-trans-out" onclick="saveTransOut()">📤 RECORD TRANS‑OUT</button>
-            </div>
-            <div class="admin-card">
-                <h3 style="color:var(--trans-in);">📥 TRANS‑IN</h3>
-                <div class="form-row">
-                    <div class="form-group"><label>Item Received</label><select id="transInItem"><option value="">-- Select Item --</option></select></div>
-                    <div class="form-group"><label>Quantity</label><input type="number" id="transInQty" placeholder="0"></div>
-                    <div class="form-group"><label>Received From</label><input type="text" id="transInFrom" placeholder="Branch name"></div>
-                    <div class="form-group"><label>Reference #</label><input type="text" id="transInRef" placeholder="Reference"></div>
-                </div>
-                <button class="btn btn-trans-in" onclick="saveTransIn()">📥 RECORD TRANS‑IN</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="admin-container hidden" id="view-settings">
-        <div class="admin-header"><h2>⚙️ SETTINGS</h2></div>
-        <div class="admin-content">
-            <div class="admin-card">
-                <h3>🔐 Admin Security</h3>
-                <div class="form-row">
-                    <div class="form-group"><label>New Admin Password</label><input type="password" id="newAdminPass" placeholder="New password"></div>
-                    <div class="form-group"><label>Confirm Password</label><input type="password" id="confirmAdminPass" placeholder="Confirm password"></div>
-                </div>
-                <button class="btn btn-primary" onclick="changeAdminPassword()">🔒 Change Password</button>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
 <script>
-let currentSession = {
-    isLoggedIn: false, userType: null, name: null, shift: null, openingCash: 0
-};
-const PASSCODES = { morning: '1111', swing: '2222', graveyard: '3333' };
-
-document.addEventListener('visibilitychange', function() {
-    if (document.hidden && currentSession.isLoggedIn) setTimeout(lockPOS, 500);
-});
-window.addEventListener('blur', function() {
-    if (currentSession.isLoggedIn) lockPOS();
-});
-
-function lockPOS() {
-    if (!currentSession.isLoggedIn) return;
-    document.getElementById('lockCashierName').textContent = currentSession.name;
-    document.getElementById('lockShiftName').textContent = currentSession.shift ? currentSession.shift.toUpperCase() + ' SHIFT' : 'ADMIN';
-    document.getElementById('lockScreen').classList.remove('hidden');
-    document.getElementById('lockPasscodeInput').value = '';
-    document.getElementById('lockErrorMsg').style.display = 'none';
-}
-
-function unlockPOS() {
-    const entered = document.getElementById('lockPasscodeInput').value.trim();
-    const adminPass = localStorage.getItem('adminPassword') || 'admin123';
-    if ((currentSession.userType === 'cashier' && PASSCODES[currentSession.shift] === entered) ||
-        (currentSession.userType === 'admin' && entered === adminPass)) {
-        document.getElementById('lockScreen').classList.add('hidden');
-    } else {
-        document.getElementById('lockErrorMsg').style.display = 'block';
-    }
-}
-
-function showCashierLogin() {
-    document.getElementById('cashierLoginForm').classList.remove('hidden');
-    document.getElementById('adminLoginForm').classList.add('hidden');
-}
-function showAdminLogin() {
-    document.getElementById('adminLoginForm').classList.remove('hidden');
-    document.getElementById('cashierLoginForm').classList.add('hidden');
-}
-
-function verifyCashierLogin() {
-    const shift = document.getElementById('shiftSelect').value;
-    const passcode = document.getElementById('shiftPasscode').value.trim();
-    const name = document.getElementById('cashierName').value.trim();
-    const openingCash = parseFloat(document.getElementById('openingCash').value) || 0;
-    if (!shift || !passcode || !name) return alert('⚠️ Fill in all fields!');
-    if (passcode !== PASSCODES[shift]) return alert('⚠️ Incorrect passcode!');
-    currentSession = { isLoggedIn: true, userType: 'cashier', name, shift, openingCash };
-    startApp();
-}
-
-function loginAdmin() {
-    const pass = document.getElementById('adminPass').value.trim();
-    if (pass !== (localStorage.getItem('adminPassword') || 'admin123')) return alert('⚠️ Incorrect admin password!');
-    currentSession = { isLoggedIn: true, userType: 'admin', name: 'ADMIN', shift: null, openingCash: 0 };
-    startApp();
-}
-
-function startApp() {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('mainApp').classList.remove('hidden');
-    document.getElementById('currentDate').textContent = new Date().toLocaleString('en-PH');
-    document.getElementById('userLabel').textContent = 'User: ' + currentSession.name;
-    document.getElementById('roleLabel').textContent = 'Role: ' + currentSession.userType.toUpperCase();
-    if (currentSession.shift) {
-        document.getElementById('shiftLabel').textContent = 'Shift: ' + currentSession.shift.toUpperCase();
-        const badge = document.getElementById('currentShiftBadge');
-        badge.textContent = currentSession.shift.toUpperCase();
-        badge.classList.remove('hidden');
-        badge.className = 'shift-badge badge-' + currentSession.shift;
-    }
-    document.getElementById('posCashierName').textContent = currentSession.name;
-    document.getElementById('rptOpening').textContent = currentSession.openingCash.toFixed(2);
-    initApp();
-}
-
-function logout() {
-    if (!confirm('🚪 Logout now?')) return;
-    currentSession = { isLoggedIn: false };
-    document.getElementById('mainApp').classList.add('hidden');
-    document.getElementById('loginScreen').classList.remove('hidden');
-    document.getElementById('cashierLoginForm').classList.add('hidden');
-    document.getElementById('adminLoginForm').classList.add('hidden');
-    document.getElementById('shiftSelect').value = '';
-    document.getElementById('shiftPasscode').value = '';
-    document.getElementById('cashierName').value = '';
-    document.getElementById('openingCash').value = '';
-    document.getElementById('adminPass').value = '';
-}
-
-const menu = {
-    burgers: [
-        {id:1,name:'Burger Regular',price:35,icon:'🍔'},
-        {id:2,name:'Burger Cheese',price:45,icon:'🍔'},
-        {id:3,name:'Burger Special',price:55,icon:'🍔'},
-        {id:4,name:'Burger Double',price:75,icon:'🍔'},
-    ],
-    chicken: [
-        {id:5,name:'1pc Chicken',price:49,icon:'🍗'},
-        {id:6,name:'2pc Chicken',price:89,icon:'🍗'},
-        {id:7,name:'Chicken Meal',price:65,icon:'🍗'},
-    ],
-    premium: [
-        {id:8,name:'Big Burger',price:85,icon:'⭐'},
-        {id:9,name:'Cheesy Burger',price:95,icon:'⭐'},
-    ],
-    hotdogs: [
-        {id:10,name:'Hotdog Regular',price:30,icon:'🌭'},
-        {id:11,name:'Hotdog Special',price:40,icon:'🌭'},
-    ],
-    drinks: [
-        {id:12,name:'Soft Drink Reg',price:15,icon:'🥤'},
-        {id:13,name:'Soft Drink Large',price:20,icon:'🥤'},
-        {id:14,name:'Iced Tea',price:18,icon:'🥤'},
-        {id:15,name:'Water',price:10,icon:'💧'},
-    ],
-    extras: [
-        {id:16,name:'Fries',price:25,icon:'🍟'},
-        {id:17,name:'Rice',price:12,icon:'🍚'},
-        {id:18,name:'Sundae',price:20,icon:'🍦'},
-    ]
+// ============= DATA & CONFIG =============
+const PRODUCTS = {
+  burgers: [
+    {name:'Minute Burger', price:43},
+    {name:'Cheesy Burger', price:54},
+    {name:'Double Minute Burger', price:66},
+    {name:'Double Cheesy Burger', price:82},
+    {name:'Chicken Time Burger', price:52},
+    {name:'Double Chicken Time Burger', price:72}
+  ],
+  hotdogs: [
+    {name:'Cheesydog', price:51},
+    {name:'French Onion Franks', price:93},
+    {name:'Beef Hungarian', price:114}
+  ],
+  premium: [
+    {name:'Black Pepper Burger', price:92},
+    {name:'Beef Shawarma Burger', price:94},
+    {name:'Bacon Cheeseburger', price:99},
+    {name:'50/50 Chicken Veggie Burger', price:89},
+    {name:'All Meat Steak Burger', price:145}
+  ],
+  drinks: [
+    {name:'Soft Drink Regular', price:15},
+    {name:'Soft Drink Large', price:20},
+    {name:'Iced Tea', price:18},
+    {name:'Bottled Water', price:10}
+  ]
 };
 
-let currentCat = 'burgers', cart = [], selectedPayment = 'Cash';
-let ticketNumber = parseInt(localStorage.getItem('lastTicket') || '0') + 1;
-let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-let stocks = JSON.parse(localStorage.getItem('stocks') || '[]');
-let voidLogs = JSON.parse(localStorage.getItem('voidLogs') || '[]');
+const SHIFT_PASSCODES = { morning:'1111', swing:'2222', graveyard:'3333' };
 
-function initApp() {
-    loadProducts(); updateDashboard(); renderTransactionTable();
-    renderStockTable(); renderVoidLog();
-    document.getElementById('ticketNo').textContent = String(ticketNumber).padStart(3, '0');
+// STATE VARIABLES
+let activeUser = { loggedIn:false, type:'', name:'', shift:'' };
+let currentCategory = 'burgers';
+let cart = [];
+let selectedPayment = 'Cash';
+let ticketNumber = parseInt(localStorage.getItem('posTicketCounter') || '1');
+let transactions = JSON.parse(localStorage.getItem('posTransactions') || '[]');
+let stocks = JSON.parse(localStorage.getItem('posStocks') || '[]');
+let adminPassword = localStorage.getItem('posAdminPass') || 'admin123';
+
+// ============= LOGIN SYSTEM =============
+function showLoginForm() {
+  const type = document.getElementById('loginType').value;
+  document.getElementById('cashierLoginForm').classList.toggle('hidden', type !== 'cashier');
+  document.getElementById('adminLoginForm').classList.toggle('hidden', type !== 'admin');
 }
 
-function loadProducts() {
-    const grid = document.getElementById('productsGrid'); grid.innerHTML = '';
-    (menu[currentCat] || []).forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'product-card'; card.onclick = () => addToCart(p);
-        card.innerHTML = `<div class="product-icon">${p.icon}</div><div class="product-info"><div class="product-name">${p.name}</div><div class="product-price">₱${p.price.toFixed(2)}</div></div>`;
-        grid.appendChild(card);
-    });
+function processCashierLogin() {
+  const shift = document.getElementById('shiftSelect').value;
+  const passcode = document.getElementById('passcodeInput').value.trim();
+  const name = document.getElementById('cashierNameInput').value.trim();
+
+  if (!shift || !passcode || !name) return alert('⚠️ Please fill in ALL fields!');
+  if (passcode !== SHIFT_PASSCODES[shift]) return alert('❌ Wrong passcode! Please check your shift.');
+
+  activeUser = { loggedIn:true, type:'cashier', name:name, shift:shift };
+  launchMainApp();
 }
 
-function changeTab(cat) {
-    currentCat = cat;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active'); loadProducts();
+function processAdminLogin() {
+  const pass = document.getElementById('adminPassInput').value.trim();
+  if (pass !== adminPassword) return alert('❌ Wrong admin password!');
+  activeUser = { loggedIn:true, type:'admin', name:'ADMIN', shift:'' };
+  launchMainApp();
 }
 
-function addToCart(product) {
-    const existing = cart.find(i => i.id === product.id);
-    existing ? existing.qty++ : cart.push({...product, qty: 1});
-    updateCartDisplay();
+function launchMainApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  document.getElementById('userDisplay').textContent = ${activeUser.name} | ${activeUser.type}${activeUser.shift ? ' | ' + activeUser.shift.toUpperCase() + ' SHIFT' : ''};
+  document.getElementById('ticketNumber').textContent = String(ticketNumber).padStart(3, '0');
+  
+  renderProducts();
+  renderTransactions();
+  renderStocks();
 }
 
-function removeFromCart(index) { cart.splice(index, 1); updateCartDisplay(); }
+function logoutSystem() {
+  if (!confirm('🚪 Are you sure you want to logout?')) return;
+  activeUser = { loggedIn:false, type:'', name:'', shift:'' };
+  cart = [];
+  location.reload();
+}
+
+// ============= PRODUCTS & CART =============
+function changeCategory(cat, btnEl) {
+  currentCategory = cat;
+  document.querySelectorAll('.cat-tab').forEach(tab => tab.classList.remove('active'));
+  btnEl.classList.add('active');
+  renderProducts();
+}
+
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = '';
+  PRODUCTS[currentCategory].forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <div class="product-name">${item.name}</div>
+      <div class="product-price">₱${item.price}</div>
+    `;
+    card.onclick = () => addToCart(item);
+    grid.appendChild(card);
+  });
+}
+
+function addToCart(item) {
+  const existingItem = cart.find(cartItem => cartItem.name === item.name);
+  if (existingItem) {
+    existingItem.quantity++;
+  } else {
+    cart.push({ ...item, quantity:1 });
+  }
+  updateCartDisplay();
+}
 
 function updateCartDisplay() {
-    const container = document.getElementById('orderItems');
-    if (cart.length === 0) {
-        container.innerHTML = '<div class="empty-msg">Tap products to add to order</div>';
-    } else {
-        container.innerHTML = cart.map((item, idx) => `<div class="order-item"><div class="item-left"><span class="qty-badge">${item.qty}</span><div><div class="item-name">${item.name}</div><div style="font-size:12px;color:#888;">₱${item.price.toFixed(2)}</div></div></div><div style="font-weight:bold;">₱${(item.price*item.qty).toFixed(2)}</div><span class="item-remove" onclick="removeFromCart(${idx})">×</span></div>`).join('');
-    }
-    const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
-    document.getElementById('totalAmt').textContent = total.toFixed(2);
-    document.getElementById('change-box').style.display = 'none';
-    document.getElementById('cashReceived').value = '';
+  const cartList = document.getElementById('cartList');
+  if (cart.length === 0) {
+    cartList.innerHTML = '<p class="empty-msg">Tap products to add to order</p>';
+  } else {
+    cartList.innerHTML = cart.map((item, index) => `
+      <div class="cart-item">
+        <div class="item-info">
+          <span class="qty-badge">${item.quantity}x</span>
+          <span class="item-name">${item.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="item-price">₱${(item.price * item.quantity).toFixed(2)}</span>
+          <button class="remove-btn" onclick="removeFromCart(${index})">×</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  document.getElementById('grandTotal').textContent = total.toFixed(2);
+  document.getElementById('cashReceivedInput').value = '';
+  document.getElementById('changeDisplay').style.display = 'none';
 }
 
-function clearAll() { if (cart.length > 0 && !confirm('Clear order?')) return; cart = []; updateCartDisplay(); }
-function selectPayment(btn, method) {
-    selectedPayment = method;
-    document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-}
-function computeChange() {
-    const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
-    const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
-    const box = document.getElementById('change-box');
-    if (cash >= total && total > 0) { box.style.display = 'block'; document.getElementById('changeAmt').textContent = (cash - total).toFixed(2); }
-    else box.style.display = 'none';
+function removeFromCart(index) {
+  if (cart[index].quantity > 1) {
+    cart[index].quantity--;
+  } else {
+    cart.splice(index, 1);
+  }
+  updateCartDisplay();
 }
 
-function completeSale() {
-    const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
-    if (total <= 0) return alert('⚠️ Cart empty!');
-    const cash = parseFloat(document.getElementById('cashReceived').value) || 0;
-    if (selectedPayment === 'Cash' && cash < total) return alert('⚠️ Not enough cash!');
-    ticketNumber++;
-    const sale = {
-        ticket: ticketNumber, datetime: new Date().toLocaleString('en-PH'),
-        cashier: currentSession.name, shift: currentSession.shift,
-        items: [...cart], total, payment: selectedPayment,
-        cashReceived: cash, change: cash - total, status: 'COMPLETED'
-    };
-    transactions.unshift(sale);
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-    localStorage.setItem('lastTicket', ticketNumber);
-    updateDashboard(); renderTransactionTable();
-    alert(`✅ SALE COMPLETED!\nTicket #${ticketNumber}\nTotal: ₱${total.toFixed(2)}\nChange: ₱${(cash-total).toFixed(2)}`);
-    cart = []; updateCartDisplay();
+function clearFullCart() {
+  if (cart.length === 0) return;
+  if (!confirm('🗑️ Clear entire order?')) return;
+  cart = [];
+  updateCartDisplay();
 }
 
-function updateDashboard() {
-    document.getElementById('dashTotalSales').textContent = transactions.reduce((s,t)=>s+t.total,0).toFixed(2);
-    document.getElementById('dashTransCount').textContent = transactions.length;
-    document.getElementById('dashItemsSold').textContent = transactions.reduce((s,t)=>s+t.items.reduce((s2,i)=>s2+i.qty,0),0);
-    const shiftSales = transactions.filter(t => t.shift === currentSession.shift).reduce((s,t)=>s+t.total,0);
-    document.getElementById('dashShiftSales').textContent = shiftSales.toFixed(2);
-    document.getElementById('rptSales').textContent = shiftSales.toFixed(2);
-    document.getElementById('rptOnHand').textContent = (currentSession.openingCash + shiftSales).toFixed(2);
+// ============= PAYMENT & SALE =============
+function selectPaymentMethod(method, btnEl) {
+  selectedPayment = method;
+  document.querySelectorAll('.pay-btn').forEach(btn => btn.classList.remove('selected'));
+  btnEl.classList.add('selected');
+  document.getElementById('changeDisplay').style.display = 'none';
 }
 
-function renderTransactionTable() {
-    const tbody = document.getElementById('transBody');
-    if (transactions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999;padding:30px;">No transactions yet...</td></tr>';
-        return;
-    }
-    tbody.innerHTML = transactions.map(t => `<tr><td>#${String(t.ticket).padStart(3,'0')}</td><td>${t.datetime}</td><td>${t.cashier}</td><td>${t.shift?t.shift.toUpperCase():'—'}</td><td>${t.items.length} item(s)</td><td>₱${t.total.toFixed(2)}</td><td>${t.payment}</td><td><span class="status-badge status-active">${t.status}</span></td></tr>`).join('');
+function calculateChange() {
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const cash = parseFloat(document.getElementById('cashReceivedInput').value) || 0;
+  const changeBox = document.getElementById('changeDisplay');
+  
+  if (selectedPayment === 'Cash' && cash >= total && total > 0) {
+    changeBox.style.display = 'block';
+    document.getElementById('changeAmount').textContent = (cash - total).toFixed(2);
+  } else {
+    changeBox.style.display = 'none';
+  }
 }
 
-function switchView(view) {
-    document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-    document.querySelector(`.menu-item[data-view="${view}"]`).classList.add('active');
-    document.querySelectorAll('.menu-section, .admin-container').forEach(el => el.classList.add('hidden'));
-    document.getElementById('view-' + view).classList.remove('hidden');
+function finalizeSale() {
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  if (total <= 0) return alert('⚠️ Cart is empty! Add items first.');
+
+  const cash = parseFloat(document.getElementById('cashReceivedInput').value) || 0;
+  if (selectedPayment === 'Cash' && cash < total) return alert('⚠️ Insufficient cash amount!');
+
+  // Save transaction
+  transactions.unshift({
+    ticket: ticketNumber,
+    datetime: new Date().toLocaleString('en-PH'),
+    items: [...cart],
+    total: total,
+    paymentMethod: selectedPayment,
+    cashier: activeUser.name,
+    shift: activeUser.shift
+  });
+  localStorage.setItem('posTransactions', JSON.stringify(transactions));
+
+  // Increment ticket
+  localStorage.setItem('posTicketCounter', ++ticketNumber);
+  document.getElementById('ticketNumber').textContent = String(ticketNumber).padStart(3, '0');
+
+  alert(✅ SALE COMPLETED!\n━━━━━━━━━━━━━━━━━\nTicket #${ticketNumber - 1}\nTotal: ₱${total.toFixed(2)}\nPayment: ${selectedPayment}\n${selectedPayment === 'Cash' ? Cash: ₱${cash.toFixed(2)}\nChange: ₱${(cash - total).toFixed(2)}` : ''}\n━━━━━━━━━━━━━━━━━`);
+
+  // Reset cart
+  cart = [];
+  updateCartDisplay();
+  renderTransactions();
 }
 
-function renderStockTable() {
-    const tbody = document.getElementById('stockBody');
-    if (stocks.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No stock items yet...</td></tr>';
-        return;
-    }
-    tbody.innerHTML = stocks.map((item, idx) => {
-        let status = 'status-active', statusText = 'In Stock';
-        if (item.qty <= 0) { status = 'status-out'; statusText = 'OUT OF STOCK'; }
-        else if (item.qty <= item.reorderLevel) { status = 'status-low'; statusText = 'LOW STOCK'; }
-        return `<tr><td>${item.name}</td><td>${item.unit||'pc'}</td><td>${item.qty}</td><td>${item.reorderLevel||5}</td><td>₱${(item.cost||0).toFixed(2)}</td><td><span class="status-badge ${status}">${statusText
-Text</span></td><td><button class="btn btn-sm btn-primary" onclick="editStock(${idx})">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteStock(${idx})">Delete</button></td></tr>`;
-    }).join('');
-    document.getElementById('stockTotalItems').textContent = stocks.length;
-    document.getElementById('stockLowItems').textContent = stocks.filter(i => i.qty <= (i.reorderLevel||5) && i.qty > 0).length;
-    document.getElementById('stockOutItems').textContent = stocks.filter(i => i.qty <= 0).length;
-    const totalValue = stocks.reduce((s,i) => s + (i.qty * (i.cost||0)), 0);
-    document.getElementById('stockValue').textContent = totalValue.toFixed(2);
+// ============= VIEWS SWITCH =============
+function switchMainView(viewName) {
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+
+  document.getElementById('view-pos').style.display = viewName === 'pos' ? '' : 'none';
+  document.getElementById('view-transactions').classList.toggle('active', viewName === 'transactions');
+  document.getElementById('view-stocks').classList.toggle('active', viewName === 'stocks');
 }
 
-function openStockModal() {
-    const name = prompt('Enter Item Name:');
-    if(!name) return;
-    const qty = parseFloat(prompt('Enter Quantity:')) || 0;
-    const unit = prompt('Enter Unit (pc/kg/pack):') || 'pc';
-    const reorder = parseFloat(prompt('Enter Reorder Level:')) || 5;
-    const cost = parseFloat(prompt('Enter Cost per Unit:')) || 0;
-    stocks.push({ name, qty, unit, reorderLevel: reorder, cost });
-    localStorage.setItem('stocks', JSON.stringify(stocks));
-    renderStockTable();
+// ============= TRANSACTIONS =============
+function renderTransactions() {
+  const tbody = document.getElementById('transactionsBody');
+  if (transactions.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">No transactions yet. Start selling!</td></tr>';
+    return;
+  }
+  tbody.innerHTML = transactions.map(t => `
+    <tr>
+      <td>#${String(t.ticket).padStart(3, '0')}</td>
+      <td>${t.datetime}</td>
+      <td>${t.items.length} item(s)</td>
+      <td><strong>₱${t.total.toFixed(2)}</strong></td>
+      <td>${t.paymentMethod}</td>
+      <td>${t.cashier}</td>
+    </tr>
+  `).join('');
 }
 
-function deleteStock(idx) {
-    if(!confirm('Delete this stock item?')) return;
-    stocks.splice(idx, 1);
-    localStorage.setItem('stocks', JSON.stringify(stocks));
-    renderStockTable();
-}
-
-function editStock(idx) {
-    const item = stocks[idx];
-    const newQty = parseFloat(prompt('Enter New Quantity:', item.qty)) || item.qty;
-    const newReorder = parseFloat(prompt('Enter New Reorder Level:', item.reorderLevel)) || item.reorderLevel;
-    const newCost = parseFloat(prompt('Enter New Cost:', item.cost)) || item.cost;
-    stocks[idx] = { ...item, qty: newQty, reorderLevel: newReorder, cost: newCost };
-    localStorage.setItem('stocks', JSON.stringify(stocks));
-    renderStockTable();
-}
-
-function saveDelivery() {
-    const itemIdx = document.getElementById('deliverItem').value;
-    const qty = parseFloat(document.getElementById('deliverQty').value) || 0;
-    const supplier = document.getElementById('deliverSupplier').value.trim() || '—';
-    if(itemIdx === '' || qty <= 0) return alert('⚠️ Fill all fields!');
-    stocks[itemIdx].qty += qty;
-    localStorage.setItem('stocks', JSON.stringify(stocks));
-    renderStockTable();
-    alert(`✅ Delivery Saved!\nAdded ${qty} × ${stocks[itemIdx].name}`);
-    document.getElementById('deliverQty').value = '';
-    document.getElementById('deliverSupplier').value = '';
-    document.getElementById('deliverRemarks').value = '';
-}
-
-function saveTransOut() {
-    const itemIdx = document.getElementById('transOutItem').value;
-    const qty = parseFloat(document.getElementById('transOutQty').value) || 0;
-    const sendTo = document.getElementById('transOutTo').value.trim();
-    if(itemIdx === '' || qty <= 0 || !sendTo) return alert('⚠️ Fill all fields!');
-    if(stocks[itemIdx].qty < qty) return alert('⚠️ Not enough stock!');
-    stocks[itemIdx].qty -= qty;
-    localStorage.setItem('stocks', JSON.stringify(stocks));
-    renderStockTable();
-    alert(`✅ Trans-Out Saved!\nSent ${qty} × ${stocks[itemIdx].name} to ${sendTo}`);
-}
-
-function saveTransIn() {
-    const itemIdx = document.getElementById('transInItem').value;
-    const qty = parseFloat(document.getElementById('transInQty').value) || 0;
-    const from = document.getElementById('transInFrom').value.trim();
-    if(itemIdx === '' || qty <= 0 || !from) return alert('⚠️ Fill all fields!');
-    stocks[itemIdx].qty += qty;
-    localStorage.setItem('stocks', JSON.stringify(stocks));
-    renderStockTable();
-    alert(`✅ Trans-In Saved!\nReceived ${qty} × ${stocks[itemIdx].name} from ${from}`);
-}
-
-function voidEntireOrder() {
-    if(cart.length === 0) return alert('⚠️ No items to void!');
-    if(!confirm('⚠️ Void entire current order?')) return;
-    voidLogs.unshift({
-        datetime: new Date().toLocaleString('en-PH'),
-        item: 'ENTIRE ORDER — Ticket #' + ticketNumber,
-        qty: cart.reduce((s,i)=>s+i.qty,0),
-        amount: cart.reduce((s,i)=>s+i.price*i.qty,0),
-        voidedBy: currentSession.name,
-        shift: currentSession.shift || 'ADMIN',
-        reason: prompt('Enter reason for void:') || 'No reason given'
-    });
-    localStorage.setItem('voidLogs', JSON.stringify(voidLogs));
-    renderVoidLog();
-    cart = []; updateCartDisplay();
-    alert('✅ Order Voided!');
-}
-
-function renderVoidLog() {
-    const tbody = document.getElementById('voidLogBody');
-    if(voidLogs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:30px;">No void records...</td></tr>';
-        return;
-    }
-    tbody.innerHTML = voidLogs.map(v => `<tr><td>${v.datetime}</td><td>${v.item}</td><td>${v.qty}</td><td>₱${v.amount.toFixed(2)}</td><td>${v.voidedBy}</td><td>${v.shift.toUpperCase()}</td><td>${v.reason}</td></tr>`).join('');
-}
-
-function generateCashOut() {
-    const shiftSales = transactions.filter(t => t.shift === currentSession.shift).reduce((s,t)=>s+t.total,0);
-    const cashOnHand = currentSession.openingCash + shiftSales;
-    const comment = prompt('Cash Out — Enter Remarks/Comments:') || '—';
-    alert(`💰 CASH OUT REPORT\n────────────────────\nOpening Cash: ₱${currentSession.openingCash.toFixed(2)}\nShift Sales:  ₱${shiftSales.toFixed(2)}\nCASH ON HAND: ₱${cashOnHand.toFixed(2)}\nRemarks: ${comment}`);
-}
-
-function endShift() {
-    if(!confirm('🔒 End current shift?')) return;
-    const shiftSales = transactions.filter(t => t.shift === currentSession.shift).reduce((s,t)=>s+t.total,0);
-    alert(`🔒 SHIFT ENDED!\n────────────────────\nCashier: ${currentSession.name}\nShift: ${currentSession.shift.toUpperCase()}\nOpening: ₱${currentSession.openingCash.toFixed(2)}\nSales: ₱${shiftSales.toFixed(2)}\nTotal Cash: ₱${(currentSession.openingCash + shiftSales).toFixed(2)}`);
-    logout();
-}
-
-function changeAdminPassword() {
-    const newPass = document.getElementById('newAdminPass').value.trim();
-    const confirmPass = document.getElementById('confirmAdminPass').value.trim();
-    if(!newPass || !confirmPass) return alert('⚠️ Enter both fields!');
-    if(newPass !== confirmPass) return alert('⚠️ Passwords do not match!');
-    localStorage.setItem('adminPassword', newPass);
-    alert('✅ Admin Password Changed!');
-    document.getElementById('newAdminPass').value = '';
-    document.getElementById('confirmAdminPass').value = '';
-}
-
-window.onload = function() {
-    setTimeout(() => {
-        const deliverSelect = document.getElementById('deliverItem');
-        const transOutSelect = document.getElementById('transOutItem');
-        const transInSelect = document.getElementById('transInItem');
-        if(deliverSelect) stocks.forEach((s,i)=>{
-            deliverSelect.innerHTML += `<option value="${i}">${s.name} (${s.qty})</option>`;
-            transOutSelect.innerHTML += `<option value="${i}">${s.name} (${s.qty})</option>`;
-            transInSelect.innerHTML += `<option value="${i}">${s.name} (${s.qty})</option>`;
-        });
-    }, 100);
-};
-</script>
-
-</body>
-</html>
+// ============= STOCKS =============
+function renderStocks() {
+  const tbody = document.getElementById('stocksBody');
+  if (stocks.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">No stock items yet. Click Add to start.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = stocks.map((item, index) => `
+    <tr>
+      <td>${item.name}</td>
+<td>₱${(item.cost || 0).toFixed(2)}</td>
+       <td>
+         <button onclick="editStockItem(${index})" style="background:#e8f5e9;color:#008000;padding:5px 10px;margin-right:5px;border-radius:4px;">Edit</button>
+         <button onclick="deleteStockItem(${index})" style="background:#ffebee;color:#c62828;padding:5px 10px;border-radius:4px;">Del</button>
+       </td>
+     </tr>
+   `).join('');
+ }
+ function addNewStock() {
+   const name = prompt('Enter Item Name:');
+   if (!name) return;
+   const qty = parseFloat(prompt('Enter Quantity:') || '0');
+   const cost = parseFloat(prompt('Enter Cost Price:') || '0');
+   stocks.push({ name:name, quantity:qty, cost:cost });
+localStorage.setItem('posStocks', JSON.stringify(stocks));
+   renderStocks();
+ }
+ function editStockItem(index) {
+   const item = stocks[index];
+   const newQty = parseFloat(prompt('Enter New Quantity:', item.quantity) || item.quantity);
+   const newCost = parseFloat(prompt('Enter New Cost:', item.cost || 0) || item.cost);
+   stocks[index] = { ...item, quantity:newQty, cost:newCost };
+   localStorage.setItem('posStocks', JSON.stringify(stocks));
+   renderStocks();
+ }
+ function deleteStockItem(index) {
+   if (!confirm('⚠️ Delete this stock item?')) return;
+   stocks.splice(index, 1);
+   localStorage.setItem('posStocks', JSON.stringify(stocks));
+   renderStocks();
+ }
+ </script>
+ </body>
+ </html>
