@@ -10,7 +10,6 @@
     .hidden { display: none !important; }
     button { cursor: pointer; border: none; border-radius: 8px; font-size: 15px; }
     input, select { border: 2px solid #ddd; border-radius: 8px; padding: 12px; font-size: 16px; width: 100%; }
-
     /* LOGIN SCREEN */
     .login-screen {
       position: fixed; inset: 0; background: linear-gradient(135deg, #00a000, #007000);
@@ -24,25 +23,23 @@
     .login-box button { width: 100%; padding: 14px; background: #00a000; color: white; font-weight: bold; margin-top: 10px; }
     .login-box button.gray { background: #eee; color: #333; }
     .divider { height: 1px; background: #ddd; margin: 15px 0; }
-
     /* MAIN LAYOUT */
     .app-layout { display: flex; flex-direction: column; min-height: 100vh; }
     .top-bar {
       background: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100;
+      flex-wrap: wrap; gap: 8px;
     }
     .top-bar h1 { font-size: 18px; color: #008000; }
     .top-bar .user { font-size: 13px; color: #555; }
     .nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
     .nav-btn { padding: 8px 14px; background: #f0f0f0; color: #333; font-size: 14px; }
     .nav-btn.active { background: #00a000; color: white; }
-
     /* POS VIEW */
     .pos-container { display: flex; flex-direction: column; }
     @media (min-width: 900px) {
       .pos-container { flex-direction: row; }
     }
-
     /* PRODUCTS AREA */
     .products-area { flex: 1; padding: 15px; }
     .cat-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
@@ -56,7 +53,6 @@
     .product-card:active { transform: scale(0.97); }
     .product-name { font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #333; }
     .product-price { color: #008000; font-size: 20px; font-weight: bold; }
-
     /* CART AREA */
     .cart-area {
       background: white; border-top: 1px solid #eee; padding: 15px;
@@ -64,21 +60,22 @@
     @media (min-width: 900px) {
       .cart-area { width: 360px; border-top: none; border-left: 1px solid #eee; }
     }
-    .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
     .cart-header h3 { font-size: 17px; }
     .clear-btn { background: #ffebee; color: #c62828; padding: 8px 12px; font-size: 13px; }
     .cart-list { max-height: 280px; overflow-y: auto; margin-bottom: 15px; }
     .cart-item {
       display: flex; justify-content: space-between; align-items: center;
       padding: 10px 0; border-bottom: 1px solid #f0f0f0;
+      gap: 8px; flex-wrap: wrap;
     }
     .item-info { display: flex; align-items: center; gap: 10px; }
     .qty-badge {
-      background: #e8f5e9; color: #008000; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 14px;
+      background: #e8f5e9; color: #008000; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 14px; flex-shrink: 0;
     }
     .item-name { font-size: 14px; }
-    .item-price { font-weight: bold; color: #333; }
-    .remove-btn { color: #e53935; font-size: 20px; padding: 0 8px; background: none; }
+    .item-price { font-weight: bold; color: #333; flex-shrink: 0; }
+    .remove-btn { color: #e53935; font-size: 20px; padding: 0 8px; background: none; flex-shrink: 0; }
     .total-row {
       display: flex; justify-content: space-between; padding: 12px 0; border-top: 2px solid #eee;
       font-size: 22px; font-weight: bold; margin-bottom: 15px;
@@ -94,16 +91,16 @@
     }
     .action-buttons { display: grid; grid-template-columns: 1fr; gap: 10px; }
     .pay-now-btn { padding: 14px; background: #00a000; color: white; font-size: 17px; font-weight: bold; }
-
     /* ADMIN PAGES */
     .admin-page { padding: 15px; display: none; }
     .admin-page.active { display: block; }
     .page-card {
       background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      overflow-x: auto;
     }
     .page-card h3 { margin-bottom: 15px; color: #333; font-size: 17px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px; }
     th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
     th { background: #f9f9f9; font-weight: bold; color: #555; }
     .add-btn { background: #00a000; color: white; padding: 10px 16px; margin-bottom: 15px; }
@@ -111,7 +108,6 @@
   </style>
 </head>
 <body>
-
 <!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
@@ -123,7 +119,6 @@
       <option value="cashier">💰 Cashier Login</option>
       <option value="admin">🔐 Admin Login</option>
     </select>
-
     <!-- CASHIER LOGIN -->
     <div id="cashierLoginForm" class="hidden">
       <div class="divider"></div>
@@ -137,7 +132,6 @@
       <input type="text" id="cashierNameInput" placeholder="Your Full Name">
       <button onclick="processCashierLogin()">✅ Start Shift</button>
     </div>
-
     <!-- ADMIN LOGIN -->
     <div id="adminLoginForm" class="hidden">
       <div class="divider"></div>
@@ -146,7 +140,6 @@
     </div>
   </div>
 </div>
-
 <!-- MAIN APPLICATION -->
 <div class="app-layout hidden" id="mainApp">
   <!-- TOP NAVIGATION -->
@@ -162,7 +155,6 @@
       <button class="nav-btn gray" onclick="logoutSystem()">🚪 Logout</button>
     </div>
   </div>
-
   <!-- POS VIEW -->
   <div id="view-pos" class="pos-container">
     <div class="products-area">
@@ -174,7 +166,6 @@
       </div>
       <div class="products-grid" id="productsGrid"></div>
     </div>
-
     <div class="cart-area">
       <div class="cart-header">
         <h3>🛒 ORDER — Ticket #<span id="ticketNumber">001</span></h3>
@@ -203,7 +194,6 @@
       </div>
     </div>
   </div>
-
   <!-- TRANSACTIONS VIEW -->
   <div id="view-transactions" class="admin-page">
     <div class="page-card">
@@ -225,7 +215,6 @@
       </table>
     </div>
   </div>
-
   <!-- STOCKS VIEW -->
   <div id="view-stocks" class="admin-page">
     <div class="page-card">
@@ -247,7 +236,6 @@
     </div>
   </div>
 </div>
-
 <script>
 // ============= DATA & CONFIG =============
 const PRODUCTS = {
@@ -278,9 +266,7 @@ const PRODUCTS = {
     {name:'Bottled Water', price:10}
   ]
 };
-
 const SHIFT_PASSCODES = { morning:'1111', swing:'2222', graveyard:'3333' };
-
 // STATE VARIABLES
 let activeUser = { loggedIn:false, type:'', name:'', shift:'' };
 let currentCategory = 'burgers';
@@ -290,51 +276,43 @@ let ticketNumber = parseInt(localStorage.getItem('posTicketCounter') || '1');
 let transactions = JSON.parse(localStorage.getItem('posTransactions') || '[]');
 let stocks = JSON.parse(localStorage.getItem('posStocks') || '[]');
 let adminPassword = localStorage.getItem('posAdminPass') || 'admin123';
-
 // ============= LOGIN SYSTEM =============
 function showLoginForm() {
   const type = document.getElementById('loginType').value;
   document.getElementById('cashierLoginForm').classList.toggle('hidden', type !== 'cashier');
   document.getElementById('adminLoginForm').classList.toggle('hidden', type !== 'admin');
 }
-
 function processCashierLogin() {
   const shift = document.getElementById('shiftSelect').value;
   const passcode = document.getElementById('passcodeInput').value.trim();
   const name = document.getElementById('cashierNameInput').value.trim();
-
   if (!shift || !passcode || !name) return alert('⚠️ Please fill in ALL fields!');
   if (passcode !== SHIFT_PASSCODES[shift]) return alert('❌ Wrong passcode! Please check your shift.');
-
   activeUser = { loggedIn:true, type:'cashier', name:name, shift:shift };
   launchMainApp();
 }
-
 function processAdminLogin() {
   const pass = document.getElementById('adminPassInput').value.trim();
   if (pass !== adminPassword) return alert('❌ Wrong admin password!');
   activeUser = { loggedIn:true, type:'admin', name:'ADMIN', shift:'' };
   launchMainApp();
 }
-
 function launchMainApp() {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('mainApp').classList.remove('hidden');
-  document.getElementById('userDisplay').textContent = ${activeUser.name} | ${activeUser.type}${activeUser.shift ? ' | ' + activeUser.shift.toUpperCase() + ' SHIFT' : ''};
+  document.getElementById('userDisplay').textContent = `${activeUser.name} | ${activeUser.type}${activeUser.shift ? ' | ' + activeUser.shift.toUpperCase() + ' SHIFT' : ''}`;
   document.getElementById('ticketNumber').textContent = String(ticketNumber).padStart(3, '0');
   
   renderProducts();
   renderTransactions();
   renderStocks();
 }
-
 function logoutSystem() {
   if (!confirm('🚪 Are you sure you want to logout?')) return;
   activeUser = { loggedIn:false, type:'', name:'', shift:'' };
   cart = [];
   location.reload();
 }
-
 // ============= PRODUCTS & CART =============
 function changeCategory(cat, btnEl) {
   currentCategory = cat;
@@ -342,7 +320,6 @@ function changeCategory(cat, btnEl) {
   btnEl.classList.add('active');
   renderProducts();
 }
-
 function renderProducts() {
   const grid = document.getElementById('productsGrid');
   grid.innerHTML = '';
@@ -357,7 +334,6 @@ function renderProducts() {
     grid.appendChild(card);
   });
 }
-
 function addToCart(item) {
   const existingItem = cart.find(cartItem => cartItem.name === item.name);
   if (existingItem) {
@@ -367,7 +343,6 @@ function addToCart(item) {
   }
   updateCartDisplay();
 }
-
 function updateCartDisplay() {
   const cartList = document.getElementById('cartList');
   if (cart.length === 0) {
@@ -386,13 +361,11 @@ function updateCartDisplay() {
       </div>
     `).join('');
   }
-
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   document.getElementById('grandTotal').textContent = total.toFixed(2);
   document.getElementById('cashReceivedInput').value = '';
   document.getElementById('changeDisplay').style.display = 'none';
 }
-
 function removeFromCart(index) {
   if (cart[index].quantity > 1) {
     cart[index].quantity--;
@@ -401,14 +374,12 @@ function removeFromCart(index) {
   }
   updateCartDisplay();
 }
-
 function clearFullCart() {
   if (cart.length === 0) return;
   if (!confirm('🗑️ Clear entire order?')) return;
   cart = [];
   updateCartDisplay();
 }
-
 // ============= PAYMENT & SALE =============
 function selectPaymentMethod(method, btnEl) {
   selectedPayment = method;
@@ -416,7 +387,6 @@ function selectPaymentMethod(method, btnEl) {
   btnEl.classList.add('selected');
   document.getElementById('changeDisplay').style.display = 'none';
 }
-
 function calculateChange() {
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const cash = parseFloat(document.getElementById('cashReceivedInput').value) || 0;
@@ -429,14 +399,11 @@ function calculateChange() {
     changeBox.style.display = 'none';
   }
 }
-
 function finalizeSale() {
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   if (total <= 0) return alert('⚠️ Cart is empty! Add items first.');
-
   const cash = parseFloat(document.getElementById('cashReceivedInput').value) || 0;
   if (selectedPayment === 'Cash' && cash < total) return alert('⚠️ Insufficient cash amount!');
-
   // Save transaction
   transactions.unshift({
     ticket: ticketNumber,
@@ -448,29 +415,23 @@ function finalizeSale() {
     shift: activeUser.shift
   });
   localStorage.setItem('posTransactions', JSON.stringify(transactions));
-
   // Increment ticket
   localStorage.setItem('posTicketCounter', ++ticketNumber);
   document.getElementById('ticketNumber').textContent = String(ticketNumber).padStart(3, '0');
-
-  alert(✅ SALE COMPLETED!\n━━━━━━━━━━━━━━━━━\nTicket #${ticketNumber - 1}\nTotal: ₱${total.toFixed(2)}\nPayment: ${selectedPayment}\n${selectedPayment === 'Cash' ? Cash: ₱${cash.toFixed(2)}\nChange: ₱${(cash - total).toFixed(2)}` : ''}\n━━━━━━━━━━━━━━━━━`);
-
+  alert(`✅ SALE COMPLETED!\n━━━━━━━━━━━━━━━━━\nTicket #${ticketNumber - 1}\nTotal: ₱${total.toFixed(2)}\nPayment: ${selectedPayment}\n${selectedPayment === 'Cash' ? `Cash: ₱${cash.toFixed(2)}\nChange: ₱${(cash - total).toFixed(2)}` : ''}\n━━━━━━━━━━━━━━━━━`);
   // Reset cart
   cart = [];
   updateCartDisplay();
   renderTransactions();
 }
-
 // ============= VIEWS SWITCH =============
 function switchMainView(viewName) {
   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
   event.target.classList.add('active');
-
   document.getElementById('view-pos').style.display = viewName === 'pos' ? '' : 'none';
   document.getElementById('view-transactions').classList.toggle('active', viewName === 'transactions');
   document.getElementById('view-stocks').classList.toggle('active', viewName === 'stocks');
 }
-
 // ============= TRANSACTIONS =============
 function renderTransactions() {
   const tbody = document.getElementById('transactionsBody');
@@ -489,7 +450,6 @@ function renderTransactions() {
     </tr>
   `).join('');
 }
-
 // ============= STOCKS =============
 function renderStocks() {
   const tbody = document.getElementById('stocksBody');
@@ -500,37 +460,38 @@ function renderStocks() {
   tbody.innerHTML = stocks.map((item, index) => `
     <tr>
       <td>${item.name}</td>
-<td>₱${(item.cost || 0).toFixed(2)}</td>
-       <td>
-         <button onclick="editStockItem(${index})" style="background:#e8f5e9;color:#008000;padding:5px 10px;margin-right:5px;border-radius:4px;">Edit</button>
-         <button onclick="deleteStockItem(${index})" style="background:#ffebee;color:#c62828;padding:5px 10px;border-radius:4px;">Del</button>
-       </td>
-     </tr>
-   `).join('');
- }
- function addNewStock() {
-   const name = prompt('Enter Item Name:');
-   if (!name) return;
-   const qty = parseFloat(prompt('Enter Quantity:') || '0');
-   const cost = parseFloat(prompt('Enter Cost Price:') || '0');
-   stocks.push({ name:name, quantity:qty, cost:cost });
-localStorage.setItem('posStocks', JSON.stringify(stocks));
-   renderStocks();
- }
- function editStockItem(index) {
-   const item = stocks[index];
-   const newQty = parseFloat(prompt('Enter New Quantity:', item.quantity) || item.quantity);
-   const newCost = parseFloat(prompt('Enter New Cost:', item.cost || 0) || item.cost);
-   stocks[index] = { ...item, quantity:newQty, cost:newCost };
-   localStorage.setItem('posStocks', JSON.stringify(stocks));
-   renderStocks();
- }
- function deleteStockItem(index) {
-   if (!confirm('⚠️ Delete this stock item?')) return;
-   stocks.splice(index, 1);
-   localStorage.setItem('posStocks', JSON.stringify(stocks));
-   renderStocks();
- }
- </script>
- </body>
- </html>
+      <td>${item.quantity || 0}</td>
+      <td>₱${(item.cost || 0).toFixed(2)}</td>
+      <td>
+        <button onclick="editStockItem(${index})" style="background:#e8f5e9;color:#008000;padding:5px 10px;margin-right:5px;border-radius:4px;">Edit</button>
+        <button onclick="deleteStockItem(${index})" style="background:#ffebee;color:#c62828;padding:5px 10px;border-radius:4px;">Del</button>
+      </td>
+    </tr>
+  `).join('');
+}
+function addNewStock() {
+  const name = prompt('Enter Item Name:');
+  if (!name) return;
+  const qty = parseFloat(prompt('Enter Quantity:') || '0');
+  const cost = parseFloat(prompt('Enter Cost Price:') || '0');
+  stocks.push({ name:name, quantity:qty, cost:cost });
+  localStorage.setItem('posStocks', JSON.stringify(stocks));
+  renderStocks();
+}
+function editStockItem(index) {
+  const item = stocks[index];
+  const newQty = parseFloat(prompt('Enter New Quantity:', item.quantity) || item.quantity);
+  const newCost = parseFloat(prompt('Enter New Cost:', item.cost || 0) || item.cost);
+  stocks[index] = { ...item, quantity:newQty, cost:newCost };
+  localStorage.setItem('posStocks', JSON.stringify(stocks));
+  renderStocks();
+}
+function deleteStockItem(index) {
+  if (!confirm('⚠️ Delete this stock item?')) return;
+  stocks.splice(index, 1);
+  localStorage.setItem('posStocks', JSON.stringify(stocks));
+  renderStocks();
+}
+</script>
+</body>
+</html>
