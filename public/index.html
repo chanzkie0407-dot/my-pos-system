@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Burger Shop POS</title>
+<title>Minute Burger POS</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#f7f7f7}
@@ -19,6 +19,7 @@ th{background:#f9f9f9}
 .tag.grab{background:#fff3e0;color:#e65100}
 .tag.fp{background:#f3e5f5;color:#7b1fa2}
 .tag.void{background:#ffebee;color:#c62828}
+.tag.warn{background:#fff3cd;color:#856404}
 .empty{text-align:center;color:#999;padding:20px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
 .card{background:#fff;border-radius:8px;padding:10px;text-align:center;cursor:pointer}
@@ -42,6 +43,7 @@ th{background:#f9f9f9}
 .green{color:#2e7d32}
 .red{color:#c62828}
 .blue{color:#1565c0}
+.yellow{color:#856404}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;padding:15px;z-index:999}
 .mbody{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:400px}
 </style>
@@ -51,7 +53,7 @@ th{background:#f9f9f9}
 <!-- LOGIN -->
 <div id="login" class="modal">
 <div class="mbody">
-<h2 style="text-align:center;color:#008000;margin-bottom:20px">🍔 BURGER POS</h2>
+<h2 style="text-align:center;color:#008000;margin-bottom:20px">🍔 MINUTE BURGER POS</h2>
 <select onchange="showForm(this.value)">
   <option value="">-- Select Login Type --</option>
   <option value="cashier">Cashier</option>
@@ -61,18 +63,18 @@ th{background:#f9f9f9}
 <div id="cform" class="hidden">
 <select id="shift">
   <option value="">-- Select Shift --</option>
-  <option value="morning">Morning (6AM-2PM) Pass:1111</option>
-  <option value="swing">Swing (2PM-10PM) Pass:2222</option>
-  <option value="graveyard">Graveyard Pass:3333</option>
+  <option value="morning">🌅 Morning (6AM–2PM) — Pass: 1111</option>
+  <option value="swing">☀️ Swing (2PM–10PM) — Pass: 2222</option>
+  <option value="graveyard">🌙 Graveyard (10PM–6AM) — Pass: 3333</option>
 </select>
-<input type="password" id="pass" placeholder="Passcode" maxlength="4">
-<input type="text" id="name" placeholder="Your Name">
-<button class="btn-green" onclick="loginCashier()">Login</button>
+<input type="password" id="pass" placeholder="4-Digit Passcode" maxlength="4">
+<input type="text" id="name" placeholder="Cashier Name">
+<button class="btn-green" onclick="loginCashier()">✅ Start Shift</button>
 </div>
 
 <div id="aform" class="hidden">
 <input type="password" id="apass" placeholder="Admin Password (admin123)">
-<button class="btn-green" onclick="loginAdmin()">Login</button>
+<button class="btn-green" onclick="loginAdmin()">🔐 Login as Admin</button>
 </div>
 </div>
 </div>
@@ -80,32 +82,36 @@ th{background:#f9f9f9}
 <!-- MAIN APP -->
 <div id="app" class="hidden">
 <div class="topbar">
-<div><h1>🍔 Burger POS</h1><small id="user"></small></div>
+<div><h1>🍔 Minute Burger POS</h1><small id="user"></small></div>
 <div class="nav">
-  <button class="active" onclick="showView('pos')">POS</button>
-  <button id="btntrans" onclick="showView('mytrans')">My Transactions</button>
-  <button id="btnsales" class="hidden" onclick="showView('sales')">Sales</button>
-  <button id="btnstocks" class="hidden" onclick="showView('stocks')">Stocks</button>
-  <button id="btnreports" class="hidden" onclick="showView('reports')">Reports</button>
-  <button onclick="logout()">Logout</button>
+  <button class="active" onclick="showView('pos')">🛒 Sales</button>
+  <button id="btntrans" onclick="showView('mytrans')">📋 Receipts</button>
+  <button id="btnshift" onclick="showView('shift')">⏱️ Shift</button>
+  <button id="btnitems" class="hidden" onclick="showView('items')">📦 Items</button>
+  <button id="btnsales" class="hidden" onclick="showView('allsales')">📊 Sales</button>
+  <button id="btnstocks" class="hidden" onclick="showView('stocks')">📦 Stocks</button>
+  <button id="btnreports" class="hidden" onclick="showView('allreports')">💰 Cash Log</button>
+  <button id="btnerrors" class="hidden" onclick="showView('errors')">⚠️ Stock Alerts</button>
+  <button onclick="logout()">🚪 Logout</button>
 </div>
 </div>
 
-<!-- POS VIEW -->
+<!-- POS VIEW — CASHIER SEES NO STOCK WARNINGS -->
 <div id="vpos" class="panels">
 <div class="prod">
 <div class="cat">
-  <button class="active" onclick="setCat('burgers',this)">Burgers</button>
-  <button onclick="setCat('hotdogs',this)">Hotdogs</button>
-  <button onclick="setCat('premium',this)">Premium</button>
-  <button onclick="setCat('drinks',this)">Drinks</button>
+  <button class="active" onclick="setCat('burgers',this)">🍔 Burgers</button>
+  <button onclick="setCat('premium',this)">⭐ Premium</button>
+  <button onclick="setCat('hotdogs',this)">🌭 Hotdogs</button>
+  <button onclick="setCat('drinks',this)">🥤 Drinks</button>
+  <button onclick="setCat('extras',this)">🧂 Extras</button>
 </div>
 <div class="grid" id="pgrid"></div>
 </div>
 <div class="cart">
-<h3>ORDER — Ticket #<span id="tic">001</span></h3>
+<h3>🧾 Ticket #<span id="tic">001</span></h3>
 <div id="clist" style="margin:10px 0;max-height:250px;overflow:auto"></div>
-<div class="total">₱<span id="gtotal">0.00</span></div>
+<div class="total">TOTAL: ₱<span id="gtotal">0.00</span></div>
 <div class="pay">
   <button class="selected" onclick="setPay('Cash',this)">💵 Cash</button>
   <button onclick="setPay('GCash',this)">📱 GCash</button>
@@ -113,49 +119,75 @@ th{background:#f9f9f9}
   <button onclick="setPay('FoodPanda',this)">🐼 FoodPanda</button>
 </div>
 <input type="number" id="cash" placeholder="Cash Received" oninput="calcChange()">
-<div style="font-weight:bold;padding:8px;background:#e3f2fd;border-radius:6px" id="chg"></div>
+<div style="font-weight:bold;padding:8px;background:#e3f2fd;border-radius:6px;margin-top:6px" id="chg"></div>
 <br>
-<button class="btn-green" onclick="checkout()">✅ COMPLETE SALE</button><br><br>
-<button class="btn-orange" onclick="cashoutModal()">💰 CASH OUT</button>
+<button class="btn-green" onclick="checkout()">💾 SAVE</button><br><br>
+<button class="btn-orange" onclick="cashoutModal()">💰 CHARGE / CASH OUT</button>
 </div>
 </div>
 
-<!-- MY TRANSACTIONS -->
+<!-- MY TRANSACTIONS / RECEIPTS -->
 <div id="vmytrans" class="hidden" style="padding:10px">
 <div class="summary">
-<div class="box blue"><div>Total Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="myamt">0.00</span></div></div>
+<div class="box blue"><div>Shift Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="myamt">0.00</span></div></div>
 <div class="box red"><div>Voided</div><div style="font-size:18px;font-weight:bold" id="myvoid">0</div></div>
 </div>
-<p style="font-size:13px;color:#666;margin:8px 0;">📌 Give Ticket # to Admin for voiding. Void = NOT counted.</p>
-<table><thead><tr><th>Ticket #</th><th>Date Time</th><th>Items</th><th>Amount</th><th>Pay</th><th>Status</th></tr></thead><tbody id="mtbody"></tbody></table>
+<p style="font-size:13px;color:#666;margin:8px 0;">📌 Give Ticket # to Admin for voiding. Voided transactions are NOT counted in sales.</p>
+<table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Status</th></tr></thead><tbody id="mtbody"></tbody></table>
 </div>
 
-<!-- SALES & VOID -->
-<div id="vsales" class="hidden" style="padding:10px">
+<!-- SHIFT INFO -->
+<div id="vshift" class="hidden" style="padding:10px">
+<div class="box" style="background:#e8f5e9">
+<h3>⏱️ Current Shift Info</h3>
+<p style="margin:8px 0;"><strong>Cashier:</strong> <span id="sname"></span></p>
+<p style="margin:8px 0;"><strong>Shift:</strong> <span id="sshift"></span></p>
+<p style="margin:8px 0;"><strong>Shift Start:</strong> <span id="sstart"></span></p>
+<p style="margin:8px 0;"><strong>Ticket Counter:</strong> #<span id="stic"></span></p>
+</div>
+</div>
+
+<!-- ITEMS LIST -->
+<div id="vitems" class="hidden" style="padding:10px">
+<h3>📦 Product List</h3>
+<table><thead><tr><th>Category</th><th>Item Name</th><th>Price</th><th>Stock</th></tr></thead><tbody id="itbody"></tbody></table>
+</div>
+
+<!-- ALL SALES / ADMIN -->
+<div id="vallsales" class="hidden" style="padding:10px">
 <div class="summary">
 <div class="box green"><div>Today Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="dsale">0.00</span></div></div>
 <div class="box blue"><div>Shift Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="ssale">0.00</span></div></div>
 <div class="box red"><div>Voided Total</div><div style="font-size:18px;font-weight:bold">₱<span id="vsum">0.00</span></div></div>
 </div>
-<table><thead><tr><th>Ticket #</th><th>DateTime</th><th>Items</th><th>Amount</th><th>Pay</th><th>Cashier</th><th>Action</th></tr></thead><tbody id="stbody"></tbody></table>
+<table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Cashier</th><th>Shift</th><th>Action</th></tr></thead><tbody id="stbody"></tbody></table>
 </div>
 
 <!-- STOCKS -->
 <div id="vstocks" class="hidden" style="padding:10px">
-<button class="btn-green" style="width:auto;margin:4px" onclick="stockModal('in')">Stock In</button>
-<button class="btn-green" style="width:auto;margin:4px" onclick="stockModal('transin')">Trans-In</button>
-<button class="btn-orange" style="width:auto;margin:4px" onclick="stockModal('transout')">Trans-Out</button>
-<table><thead><tr><th>Item</th><th>Qty</th><th>Cost</th><th>Date</th></tr></thead><tbody id="stkbody"></tbody></table>
-<h4 style="margin-top:15px">Stock Log</h4>
-<table><thead><tr><th>DateTime</th><th>Item</th><th>Type</th><th>Qty</th><th>User</th></tr></thead><tbody id="logbody"></tbody></table>
+<button class="btn-green" style="width:auto;margin:4px" onclick="stockModal('in')">📥 Stock In</button>
+<button class="btn-green" style="width:auto;margin:4px" onclick="stockModal('transin')">➡️ Trans-In</button>
+<button class="btn-orange" style="width:auto;margin:4px" onclick="stockModal('transout')">⬅️ Trans-Out</button>
+<table><thead><tr><th>Item Name</th><th>Qty</th><th>Cost</th><th>Last Update</th></tr></thead><tbody id="stkbody"></tbody></table>
+<h4 style="margin-top:15px">📜 Stock Movement Log</h4>
+<table><thead><tr><th>Date & Time</th><th>Item</th><th>Type</th><th>Qty</th><th>User</th></tr></thead><tbody id="logbody"></tbody></table>
 </div>
 
-<!-- REPORTS -->
-<div id="vreports" class="hidden" style="padding:10px">
-<h4>Cash Out Records</h4>
-<table><thead><tr><th>DateTime</th><th>Cashier</th><th>Amount</th><th>Remarks</th></tr></thead><tbody id="cobody"></tbody></table>
-<h4 style="margin-top:15px">GCash Transactions</h4>
-<table><thead><tr><th>DateTime</th><th>Ticket</th><th>Amount</th><th>Cashier</th><th>Status</th></tr></thead><tbody id="gbody"></tbody></table>
+<!-- STOCK ALERTS / ERROR REPORTS — ADMIN ONLY -->
+<div id="verrors" class="hidden" style="padding:10px">
+<div class="box" style="background:#fff3cd;border:1px solid #ffeeba;margin-bottom:10px">
+<h3 style="color:#856404">⚠️ STOCK ALERTS — Sold Without Sufficient Inventory</h3>
+<p style="font-size:13px;color:#856404;margin-top:6px;">📌 Monitor here: items sold even when stock was insufficient.</p>
+</div>
+<table><thead><tr><th>Date & Time</th><th>Item Sold</th><th>Sold Qty</th><th>Available Stock</th><th>Cashier</th><th>Shift</th><th>Ticket #</th></tr></thead><tbody id="errbody"></tbody></table>
+</div>
+
+<!-- ALL REPORTS / CASH LOG -->
+<div id="vallreports" class="hidden" style="padding:10px">
+<h4>💰 Cash Out Records</h4>
+<table><thead><tr><th>Date & Time</th><th>Cashier</th><th>Shift</th><th>Amount</th><th>Remarks</th></tr></thead><tbody id="cobody"></tbody></table>
+<h4 style="margin-top:15px">📱 GCash Transactions</h4>
+<table><thead><tr><th>Date & Time</th><th>Ticket #</th><th>Amount</th><th>Cashier</th><th>Status</th></tr></thead><tbody id="gbody"></tbody></table>
 </div>
 
 </div>
@@ -166,130 +198,364 @@ th{background:#f9f9f9}
 </div>
 
 <script>
-const PROD={
-burgers:[{n:'Minute Burger',p:43},{n:'Cheesy Burger',p:54},{n:'Double Minute',p:66},{n:'Double Cheesy',p:82},{n:'Chicken Burger',p:52},{n:'Double Chicken',p:72}],
-hotdogs:[{n:'Cheesydog',p:51},{n:'Onion Franks',p:93},{n:'Beef Hungarian',p:114}],
-premium:[{n:'Black Pepper',p:92},{n:'Beef Shawarma',p:94},{n:'Bacon Burger',p:99},{n:'Chicken Veggie',p:89},{n:'Steak Burger',p:145}],
-drinks:[{n:'Softdrink Reg',p:15},{n:'Softdrink Lge',p:20},{n:'Iced Tea',p:18},{n:'Water',p:10}]
-},PASS={morning:'1111',swing:'2222',graveyard:'3333'},LAB={morning:'Morning',swing:'Swing',graveyard:'Graveyard'};
-let user={logged:false,type:'',name:'',shift:''},cat='burgers',cart=[],pay='Cash',tic=+localStorage.getItem('tic')||1,trans=JSON.parse(localStorage.getItem('trans')||'[]'),stk=JSON.parse(localStorage.getItem('stk')||'[]'),stklog=JSON.parse(localStorage.getItem('stklog')||'[]'),cashout=JSON.parse(localStorage.getItem('cashout')||'[]'),adminPass='admin123';
+// ============= PRODUCT DATABASE =============
+const PROD = {
+  burgers: [
+    {n:'Minute Burger',p:43,stock:50},
+    {n:'Cheesy Burger',p:52,stock:50},
+    {n:'Double Minute Burger',p:80,stock:40},
+    {n:'Double Cheesy Burger',p:82,stock:40},
+    {n:'Chicken Time Burger',p:52,stock:50},
+    {n:'Double Chicken Time Burger',p:72,stock:35}
+  ],
+  premium: [
+    {n:'Black Pepper Burger',p:92,stock:30},
+    {n:'Beef Shawarma Burger',p:94,stock:30},
+    {n:'Crispy Chicken Chimichurri',p:101,stock:25},
+    {n:'Crispy Chicken Roasted Sesame',p:97,stock:25},
+    {n:'50/50 Veggie Chicken Burger',p:89,stock:25},
+    {n:'Bacon Cheese Burger',p:99,stock:25},
+    {n:'Steak Burger',p:145,stock:15},
+    {n:'Chicken Sisig Burger',p:98,stock:30},
+    {n:'Pizza Burger',p:98,stock:20}
+  ],
+  hotdogs: [
+    {n:'Beef Hungarian',p:26,stock:40},
+    {n:'French Onion Franks',p:26,stock:40},
+    {n:'Cheesydog',p:51,stock:35},
+    {n:'FOF French Onion Franks (B1T1)',p:97,stock:20}
+  ],
+  drinks: [
+    {n:'Calamansi Tea',p:26,stock:80},
+    {n:'Fruitivist',p:26,stock:80},
+    {n:'Iced Coffee',p:18,stock:80},
+    {n:'Hot Coffee',p:15,stock:60},
+    {n:'Hot Choco',p:26,stock:60},
+    {n:'Bottled Water',p:16,stock:100}
+  ],
+  extras: [
+    {n:'Egg',p:15,stock:999},
+    {n:'Supreme Cheese',p:15,stock:999},
+    {n:'Coleslaw',p:13,stock:999},
+    {n:'Minute Burger Pack',p:32,stock:50}
+  ]
+};
 
-function SAVE(){localStorage.setItem('tic',tic);localStorage.setItem('trans',JSON.stringify(trans));localStorage.setItem('stk',JSON.stringify(stk));localStorage.setItem('stklog',JSON.stringify(stklog));localStorage.setItem('cashout',JSON.stringify(cashout))}
-function showForm(t){document.getElementById('cform').classList.toggle('hidden',t!=='cashier');document.getElementById('aform').classList.toggle('hidden',t!=='admin')}
+const PASS = {morning:'1111',swing:'2222',graveyard:'3333'};
+const LAB = {morning:'Morning',swing:'Swing',graveyard:'Graveyard'};
+const ADMIN_PASS = 'admin123';
+
+// ============= STATE =============
+let user = {logged:false,type:'',name:'',shift:'',startTime:null};
+let cat = 'burgers', cart = [], pay = 'Cash';
+let tic = +localStorage.getItem('tic') || 1;
+let trans = JSON.parse(localStorage.getItem('trans') || '[]');
+let stk = JSON.parse(localStorage.getItem('stk') || '[]');
+let stklog = JSON.parse(localStorage.getItem('stklog') || '[]');
+let cashout = JSON.parse(localStorage.getItem('cashout') || '[]');
+let stockAlerts = JSON.parse(localStorage.getItem('stockAlerts') || '[]');
+
+function SAVE(){
+  localStorage.setItem('tic',tic);
+  localStorage.setItem('trans',JSON.stringify(trans));
+  localStorage.setItem('stk',JSON.stringify(stk));
+  localStorage.setItem('stklog',JSON.stringify(stklog));
+  localStorage.setItem('cashout',JSON.stringify(cashout));
+  localStorage.setItem('stockAlerts',JSON.stringify(stockAlerts));
+}
+
+// ============= LOGIN =============
+function showForm(t){
+  document.getElementById('cform').classList.toggle('hidden',t!=='cashier');
+  document.getElementById('aform').classList.toggle('hidden',t!=='admin');
+}
 function loginCashier(){
-  const s=document.getElementById('shift').value,p=document.getElementById('pass').value.trim(),n=document.getElementById('name').value.trim();
-  if(!s||!p||!n)return alert('Fill all fields');
-  if(PASS[s]!==p)return alert('Wrong passcode');
-  user={logged:true,type:'cashier',name:n,shift:s};start();
+  const s=document.getElementById('shift').value;
+  const p=document.getElementById('pass').value.trim();
+  const n=document.getElementById('name').value.trim();
+  if(!s||!p||!n)return alert('⚠️ Fill all fields!');
+  if(PASS[s]!==p)return alert('❌ Wrong passcode!');
+  user={logged:true,type:'cashier',name:n,shift:s,startTime:new Date()};
+  start();
 }
 function loginAdmin(){
-  if(document.getElementById('apass').value.trim()!==adminPass)return alert('Wrong admin password');
-  user={logged:true,type:'admin',name:'ADMIN',shift:''};start();
+  if(document.getElementById('apass').value.trim()!==ADMIN_PASS)return alert('❌ Wrong admin password!');
+  user={logged:true,type:'admin',name:'ADMIN',shift:'',startTime:new Date()};
+  start();
 }
 function start(){
-  document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');
-  document.getElementById('user').textContent=user.name+' | '+(user.type==='admin'?'Admin':LAB[user.shift]+' Shift');
-  document.getElementById('tic').textContent=String(tic).padStart(3,'0');
-  const adm=user.type==='admin';
-  document.getElementById('btntrans').classList.toggle('hidden',adm);document.getElementById('btnsales').classList.toggle('hidden',!adm);
-  document.getElementById('btnstocks').classList.toggle('hidden',!adm);document.getElementById('btnreports').classList.toggle('hidden',!adm);
-  renderProducts();adm?(renderSales(),renderStocks(),renderReports()):renderMyTrans();
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  const shiftLabel = user.shift ? LAB[user.shift]+' Shift' : 'Admin';
+  document.getElementById('user').textContent = `${shiftLabel} | ${user.name}`;
+  document.getElementById('tic').textContent = String(tic).padStart(3,'0');
+
+  const adm = user.type === 'admin';
+  document.getElementById('btntrans').classList.toggle('hidden',adm);
+  document.getElementById('btnshift').classList.toggle('hidden',adm);
+  document.getElementById('btnitems').classList.toggle('hidden',!adm);
+  document.getElementById('btnsales').classList.toggle('hidden',!adm);
+  document.getElementById('btnstocks').classList.toggle('hidden',!adm);
+  document.getElementById('btnreports').classList.toggle('hidden',!adm);
+  document.getElementById('btnerrors').classList.toggle('hidden',!adm);
+
+  renderProducts();
+  if(adm){renderAllSales();renderStocks();renderAllReports();renderItemsList();renderStockAlerts();}
+  else{renderMyTrans();renderShiftInfo();}
 }
-function logout(){if(confirm('Logout?'))location.reload()}
-function setCat(c,b){cat=c;document.querySelectorAll('.cat button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderProducts()}
+function logout(){if(confirm('🚪 Logout?'))location.reload()}
+
+// ============= PRODUCTS & CART — NO STOCK BLOCKING FOR CASHIER =============
+function setCat(c,b){
+  cat=c;
+  document.querySelectorAll('.cat button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  renderProducts();
+}
 function renderProducts(){
   const g=document.getElementById('pgrid');g.innerHTML='';
   PROD[cat].forEach(x=>{
-    const d=document.createElement('div');d.className='card';d.innerHTML=`<div>${x.n}</div><div style="font-weight:bold;color:#008000">₱${x.p}</div>`;
-    d.onclick=()=>{const i=cart.findIndex(y=>y.n===x.n);i>=0?cart[i].q++:cart.push({n:x.n,p:x.p,q:1});updCart()};
+    // CASHIER: Always show & enable — NO warnings, NO blocking
+    const d=document.createElement('div');
+    d.className='card';
+    d.innerHTML = `<div style="font-size:13px;line-height:1.3">${x.n}</div><div style="font-weight:bold;color:#008000;margin-top:4px">₱${x.p}</div>`;
+    d.onclick=()=>addToCart(x);
     g.appendChild(d);
   })
 }
+function addToCart(x){
+  const i = cart.findIndex(y=>y.n===x.n);
+  i>=0 ? cart[i].q++ : cart.push({n:x.n,p:x.p,q:1});
+  updCart();
+}
 function updCart(){
-  const l=document.getElementById('clist');l.innerHTML='';let t=0;
-  cart.forEach((x,i)=>{l.innerHTML+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #eee"><span>${x.q}x ${x.n}</span><span>₱${(x.p*x.q).toFixed(2)} <button style="background:red;color:#fff;border-radius:50%;width:20px;height:20px;padding:0" onclick="cart.splice(${i},1);updCart()">×</button></span></div>`;t+=x.p*x.q;});
-  document.getElementById('gtotal').textContent=t.toFixed(2);document.getElementById('chg').innerHTML='';
+  const l=document.getElementById('clist');l.innerHTML='';
+  let t=0;
+  cart.forEach((x,i)=>{
+    l.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #eee">
+      <span>${x.q}x ${x.n}</span>
+      <span>₱${(x.p*x.q).toFixed(2)}
+        <button style="background:red;color:#fff;border-radius:50%;width:20px;height:20px;padding:0;margin-left:6px" onclick="cart.splice(${i},1);updCart()">×</button>
+      </span>
+    </div>`;
+    t += x.p*x.q;
+  });
+  document.getElementById('gtotal').textContent = t.toFixed(2);
+  document.getElementById('chg').innerHTML='';
 }
-function setPay(m,b){pay=m;document.querySelectorAll('.pay button').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');document.getElementById('chg').innerHTML=''}
+function setPay(m,b){
+  pay=m;
+  document.querySelectorAll('.pay button').forEach(x=>x.classList.remove('selected'));
+  b.classList.add('selected');
+  document.getElementById('chg').innerHTML='';
+}
 function calcChange(){
-  const t=cart.reduce((s,x)=>s+x.p*x.q,0),c=+document.getElementById('cash').value||0;
-  document.getElementById('chg').innerHTML=(pay==='Cash'&&c>=t&&t>0)?`CHANGE: ₱${(c-t).toFixed(2)}`:'';
+  const t = cart.reduce((s,x)=>s+x.p*x.q,0);
+  const c = +document.getElementById('cash').value || 0;
+  document.getElementById('chg').innerHTML = (pay==='Cash' && c>=t && t>0) ? `💰 CHANGE: ₱${(c-t).toFixed(2)}` : '';
 }
+
+// ============= CHECKOUT — TRACK SOLD-OUT ITEMS FOR ADMIN =============
 function checkout(){
-  const t=cart.reduce((s,x)=>s+x.p*x.q,0),c=+document.getElementById('cash').value||0;
-  if(!t)return alert('Empty cart');if(pay==='Cash'&&c<t)return alert('Insufficient cash');
-  const dt=new Date().toLocaleString('en-PH'),d=new Date().toLocaleDateString('en-PH');
-  trans.unshift({tic:tic,dt:dt,date:d,items:[...cart],total:t,pay:pay,who:user.name,shift:LAB[user.shift]||'ADMIN',voided:false});
-  tic++;SAVE();
-  alert(`✅ Ticket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${t.toFixed(2)}\nPaid: ${pay}`);
-  cart=[];updCart();document.getElementById('tic').textContent=String(tic).padStart(3,'0');
-  user.type==='admin'?(renderSales(),renderReports()):renderMyTrans();
+  const t = cart.reduce((s,x)=>s+x.p*x.q,0);
+  const c = +document.getElementById('cash').value || 0;
+  if(!t)return alert('⚠️ Cart is empty!');
+  if(pay==='Cash' && c<t)return alert('⚠️ Insufficient cash!');
+
+  const dt = new Date().toLocaleString('en-PH');
+  const d = new Date().toLocaleDateString('en-PH');
+
+  // Deduct stock & RECORD ALERT if insufficient stock (FOR ADMIN MONITORING)
+  cart.forEach(x=>{
+    let found = stk.find(s=>s.n.trim().toLowerCase() === x.n.trim().toLowerCase());
+    if(!found){
+      const src = PROD[Object.keys(PROD).find(k=>PROD[k].some(p=>p.n===x.n))];
+      const prod = src?.find(p=>p.n===x.n);
+      if(prod) found = {n:prod.n,qty:prod.stock,cost:0,dt:new Date().toLocaleString('en-PH')};
+    }
+    if(found){
+      // ⚠️ RECORD ALERT if selling more than available — FOR ADMIN'S EYES ONLY
+      if(found.qty < x.q){
+        stockAlerts.unshift({
+          dt: dt, date: d,
+          item: x.n, soldQty: x.q, availQty: found.qty,
+          cashier: user.name, shift: LAB[user.shift]||'ADMIN', ticket: tic
+        });
+      }
+      found.qty = Math.max(0, found.qty - x.q);
+    }
+  });
+
+  trans.unshift({
+    tic: tic, dt: dt, date: d,
+    items: [...cart], total: t, pay: pay,
+    who: user.name, shift: LAB[user.shift]||'ADMIN', voided: false
+  });
+  tic++; SAVE();
+
+  alert(`✅ SALE SAVED!\n━━━━━━━━━━━━━━━━━\nTicket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${t.toFixed(2)}\nPayment: ${pay}`);
+  cart=[]; updCart();
+  document.getElementById('tic').textContent = String(tic).padStart(3,'0');
+
+  user.type==='admin' ? (renderAllSales(),renderStocks(),renderAllReports(),renderStockAlerts()) : renderMyTrans();
 }
+
+// ============= VIEW SWITCHING =============
 function showView(v){
-  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));event.target.classList.add('active');
-  document.getElementById('vpos').classList.add('hidden');document.getElementById('vmytrans').classList.add('hidden');document.getElementById('vsales').classList.add('hidden');
-  document.getElementById('vstocks').classList.add('hidden');document.getElementById('vreports').classList.add('hidden');
-  document.getElementById('v'+v).classList.remove('hidden');
-  if(v==='mytrans')renderMyTrans();if(v==='sales')renderSales();if(v==='stocks')renderStocks();if(v==='reports')renderReports();
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('vpos').classList.add('hidden');
+  document.getElementById('vmytrans').classList.add('hidden');
+  document.getElementById('vshift').classList.add('hidden');
+  document.getElementById('vitems').classList.add('hidden');
+  document.getElementById('vallsales').classList.add('hidden');
+  document.getElementById('vstocks').classList.add('hidden');
+  document.getElementById('vallreports').classList.add('hidden');
+  document.getElementById('verrors').classList.add('hidden');
+
+  if(v==='pos'){document.getElementById('vpos').classList.remove('hidden');renderProducts();}
+  else if(v==='mytrans'){document.getElementById('vmytrans').classList.remove('hidden');renderMyTrans();}
+  else if(v==='shift'){document.getElementById('vshift').classList.remove('hidden');renderShiftInfo();}
+  else if(v==='items'){document.getElementById('vitems').classList.remove('hidden');renderItemsList();}
+  else if(v==='allsales'){document.getElementById('vallsales').classList.remove('hidden');renderAllSales();}
+  else if(v==='stocks'){document.getElementById('vstocks').classList.remove('hidden');renderStocks();}
+  else if(v==='allreports'){document.getElementById('vallreports').classList.remove('hidden');renderAllReports();}
+  else if(v==='errors'){document.getElementById('verrors').classList.remove('hidden');renderStockAlerts();}
+}
+
+// ============= CASHIER VIEWS =============
+function renderShiftInfo(){
+  document.getElementById('sname').textContent = user.name;
+  document.getElementById('sshift').textContent = LAB[user.shift];
+  document.getElementById('sstart').textContent = user.startTime.toLocaleString('en-PH');
+  document.getElementById('stic').textContent = String(tic).padStart(3,'0');
 }
 function renderMyTrans(){
-  const mt=trans.filter(x=>x.who===user.name);
-  let sum=0,vd=0;mt.forEach(x=>x.voided?vd++:sum+=x.total);
-  document.getElementById('myamt').textContent=sum.toFixed(2);document.getElementById('myvoid').textContent=vd;
-  document.getElementById('mtbody').innerHTML=mt.length?mt.map(x=>{
-    let cl={Cash:'cash',GCash:'gcash',Grab:'grab',FoodPanda:'fp'}[x.pay];if(x.voided)cl='void';
-    return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length}</td><td>₱${x.total.toFixed(2)}</td><td><span class="tag ${cl}">${x.pay}</span></td><td>${x.voided?'❌ VOIDED':'✅ COUNTED'}</td></tr>`;
-  }).join(''):'<tr><td colspan="6" class="empty">No transactions yet</td></tr>';
+  const mt = trans.filter(x=>x.who===user.name);
+  let sum=0,vd=0;
+  mt.forEach(x=>x.voided?vd++:sum+=x.total);
+  document.getElementById('myamt').textContent = sum.toFixed(2);
+  document.getElementById('myvoid').textContent = vd;
+  document.getElementById('mtbody').innerHTML = mt.length ? mt.map(x=>{
+    let cl = {Cash:'cash',GCash:'gcash',Grab:'grab',FoodPanda:'fp'}[x.pay];
+    if(x.voided)cl='void';
+    return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${x.total.toFixed(2)}</td><td><span class="tag ${cl}">${x.pay}</span></td><td>${x.voided?'❌ VOIDED':'✅ COUNTED'}</td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="empty">No transactions yet</td></tr>';
 }
+
+// ============= ADMIN — VOID & SALES =============
 function voidTrans(n){
-  if(!confirm(`Void Ticket #${String(n).padStart(3,'0')}? NOT counted in sales!`))return;
-  const r=trans.find(x=>x.tic===n);if(r){r.voided=true;SAVE();renderSales();renderMyTrans();alert('✅ VOIDED — Cashier NOT short!')}
+  if(!confirm(`⚠️ VOID Ticket #${String(n).padStart(3,'0')}?\n• NOT counted in sales\n• Cashier NOT short\n• Stock NOT auto-restored`))return;
+  const r = trans.find(x=>x.tic===n);
+  if(r){r.voided=true;SAVE();alert('✅ TRANSACTION VOIDED — Cashier NOT short!');renderAllSales();renderMyTrans();}
 }
-function renderSales(){
-  const td=new Date().toLocaleDateString('en-PH');
+function renderAllSales(){
+  const td = new Date().toLocaleDateString('en-PH');
   let dsum=0,ssum=0,vsum=0;
   trans.forEach(x=>{
-    if(x.voided)vsum+=x.total;else{if(x.date===td)dsum+=x.total;if(x.shift===LAB[user.shift])ssum+=x.total;}
+    if(x.voided){vsum+=x.total;return;}
+    if(x.date===td)dsum+=x.total;
+    if(user.shift && x.shift===LAB[user.shift])ssum+=x.total;
   });
-  document.getElementById('dsale').textContent=dsum.toFixed(2);document.getElementById('ssale').textContent=ssum.toFixed(2);document.getElementById('vsum').textContent=vsum.toFixed(2);
-  document.getElementById('stbody').innerHTML=trans.length?trans.map(x=>{
-    let cl={Cash:'cash',GCash:'gcash',Grab:'grab',FoodPanda:'fp'}[x.pay];if(x.voided)cl='void';
-    return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length}</td><td>₱${x.total.toFixed(2)}</td><td><span class="tag ${cl}">${x.pay}</span></td><td>${x.who}</td><td>${x.voided?'❌ VOIDED':`<button onclick="voidTrans(${x.tic})">VOID</button>`}</td></tr>`;
-  }).join(''):'<tr><td colspan="7" class="empty">No transactions</td></tr>';
+  document.getElementById('dsale').textContent = dsum.toFixed(2);
+  document.getElementById('ssale').textContent = ssum.toFixed(2);
+  document.getElementById('vsum').textContent = vsum.toFixed(2);
+  document.getElementById('stbody').innerHTML = trans.length ? trans.map(x=>{
+    let cl = {Cash:'cash',GCash:'gcash',Grab:'grab',FoodPanda:'fp'}[x.pay];
+    if(x.voided)cl='void';
+    return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${x.total.toFixed(2)}</td><td><span class="tag ${cl}">${x.pay}</span></td><td>${x.who}</td><td>${x.shift}</td><td>${x.voided?'<span class="tag void">❌ VOIDED</span>':`<button onclick="voidTrans(${x.tic})">VOID</button>`}</td></tr>`;
+  }).join('') : '<tr><td colspan="8" class="empty">No transactions yet</td></tr>';
 }
+
+// ============= ADMIN — ITEMS LIST =============
+function renderItemsList(){
+  let rows=[];
+  Object.entries(PROD).forEach(([catName,items])=>{
+    items.forEach(it=>{
+      const inv = stk.find(s=>s.n.trim().toLowerCase()===it.n.trim().toLowerCase());
+      rows.push(`<tr><td>${catName.charAt(0).toUpperCase()+catName.slice(1)}</td><td>${it.n}</td><td>₱${it.p}</td><td>${inv?inv.qty:it.stock}</td></tr>`);
+    });
+  });
+  document.getElementById('itbody').innerHTML = rows.join('');
+}
+
+// ============= ADMIN — STOCK ALERTS MONITORING =============
+function renderStockAlerts(){
+  document.getElementById('errbody').innerHTML = stockAlerts.length ? stockAlerts.map(x=>`<tr style="background:#fff3cd">
+    <td>${x.dt}</td>
+    <td><strong>${x.item}</strong></td>
+    <td>${x.soldQty}</td>
+    <td>${x.availQty}</td>
+    <td>${x.cashier}</td>
+    <td>${x.shift}</td>
+    <td>#${String(x.ticket).padStart(3,'0')}</td>
+  </tr>`).join('') : '<tr><td colspan="7" class="empty">✅ No stock alerts. Good inventory control!</td></tr>';
+}
+
+// ============= STOCKS =============
 function stockModal(t){
-  let h=t==='in'?'Stock In':t==='transin'?'Trans-In':'Trans-Out';
-  document.getElementById('mcont').innerHTML=`<h3>${h}</h3><input id="sn" placeholder="Item Name"><input id="sq" type="number" placeholder="Qty">${t==='in'?'<input id="sc" type="number" step="0.01" placeholder="Cost">':'<input id="sr" placeholder="Remarks">'}<div style="display:flex;gap:8px;margin-top:10px"><button class="btn-green" onclick="saveStk('${t}')">Save</button><button onclick="closeMod()" style="background:#eee">Cancel</button></div>`;
+  let h=t==='in'?'📥 Stock In / Delivery':t==='transin'?'➡️ Transfer-In':'⬅️ Transfer-Out';
+  document.getElementById('mcont').innerHTML = `<h3>${h}</h3>
+    <input id="sn" placeholder="Item Name">
+    <input id="sq" type="number" placeholder="Quantity">
+    ${t==='in'?'<input id="sc" type="number" step="0.01" placeholder="Cost Price">':'<input id="sr" placeholder="Remarks / From-To">'}
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn-green" onclick="saveStk('${t}')">Save</button>
+      <button onclick="closeMod()" style="background:#eee">Cancel</button>
+    </div>`;
   document.getElementById('modal').classList.remove('hidden');
 }
 function saveStk(t){
-  const n=document.getElementById('sn').value.trim(),q=+document.getElementById('sq').value||0;
-  if(!n||q<=0)return alert('Enter name and qty');
-  const e=stk.find(x=>x.n.toLowerCase()===n.toLowerCase()),dt=new Date().toLocaleString('en-PH');
-  if(t==='in'||t==='transin')e?e.qty+=q:stk.push({n:n,qty:q,cost:+document.getElementById('sc')?.value||0,dt:dt});
-  else{if(!e)return alert('Item not found');e.qty=Math.max(0,e.qty-q)}
+  const n=document.getElementById('sn').value.trim();
+  const q=+document.getElementById('sq').value||0;
+  if(!n||q<=0)return alert('⚠️ Enter valid name and quantity');
+  const dt=new Date().toLocaleString('en-PH');
+  let e = stk.find(x=>x.n.trim().toLowerCase() === n.trim().toLowerCase());
+  if(t==='in'||t==='transin'){
+    if(e)e.qty+=q;
+    else stk.push({n:n,qty:q,cost:+document.getElementById('sc')?.value||0,dt:dt});
+  }else{
+    if(!e)return alert('❌ Item not found in stocks!');
+    e.qty = Math.max(0,e.qty-q);
+  }
   stklog.unshift({dt:dt,n:n,type:t==='in'?'Stock In':t==='transin'?'Trans-In':'Trans-Out',q:q,who:user.name});
   SAVE();closeMod();renderStocks();
 }
 function renderStocks(){
-  document.getElementById('stkbody').innerHTML=stk.length?stk.map(x=>`<tr><td>${x.n}</td><td>${x.qty}</td><td>₱${(x.cost||0).toFixed(2)}</td><td>${x.dt||'-'}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No stock</td></tr>';
-  document.getElementById('logbody').innerHTML=stklog.length?stklog.map(x=>`<tr><td>${x.dt}</td><td>${x.n}</td><td>${x.type}</td><td>${x.q}</td><td>${x.who}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">No log</td></tr>';
+  document.getElementById('stkbody').innerHTML = stk.length ? stk.map(x=>`<tr><td>${x.n}</td><td>${x.qty}</td><td>₱${(x.cost||0).toFixed(2)}</td><td>${x.dt||'-'}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">No stock records</td></tr>';
+  document.getElementById('logbody').innerHTML = stklog.length ? stklog.map(x=>`<tr><td>${x.dt}</td><td>${x.n}</td><td>${x.type}</td><td>${x.q}</td><td>${x.who}</td></tr>`).join('') : '<tr><td colspan="5" class="empty">No movements yet</td></tr>';
 }
+
+// ============= CASH OUT =============
 function cashoutModal(){
-  document.getElementById('mcont').innerHTML=`<h3>💰 Cash Out</h3><input id="coamt" type="number" step="0.01" placeholder="Amount"><input id="corem" placeholder="Remarks"><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-orange" onclick="saveCO()">Save</button><button onclick="closeMod()" style="background:#eee">Cancel</button></div>`;
+  document.getElementById('mcont').innerHTML = `<h3>💰 Cash Out / Charge</h3>
+    <input id="coamt" type="number" step="0.01" placeholder="Amount">
+    <input id="corem" placeholder="Remarks / Reason">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn-orange" onclick="saveCO()">Save</button>
+      <button onclick="closeMod()" style="background:#eee">Cancel</button>
+    </div>`;
   document.getElementById('modal').classList.remove('hidden');
 }
 function saveCO(){
-  const a=+document.getElementById('coamt').value||0,r=document.getElementById('corem').value.trim();
-  if(a<=0)return alert('Enter amount');
+  const a=+document.getElementById('coamt').value||0;
+  const r=document.getElementById('corem').value.trim();
+  if(a<=0)return alert('⚠️ Enter valid amount');
   cashout.unshift({dt:new Date().toLocaleString('en-PH'),amt:a,rem:r,who:user.name,shift:LAB[user.shift]||'ADMIN'});
-  SAVE();alert(`✅ Cash Out: ₱${a.toFixed(2)}`);closeMod();renderReports();
+  SAVE();alert(`✅ Cash Out saved: ₱${a.toFixed(2)}`);closeMod();
+  if(user.type==='admin')renderAllReports();
 }
-function renderReports(){
-  document.getElementById('cobody').innerHTML=cashout.length?cashout.map(x=>`<tr><td>${x.dt}</td><td>${x.who} (${x.shift})</td><td>₱${x.amt.toFixed(2)}</td><td>${x.rem||'-'}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No records</td></tr>';
-  const g=trans.filter(x=>x.pay==='GCash');
-  document.getElementById('gbody').innerHTML=g.length?g.map(x=>{let cl=x.voided?'❌ VOIDED':'✅ Active';return `<tr><td>${x.dt}</td><td>#${String(x.tic).padStart(3,'0')}</td><td>₱${x.total.toFixed(2)}</td><td>${x.who}</td><td>${cl}</td></tr>`}).join(''):'<tr><td colspan="5" class="empty">No GCash transactions</td></tr>';
+
+// ============= REPORTS =============
+function renderAllReports(){
+  document.getElementById('cobody').innerHTML = cashout.length ? cashout.map(x=>`<tr><td>${x.dt}</td><td>${x.who}</td><td>${x.shift}</td><td>₱${x.amt.toFixed(2)}</td><td>${x.rem||'-'}</td></tr>`).join('') : '<tr><td colspan="5" class="empty">No cash out records</td></tr>';
+  const g = trans.filter(x=>x.pay==='GCash');
+  document.getElementById('gbody').innerHTML = g.length ? g.map(x=>{
+    const st = x.voided?'❌ VOIDED':'✅ Active';
+    return `<tr><td>${x.dt}</td><td>#${String(x.tic).padStart(3,'0')}</td><td>₱${x.total.toFixed(2)}</td><td>${x.who}</td><td>${st}</td></tr>`;
+  }).join('') : '<tr><td colspan="5" class="empty">No GCash transactions</td></tr>';
 }
+
 function closeMod(){document.getElementById('modal').classList.add('hidden')}
 </script>
 </body>
