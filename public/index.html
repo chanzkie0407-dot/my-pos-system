@@ -57,7 +57,7 @@ th{background:#f9f9f9}
 </head>
 <body>
 
-<!-- LOGIN — NO PASSCODE HINTS -->
+<!-- LOGIN -->
 <div id="login" class="modal">
 <div class="mbody">
 <h2 style="text-align:center;color:#008000;margin-bottom:20px">🍔 MINUTE BURGER POS</h2>
@@ -91,11 +91,9 @@ th{background:#f9f9f9}
 <div class="topbar">
 <div><h1>🍔 Minute Burger POS</h1><small id="user"></small></div>
 <div class="nav" id="mainnav">
-  <!-- CASHIER MENU ONLY -->
   <button id="nsales" class="active" onclick="showView('pos')">🛒 Sales</button>
   <button id="nreceipts" onclick="showView('mytrans')">📋 Receipts</button>
   <button id="nshift" onclick="showView('shift')">⏱️ Shift</button>
-  <!-- ADMIN MENU ONLY -->
   <button id="nasales" class="hidden" onclick="showView('allsales')">📊 Sales</button>
   <button id="nstocks" class="hidden" onclick="showView('stocks')">📦 Stocks</button>
   <button id="nprices" class="hidden" onclick="showView('prices')">💰 Update Price</button>
@@ -156,7 +154,7 @@ th{background:#f9f9f9}
 </div>
 </div>
 
-<!-- ADMIN — SALES REPORT (PER DAY + PER SHIFT) -->
+<!-- ADMIN — SALES REPORT -->
 <div id="vallsales" class="hidden" style="padding:10px">
 <div class="summary">
 <div class="box green"><div>📅 Today Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="dsale">0.00</span></div></div>
@@ -166,9 +164,9 @@ th{background:#f9f9f9}
 <table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Cashier</th><th>Shift</th><th>Action</th></tr></thead><tbody id="stbody"></tbody></table>
 </div>
 
-<!-- ADMIN — STOCKS ON HAND + UPDATE BUTTONS -->
+<!-- ADMIN — ✅ LAHAT NG PRODUKTO LAGING NAKIKITA SA STOCKS ON HAND -->
 <div id="vstocks" class="hidden" style="padding:10px">
-<h3>📦 Stocks On Hand</h3>
+<h3>📦 Stocks On Hand — ALL PRODUCTS</h3>
 <div class="stk-box">
 <table style="margin:0"><thead><tr><th>Product Name</th><th>Current Stock</th><th>Last Updated</th></tr></thead><tbody id="stkbody"></tbody></table>
 </div>
@@ -183,7 +181,7 @@ th{background:#f9f9f9}
 <table><thead><tr><th>Date & Time</th><th>Item</th><th>Type</th><th>Qty</th><th>Updated By</th></tr></thead><tbody id="logbody"></tbody></table>
 </div>
 
-<!-- ADMIN — UPDATE PRICE PANEL -->
+<!-- ADMIN — UPDATE PRICE -->
 <div id="vprices" class="hidden" style="padding:10px">
 <h3>💰 Update Product Prices</h3>
 <p style="font-size:13px;color:#666;margin:8px 0;">📌 Updated prices will automatically appear on Cashier menu.</p>
@@ -227,11 +225,11 @@ th{background:#f9f9f9}
 </div>
 
 <script>
-// ============= UPDATED PRODUCT DATABASE =============
+// ============= UPDATED PRODUCT LIST =============
 const PROD = {
   burgers: [
     {n:'Minute Burger',p:43,stock:50},
-    {n:'Cheesy Burger',p:54,stock:54},
+    {n:'Cheesy Burger',p:54,stock:50},
     {n:'Double Minute Burger',p:66,stock:40},
     {n:'Double Cheesy Burger',p:82,stock:40},
     {n:'Chicken Time Burger',p:52,stock:50},
@@ -283,21 +281,27 @@ let cashout = JSON.parse(localStorage.getItem('cashout') || '[]');
 let stockAlerts = JSON.parse(localStorage.getItem('stockAlerts') || '[]');
 let priceLog = JSON.parse(localStorage.getItem('priceLog') || '[]');
 
-// BUILD FULL PRODUCT LIST
+// ============= BUILD FULL PRODUCT LIST =============
 function allProducts(){
   let list=[];
   Object.entries(PROD).forEach(([catName,items])=>{
-    items.forEach(x=>list.push({n:x.n,p:x.p,cat:catName}));
+    items.forEach(x=>list.push({n:x.n,p:x.p,initialStock:x.stock}));
   });
   return list.sort((a,b)=>a.n.localeCompare(b.n));
 }
 
-// INITIALIZE STOCK FROM PRODUCT DATA IF EMPTY
-function initStock(){
-  if(stk.length===0){
-    allProducts().forEach(x=>stk.push({n:x.n,qty:x.stock||50,dt:'Initial Stock'}));
-    SAVE();
-  }
+// ============= ✅ IMPORTANT: SHOW ALL PRODUCTS IN STOCKS ON HAND =============
+// EVERY product ALWAYS appears — whether updated or NOT
+function getStockAllProducts(){
+  return allProducts().map(prod=>{
+    // Find if stock was updated before; if not → use initial stock
+    const saved = stk.find(s=>s.n.trim().toLowerCase() === prod.n.trim().toLowerCase());
+    return {
+      n: prod.n,
+      qty: saved ? saved.qty : prod.initialStock,
+      dt: saved ? saved.dt : 'Initial Stock'
+    };
+  });
 }
 
 function SAVE(){
@@ -322,13 +326,11 @@ function loginCashier(){
   if(!s||!p||!n)return alert('⚠️ Fill all fields!');
   if(PASS[s]!==p)return alert('❌ Wrong passcode!');
   user={logged:true,type:'cashier',name:n,shift:s,startTime:new Date()};
-  initStock();
   start();
 }
 function loginAdmin(){
   if(document.getElementById('apass').value.trim()!==ADMIN_PASS)return alert('❌ Wrong admin password!');
   user={logged:true,type:'admin',name:'ADMIN',shift:'',startTime:new Date()};
-  initStock();
   start();
 }
 function start(){
@@ -339,7 +341,6 @@ function start(){
   document.getElementById('tic').textContent = String(tic).padStart(3,'0');
 
   const adm = user.type === 'admin';
-  // SHOW/HIDE MENUS
   document.getElementById('nsales').classList.toggle('hidden',adm);
   document.getElementById('nreceipts').classList.toggle('hidden',adm);
   document.getElementById('nshift').classList.toggle('hidden',adm);
@@ -409,7 +410,7 @@ function calcChange(){
   document.getElementById('chg').innerHTML = (pay==='Cash' && c>=t && t>0) ? `💰 CHANGE: ₱${(c-t).toFixed(2)}` : '';
 }
 
-// ============= CHECKOUT — TRACK STOCK ALERTS =============
+// ============= CHECKOUT =============
 function checkout(){
   const t = cart.reduce((s,x)=>s+x.p*x.q,0);
   const c = +document.getElementById('cash').value || 0;
@@ -419,18 +420,27 @@ function checkout(){
   const dt = new Date().toLocaleString('en-PH');
   const d = new Date().toLocaleDateString('en-PH');
 
-  // Deduct stock & RECORD ALERT if insufficient
+  // Deduct stock — get from ALL products first
+  const allStk = getStockAllProducts();
   cart.forEach(x=>{
-    let found = stk.find(s=>s.n.trim().toLowerCase() === x.n.trim().toLowerCase());
+    const found = allStk.find(s=>s.n.trim().toLowerCase() === x.n.trim().toLowerCase());
     if(found){
-      if(found.qty < x.q){
+      const currQty = found.qty;
+      if(currQty < x.q){
         stockAlerts.unshift({
           dt: dt, date: d,
-          item: x.n, soldQty: x.q, availQty: found.qty,
+          item: x.n, soldQty: x.q, availQty: currQty,
           cashier: user.name, shift: LAB[user.shift]||'ADMIN', ticket: tic
         });
       }
-      found.qty = Math.max(0, found.qty - x.q);
+      // Save new qty to stk array
+      let saved = stk.find(s=>s.n.trim().toLowerCase() === x.n.trim().toLowerCase());
+      if(!saved){
+        saved = {n:x.n,qty:0,dt:dt};
+        stk.push(saved);
+      }
+      saved.qty = Math.max(0, currQty - x.q);
+      saved.dt = dt;
     }
   });
 
@@ -514,7 +524,7 @@ function renderAllSales(){
   }).join('') : '<tr><td colspan="8" class="empty">No transactions yet</td></tr>';
 }
 
-// ============= ADMIN — UPDATE PRICE SYSTEM =============
+// ============= ADMIN — UPDATE PRICE =============
 function renderPriceDropdown(){
   const sel = document.getElementById('priceItem');
   if(!sel)return;
@@ -536,18 +546,13 @@ function saveNewPrice(){
   if(!n||newP<=0)return alert('⚠️ Select product and enter valid price!');
   if(newP===oldP)return alert('⚠️ New price is same as current price!');
 
-  // UPDATE PRICE IN MAIN PRODUCT DATABASE
   let found = false;
   Object.entries(PROD).forEach(([catName,items])=>{
     const prod = items.find(x=>x.n===n);
-    if(prod){
-      prod.p = newP;
-      found = true;
-    }
+    if(prod){prod.p=newP;found=true;}
   });
   if(!found)return alert('❌ Product not found!');
 
-  // LOG PRICE CHANGE
   const dt = new Date().toLocaleString('en-PH');
   priceLog.unshift({item:n,oldPrice:oldP,newPrice:newP,dt:dt,who:user.name});
   SAVE();
@@ -563,15 +568,25 @@ function renderPriceLog(){
   document.getElementById('pricelog').innerHTML = priceLog.length ? priceLog.map(x=>`<tr><td>${x.item}</td><td>₱${x.oldPrice}</td><td><strong>₱${x.newPrice}</strong></td><td>${x.dt}</td><td>${x.who}</td></tr>`).join('') : '<tr><td colspan="5" class="empty">No price changes yet</td></tr>';
 }
 
-// ============= ADMIN — STOCK UPDATE MODAL =============
+// ============= ✅ ADMIN — STOCKS ON HAND: ALL PRODUCTS ALWAYS SHOW =============
+function renderStocks(){
+  // GET ALL PRODUCTS — use saved stock or initial stock if never updated
+  const allStocks = getStockAllProducts();
+  document.getElementById('stkbody').innerHTML = allStocks.length ? allStocks.map(x=>`<tr><td><strong>${x.n}</strong></td><td>${x.qty}</td><td>${x.dt}</td></tr>`).join('') : '<tr><td colspan="3" class="empty">No products</td></tr>';
+
+  // Render movement log below
+  document.getElementById('logbody').innerHTML = stklog.length ? stklog.map(x=>`<tr><td>${x.dt}</td><td>${x.n}</td><td>${x.type}</td><td>${x.q}</td><td>${x.who}</td></tr>`).join('') : '<tr><td colspan="5" class="empty">No movements yet</td></tr>';
+}
+
+// ============= STOCK UPDATE MODAL =============
 let stockUpdateType='';
 function stockModal(t){
   stockUpdateType=t;
   const labels = {
-    delivery: {title:'📥 DELIVERY — Add Stocks from Warehouse',sign:'+',color:'#00a000'},
-    transin: {title:'➡️ TRANS IN — Add Stocks from Other Store',sign:'+',color:'#00a000'},
-    transout: {title:'⬅️ TRANS OUT — Remove Stocks to Other Store',sign:'-',color:'#d32f2f'},
-    spoil: {title:'🗑️ SPOIL — Remove Spoiled/Damaged Stocks',sign:'-',color:'#d32f2f'}
+    delivery: {title:'📥 DELIVERY — Add Stocks from Warehouse',sign:'+'},
+    transin: {title:'➡️ TRANS IN — Add Stocks from Other Store',sign:'+'},
+    transout: {title:'⬅️ TRANS OUT — Remove Stocks to Other Store',sign:'-'},
+    spoil: {title:'🗑️ SPOIL — Remove Spoiled/Damaged Stocks',sign:'-'}
   };
   const info = labels[t];
   const opts = allProducts().map(x=>`<option value="${x.n}">${x.n}</option>`).join('');
@@ -601,7 +616,9 @@ function stockModal(t){
 function calcStockTotal(){
   const n = document.getElementById('selItem').value;
   if(!n){document.getElementById('curr').value='';document.getElementById('newtotal').textContent='0';return;}
-  let found = stk.find(x=>x.n.trim().toLowerCase() === n.trim().toLowerCase());
+  // Get current stock from ALL products logic
+  const allStocks = getStockAllProducts();
+  const found = allStocks.find(x=>x.n.trim().toLowerCase() === n.trim().toLowerCase());
   const currQty = found ? found.qty : 0;
   document.getElementById('curr').value = currQty;
   const q = +document.getElementById('qty').value || 0;
@@ -617,18 +634,20 @@ function saveStockUpdate(){
   if(!n||q<=0)return alert('⚠️ Select product and enter valid quantity!');
 
   const dt = new Date().toLocaleString('en-PH');
-  let found = stk.find(x=>x.n.trim().toLowerCase() === n.trim().toLowerCase());
-  if(!found){
-    found = {n:n,qty:0,cost:0,dt:dt};
-    stk.push(found);
-  }
+  const allStocks = getStockAllProducts();
+  const found = allStocks.find(x=>x.n.trim().toLowerCase() === n.trim().toLowerCase());
+  const currQty = found ? found.qty : 0;
 
   let newQty = 0;
-  if(stockUpdateType==='delivery'||stockUpdateType==='transin') newQty = found.qty + q;
-  else newQty = Math.max(0, found.qty - q);
+  if(stockUpdateType==='delivery'||stockUpdateType==='transin') newQty = currQty + q;
+  else newQty = Math.max(0, currQty - q);
 
-  found.qty = newQty;
-  found.dt = dt;
+  // Save to stk array
+  let saved = stk.find(s=>s.n.trim().toLowerCase() === n.trim().toLowerCase());
+  if(!saved) saved = {n:n,qty:0,dt:dt};
+  saved.qty = newQty;
+  saved.dt = dt;
+  if(!stk.some(s=>s.n.trim().toLowerCase() === n.trim().toLowerCase())) stk.push(saved);
 
   const typeLabels = {delivery:'Delivery',transin:'Trans-In',transout:'Trans-Out',spoil:'Spoil'};
   stklog.unshift({dt:dt,n:n,type:typeLabels[stockUpdateType],q:q,who:user.name});
@@ -637,12 +656,6 @@ function saveStockUpdate(){
   alert(`✅ STOCK UPDATED!\n━━━━━━━━━━━━━━━━━\nProduct: ${n}\nQty: ${q}\nNew Total: ${newQty}`);
   closeMod();
   renderStocks();
-}
-
-// ============= ADMIN — STOCK LIST & LOG =============
-function renderStocks(){
-  document.getElementById('stkbody').innerHTML = stk.length ? stk.map(x=>`<tr><td>${x.n}</td><td>${x.qty}</td><td>${x.dt||'-'}</td></tr>`).join('') : '<tr><td colspan="3" class="empty">No stock records — use Delivery to add</td></tr>';
-  document.getElementById('logbody').innerHTML = stklog.length ? stklog.map(x=>`<tr><td>${x.dt}</td><td>${x.n}</td><td>${x.type}</td><td>${x.q}</td><td>${x.who}</td></tr>`).join('') : '<tr><td colspan="5" class="empty">No movements yet</td></tr>';
 }
 
 // ============= ADMIN — STOCK ALERTS =============
