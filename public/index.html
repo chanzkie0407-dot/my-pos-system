@@ -1,368 +1,825 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Minute Burger POS</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#f7f7f7}
-.hidden{display:none!important}
-button{border:none;border-radius:8px;padding:10px;cursor:pointer;font-size:14px}
-input,select{border:2px solid #ddd;border-radius:8px;padding:10px;width:100%;margin:4px 0 10px}
-table{width:100%;border-collapse:collapse;margin-top:8px}
-th,td{padding:8px;text-align:left;border-bottom:1px solid #eee;font-size:13px}
-th{background:#f9f9f9}
-.tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:bold}
-.tag.cash{background:#e8f5e9;color:#2e7d32}
-.tag.gcash{background:#e3f2fd;color:#1565c0}
-.tag.grab{background:#fff3e0;color:#e65100}
-.tag.fp{background:#f3e5f5;color:#7b1fa2}
-.tag.bank{background:#e8eaf6;color:#283593}
-.tag.ewallet{background:#fce4ec;color:#ad1457}
-.tag.split{background:#e0f2f1;color:#00695c}
-.tag.void{background:#ffebee;color:#c62828}
-.empty{text-align:center;color:#999;padding:20px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
-.card{background:#fff;border-radius:8px;padding:10px;text-align:center;cursor:pointer}
-.topbar{background:#fff;padding:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4px #0001;position:sticky;top:0;flex-wrap:wrap;gap:8px}
-.nav{display:flex;gap:4px;flex-wrap:wrap}
-.nav button{padding:6px 10px;font-size:13px;background:#f0f0f0}
-.nav button.active{background:#00a000;color:#fff}
-.panels{display:flex;flex-wrap:wrap}
-.prod{flex:1;padding:10px}
-.cart{width:360px;padding:10px;background:#fff;border-left:1px solid #eee}
-.cat{display:flex;gap:4px;margin-bottom:10px;overflow-x:auto}
-.cat button{background:#fff;border:2px solid #eee}
-.cat button.active{background:#00a000;color:#fff;border-color:#00a000}
-.total{font-size:20px;font-weight:bold;text-align:right;padding:10px 0;border-top:2px solid #eee;margin:10px 0}
-.pay{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
-.pay button.selected{background:#e8f5e9;color:#008000;border:2px solid #00a000}
-.btn-green{background:#00a000;color:#fff;width:100%;font-weight:bold}
-.btn-orange{background:#ff9800;color:#fff;width:100%}
-.btn-red{background:#d32f2f;color:#fff;width:100%}
-.btn-sm{padding:6px 10px;font-size:13px;width:auto;margin:2px}
-.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
-.box{background:#fff;padding:10px;border-radius:8px;text-align:center}
-.green{color:#2e7d32}.red{color:#c62828}.blue{color:#1565c0}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;padding:15px;z-index:999}
-.mbody{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto}
-.stk-box{background:#e8f5e9;padding:12px;border-radius:8px;margin:10px 0}
-.lbl{font-size:13px;color:#555;font-weight:bold}
-.hint{font-size:12px;color:#888;margin-top:-6px;margin-bottom:10px}
-.discount-bar{display:flex;gap:6px;margin:8px 0}
-.discount-bar button{flex:1;padding:6px;font-size:12px;background:#f0f0f0}
-.discount-bar button.applied{background:#ff9800;color:#fff}
-.split-row{display:flex;gap:6px;align-items:center;margin:6px 0}
-.split-row input,.split-row select{flex:1;margin:0}
-.online-indicator{display:inline-block;width:10px;height:10px;border-radius:50%;background:#4caf50;margin-right:6px}
-.online-indicator.offline{background:#f44336}
-.shift-group{margin-bottom:20px;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}
-.shift-group h4{background:#f5f5f5;padding:8px 12px;margin:0;border-bottom:1px solid #e0e0e0}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Minute Burger POS</title>
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+        body {background:#f7f7f7}
+        .hidden {display:none !important}
+        button {border:none;border-radius:8px;padding:10px;cursor:pointer;font-size:14px}
+        input, select {border:2px solid #ddd;border-radius:8px;padding:10px;width:100%;margin:4px 0 10px}
+        table {width:100%;border-collapse:collapse;margin-top:8px}
+        th, td {padding:8px;text-align:left;border-bottom:1px solid #eee;font-size:13px}
+        th {background:#f9f9f9}
+        .tag {display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:bold}
+        .tag.cash {background:#e8f5e9;color:#2e7d32}
+        .tag.gcash {background:#e3f2fd;color:#1565c0}
+        .tag.grab {background:#fff3e0;color:#e65100}
+        .tag.fp {background:#f3e5f5;color:#7b1fa2}
+        .tag.bank {background:#e8eaf6;color:#283593}
+        .tag.ewallet {background:#fce4ec;color:#ad1457}
+        .tag.split {background:#e0f2f1;color:#00695c}
+        .tag.void {background:#ffebee;color:#c62828}
+        .empty {text-align:center;color:#999;padding:20px}
+        .grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+        .card {background:#fff;border-radius:8px;padding:10px;text-align:center;cursor:pointer}
+        .topbar {background:#fff;padding:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4px #0001;position:sticky;top:0;flex-wrap:wrap;gap:8px}
+        .nav {display:flex;gap:4px;flex-wrap:wrap}
+        .nav button {padding:6px 10px;font-size:13px;background:#f0f0f0}
+        .nav button.active {background:#00a000;color:#fff}
+        .panels {display:flex;flex-wrap:wrap}
+        .prod {flex:1;padding:10px}
+        .cart {width:360px;padding:10px;background:#fff;border-left:1px solid #eee}
+        .cat {display:flex;gap:4px;margin-bottom:10px;overflow-x:auto}
+        .cat button {background:#fff;border:2px solid #eee}
+        .cat button.active {background:#00a000;color:#fff;border-color:#00a000}
+        .total {font-size:20px;font-weight:bold;text-align:right;padding:10px 0;border-top:2px solid #eee;margin:10px 0}
+        .pay {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+        .pay button.selected {background:#e8f5e9;color:#008000;border:2px solid #00a000}
+        .btn-green {background:#00a000;color:#fff;width:100%;font-weight:bold}
+        .btn-orange {background:#ff9800;color:#fff;width:100%}
+        .btn-red {background:#d32f2f;color:#fff;width:100%}
+        .btn-sm {padding:6px 10px;font-size:13px;width:auto;margin:2px}
+        .summary {display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+        .box {background:#fff;padding:10px;border-radius:8px;text-align:center}
+        .green {color:#2e7d32}
+        .red {color:#c62828}
+        .blue {color:#1565c0}
+        .modal {position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;padding:15px;z-index:999}
+        .mbody {background:#fff;border-radius:12px;padding:20px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto}
+        .stk-box {background:#e8f5e9;padding:12px;border-radius:8px;margin:10px 0}
+        .lbl {font-size:13px;color:#555;font-weight:bold}
+        .hint {font-size:12px;color:#888;margin-top:-6px;margin-bottom:10px}
+        .discount-bar {display:flex;gap:6px;margin:8px 0}
+        .discount-bar button {flex:1;padding:6px;font-size:12px;background:#f0f0f0}
+        .discount-bar button.applied {background:#ff9800;color:#fff}
+        .split-row {display:flex;gap:6px;align-items:center;margin:6px 0}
+        .split-row input, .split-row select {flex:1;margin:0}
+        .online-indicator {display:inline-block;width:10px;height:10px;border-radius:50%;background:#4caf50;margin-right:6px}
+        .online-indicator.offline {background:#f44336}
+        .shift-group {margin-bottom:20px;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden}
+        .shift-group h4 {background:#f5f5f5;padding:8px 12px;margin:0;border-bottom:1px solid #e0e0e0}
+    </style>
 </head>
 <body>
+
 <!-- LOGIN -->
 <div id="login" class="modal">
-<div class="mbody">
-<h2 style="text-align:center;color:#008000;margin-bottom:20px">🍔 MINUTE BURGER POS</h2>
-<select id="loginType" onchange="showForm(this.value)">
-  <option value="">-- Select Login Type --</option>
-  <option value="cashier">Cashier</option>
-  <option value="admin">Admin</option>
-</select>
-<div id="cform" class="hidden">
-<input type="text" id="name" placeholder="Cashier Name">
-<input type="password" id="pass" placeholder="Passcode" maxlength="4" oninput="detectShift(this.value)">
-<div class="hint">ⓘ 1111=Morning | 2222=Swing | 3333=Graveyard</div>
-<div style="font-weight:bold;margin:6px 0;color:#008000" id="shiftInfo"></div>
-<button class="btn-green" onclick="loginCashier()">✅ Start Shift</button>
+    <div class="mbody">
+        <h2 style="text-align:center;color:#008000;margin-bottom:20px">🍔 MINUTE BURGER POS</h2>
+        <select id="loginType" onchange="showForm(this.value)">
+            <option value="">-- Select Login Type --</option>
+            <option value="cashier">Cashier</option>
+            <option value="admin">Admin</option>
+        </select>
+
+        <!-- CASHIER FORM -->
+        <div id="cform" class="hidden">
+            <input type="text" id="name" placeholder="Cashier Name">
+            <input type="password" id="pass" placeholder="Passcode" maxlength="4" oninput="detectShift(this.value)">
+            <div class="hint">ⓘ 1111=Morning | 2222=Swing | 3333=Graveyard</div>
+            <div style="font-weight:bold;margin:6px 0;color:#008000" id="shiftInfo"></div>
+            <button class="btn-green" onclick="loginCashier()">✅ Start Shift</button>
+        </div>
+
+        <!-- ADMIN FORM -->
+        <div id="aform" class="hidden">
+            <input type="password" id="apass" placeholder="Admin Password">
+            <button class="btn-green" onclick="loginAdmin()">🔐 Login as Admin</button>
+        </div>
+    </div>
 </div>
-<div id="aform" class="hidden">
-<input type="password" id="apass" placeholder="Admin Password">
-<button class="btn-green" onclick="loginAdmin()">🔐 Login as Admin</button>
-</div>
-</div>
-</div>
+
 <!-- MAIN APP -->
 <div id="app" class="hidden">
-<div class="topbar">
-<div><h1>🍔 Minute Burger POS <span id="netStatus" class="online-indicator"></span></h1><small id="user"></small></div>
-<div class="nav">
-  <button id="nsales" class="active" onclick="showView('pos', this)">🛒 Sales</button>
-  <button id="nreceipts" onclick="showView('mytrans', this)">📋 Receipts</button>
-  <button id="nshift" onclick="showView('shift', this)">⏱️ Shift</button>
-  <button id="nasales" class="hidden" onclick="showView('allsales', this)">📊 Sales Report</button>
-  <button id="nproductsales" class="hidden" onclick="showView('productsales', this)">📈 Product Sales</button>
-  <button id="nstocks" class="hidden" onclick="showView('stocks', this)">📦 Stocks</button>
-  <button id="nprices" class="hidden" onclick="showView('prices', this)">💰 Update Price</button>
-  <button id="npaymentsettings" class="hidden" onclick="showView('payments', this)">🏦 Payment Setup</button>
-  <button id="nalerts" class="hidden" onclick="showView('errors', this)">⚠️ Stock Alerts</button>
-  <button id="nreports" class="hidden" onclick="showView('cashlog', this)">💰 Cash Log</button>
-  <button onclick="logout()">🚪 Logout</button>
+    <div class="topbar">
+        <div><h1>🍔 Minute Burger POS <span id="netStatus" class="online-indicator"></span></h1><small id="user"></small></div>
+        <div class="nav">
+            <button id="nsales" class="active" onclick="showView('pos', this)">🛒 Sales</button>
+            <button id="nreceipts" onclick="showView('mytrans', this)">📋 Receipts</button>
+            <button id="nshift" onclick="showView('shift', this)">⏱️ Shift</button>
+            <button id="nasales" class="hidden" onclick="showView('allsales', this)">📊 Sales Report</button>
+            <button id="nproductsales" class="hidden" onclick="showView('productsales', this)">📈 Product Sales</button>
+            <button id="nstocks" class="hidden" onclick="showView('stocks', this)">📦 Stocks</button>
+            <button id="nprices" class="hidden" onclick="showView('prices', this)">💰 Update Price</button>
+            <button id="npaymentsettings" class="hidden" onclick="showView('payments', this)">🏦 Payment Setup</button>
+            <button id="nalerts" class="hidden" onclick="showView('errors', this)">⚠️ Stock Alerts</button>
+            <button id="nreports" class="hidden" onclick="showView('cashlog', this)">💰 Cash Log</button>
+            <button onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <!-- POS SCREEN -->
+    <div id="vpos" class="panels hidden">
+        <div class="prod">
+            <div class="cat">
+                <button class="active" onclick="setCat('burgers', this)">🍔 Burgers</button>
+                <button onclick="setCat('premium', this)">⭐ Premium</button>
+                <button onclick="setCat('hotdogs', this)">🌭 Hotdogs</button>
+                <button onclick="setCat('drinks', this)">🥤 Drinks</button>
+                <button onclick="setCat('extras', this)">🧂 Extras</button>
+            </div>
+            <div class="grid" id="pgrid"></div>
+        </div>
+        <div class="cart">
+            <h3>🧾 Ticket #<span id="tic">001</span></h3>
+            <div class="discount-bar">
+                <button id="btnSr" onclick="toggleDisc('sr')">👴 Senior</button>
+                <button id="btnPwd" onclick="toggleDisc('pwd')">♿ PWD</button>
+                <button onclick="toggleDisc('none')">❌ Remove</button>
+            </div>
+            <div style="font-size:12px;color:#666;margin-bottom:6px" id="discNote"></div>
+            <div id="clist" style="margin:10px 0;max-height:200px;overflow:auto"></div>
+            <div class="total">
+                Subtotal: ₱<span id="subtotal">0.00</span><br>
+                <span id="discLine" class="hidden" style="color:green">Discount: -₱<span id="discAmt">0.00</span></span><br>
+                <strong>TOTAL: ₱<span id="gtotal">0.00</span></strong>
+            </div>
+            <div class="pay">
+                <button class="selected" onclick="setPay('Cash', this)">💵 Cash</button>
+                <button onclick="setPay('GCash', this)">📱 GCash</button>
+                <button id="bankBtn" class="hidden" onclick="setPay('Bank', this)">🏦 Bank</button>
+                <button id="ewalletBtn" class="hidden" onclick="setPay('EWallet', this)">💳 E-Wallet</button>
+                <button onclick="setPay('Grab', this)">🛵 Grab</button>
+                <button onclick="setPay('FoodPanda', this)">🐼 FoodPanda</button>
+            </div>
+            <div style="background:#f5f5f5;padding:8px;border-radius:6px;margin:8px 0">
+                <label style="font-size:13px;font-weight:bold">💱 Split Payment</label>
+                <div class="split-row">
+                    <select id="pay1">
+                        <option value="Cash">Cash</option>
+                        <option value="GCash">GCash</option>
+                        <option value="Bank">Bank</option>
+                        <option value="EWallet">E-Wallet</option>
+                    </select>
+                    <input type="number" id="amt1" placeholder="Amount" oninput="calcSplit()">
+                </div>
+                <div style="font-size:13px">Remaining: ₱<span id="amt2">0.00</span></div>
+            </div>
+            <div id="accSel" class="hidden" style="margin:8px 0">
+                <label class="lbl">Send To:</label>
+                <select id="acc"></select>
+            </div>
+            <input type="number" id="cashIn" placeholder="Cash Received" oninput="calcChange()">
+            <div style="font-weight:bold;padding:8px;background:#e3f2fd;border-radius:6px;margin-top:6px" id="change"></div>
+            <br>
+            <button class="btn-green" onclick="checkout()">💾 SAVE</button><br><br>
+            <button class="btn-orange" onclick="cashOutModal()">💰 CHARGE / CASH OUT</button>
+        </div>
+    </div>
+
+    <!-- MY TRANSACTIONS -->
+    <div id="vmytrans" class="hidden" style="padding:10px">
+        <div class="summary">
+            <div class="box blue"><div>Shift Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="myAmt">0.00</span></div></div>
+            <div class="box red"><div>Voided</div><div style="font-size:18px;font-weight:bold" id="myVoid">0</div></div>
+        </div>
+        <table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Status</th></tr></thead>
+        <tbody id="myTbody"></tbody></table>
+    </div>
+
+    <!-- SHIFT INFO -->
+    <div id="vshift" class="hidden" style="padding:10px">
+        <div class="box" style="background:#e8f5e9">
+            <h3>⏱️ Shift Info</h3>
+            <p><strong>Cashier:</strong> <span id="sName"></span></p>
+            <p><strong>Shift:</strong> <span id="sLabel"></span></p>
+            <p><strong>Started:</strong> <span id="sStart"></span></p>
+            <p><strong>Ticket #:</strong> #<span id="sTic"></span></p>
+        </div>
+    </div>
+
+    <!-- ALL SALES REPORT -->
+    <div id="vallsales" class="hidden" style="padding:10px">
+        <div class="summary">
+            <div class="box green"><div>📅 Today Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="daySale">0.00</span></div></div>
+            <div class="box blue"><div>⏱️ Shift Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="shiftSale">0.00</span></div></div>
+            <div class="box red"><div>❌ Voided</div><div style="font-size:18px;font-weight:bold">₱<span id="voidSum">0.00</span></div></div>
+        </div>
+        <table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Cashier</th><th>Shift</th><th>Action</th></tr></thead>
+        <tbody id="allTbody"></tbody></table>
+    </div>
+
+    <!-- PRODUCT SALES -->
+    <div id="vproductsales" class="hidden" style="padding:10px">
+        <h3>📈 Product Sales by Shift</h3>
+        <div id="prodReport"></div>
+    </div>
+
+    <!-- STOCKS -->
+    <div id="vstocks" class="hidden" style="padding:10px">
+        <h3>📦 Stocks On Hand</h3>
+        <div class="stk-box">
+            <table><thead><tr><th>Product</th><th>Stock</th><th>Updated</th></tr></thead>
+            <tbody id="stkTbody"></tbody></table>
+        </div>
+        <div style="margin:10px 0">
+            <button class="btn-green btn-sm" onclick="stockIn('delivery')">📥 Delivery</button>
+            <button class="btn-green btn-sm" onclick="stockIn('transfer')">➡️ Trans In</button>
+            <button class="btn-orange btn-sm" onclick="stockOut('transfer')">⬅️ Trans Out</button>
+            <button class="btn-red btn-sm" onclick="stockOut('spoil')">🗑️ Spoil</button>
+        </div>
+        <h4>📜 Stock Log</h4>
+        <table><thead><tr><th>Date</th><th>Item</th><th>Type</th><th>Qty</th><th>By</th></tr></thead>
+        <tbody id="stkLog"></tbody></table>
+    </div>
+
+    <!-- PRICE UPDATE -->
+    <div id="vprices" class="hidden" style="padding:10px">
+        <h3>💰 Update Product Prices</h3>
+        <select id="prodSel" onchange="showPrice()">
+            <option value="">-- Select Product --</option>
+        </select>
+        <div class="stk-box">
+            <div class="lbl">Current Price:</div><input id="curPrice" type="number" readonly style="background:#f0f0f0">
+            <div class="lbl">New Price:</div><input id="newPrice" type="number" step="1" placeholder="Enter New Price">
+        </div>
+        <button class="btn-green" onclick="savePrice()">✅ UPDATE PRICE</button>
+        <table style="margin-top:20px"><thead><tr><th>Product</th><th>Old</th><th>New</th><th>Date</th><th>By</th></tr></thead>
+        <tbody id="priceLog"></tbody></table>
+    </div>
+
+    <!-- PAYMENT SETUP -->
+    <div id="vpayments" class="hidden" style="padding:10px">
+        <h3>🏦 Bank & E-Wallet Accounts</h3>
+        <div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:15px">
+            <select id="accType">
+                <option value="Bank">🏦 Bank</option>
+                <option value="GCash">📱 GCash</option>
+                <option value="EWallet">💳 E-Wallet</option>
+            </select>
+            <input type="text" id="accName" placeholder="Account Name">
+            <input type="text" id="accNum" placeholder="Account/Number">
+            <button class="btn-green" onclick="saveAcc()">✅ Save</button>
+        </div>
+        <table><thead><tr><th>Type</th><th>Name</th><th>Number</th><th>Action</th></tr></thead>
+        <tbody id="accTbody"></tbody></table>
+    </div>
+
+    <!-- STOCK ALERTS -->
+    <div id="verrors" class="hidden" style="padding:10px">
+        <div class="box" style="background:#fff3cd;border:1px solid #ffeeba">
+            <h3 style="color:#856404">⚠️ SOLD WITHOUT SUFFICIENT STOCK</h3>
+        </div>
+        <table><thead><tr><th>Date</th><th>Item</th><th>Sold</th><th>Stock</th><th>Cashier</th><th>Ticket</th></tr></thead>
+        <tbody id="errTbody"></tbody></table>
+    </div>
+
+    <!-- CASH LOG -->
+    <div id="vcashlog" class="hidden" style="padding:10px">
+        <h4>💰 Cash Out Records</h4>
+        <table><thead><tr><th>Date</th><th>Cashier</th><th>Shift</th><th>Amount</th><th>Note</th></tr></thead>
+        <tbody id="cashTbody"></tbody></table>
+        <h4 style="margin-top:15px">📱 E-Payments</h4>
+        <table><thead><tr><th>Date</th><th>Ticket</th><th>Amount</th><th>Method</th><th>Account</th><th>Cashier</th></tr></thead>
+        <tbody id="epTbody"></tbody></table>
+    </div>
 </div>
-</div>
-<!-- POS SCREEN -->
-<div id="vpos" class="panels hidden">
-<div class="prod">
-<div class="cat">
-  <button class="active" onclick="setCat('burgers', this)">🍔 Burgers</button>
-  <button onclick="setCat('premium', this)">⭐ Premium</button>
-  <button onclick="setCat('hotdogs', this)">🌭 Hotdogs</button>
-  <button onclick="setCat('drinks', this)">🥤 Drinks</button>
-  <button onclick="setCat('extras', this)">🧂 Extras</button>
-</div>
-<div class="grid" id="pgrid"></div>
-</div>
-<div class="cart">
-<h3>🧾 Ticket #<span id="tic">001</span></h3>
-<div class="discount-bar">
-  <button id="btnSr" onclick="toggleDisc('sr')">👴 Senior</button>
-  <button id="btnPwd" onclick="toggleDisc('pwd')">♿ PWD</button>
-  <button onclick="toggleDisc('none')">❌ Remove</button>
-</div>
-<div style="font-size:12px;color:#666;margin-bottom:6px" id="discNote"></div>
-<div id="clist" style="margin:10px 0;max-height:200px;overflow:auto"></div>
-<div class="total">
-  Subtotal: ₱<span id="subtotal">0.00</span><br>
-  <span id="discLine" class="hidden" style="color:green">Discount: -₱<span id="discAmt">0.00</span></span><br>
-  <strong>TOTAL: ₱<span id="gtotal">0.00</span></strong>
-</div>
-<div class="pay">
-  <button class="selected" onclick="setPay('Cash', this)">💵 Cash</button>
-  <button onclick="setPay('GCash', this)">📱 GCash</button>
-  <button id="bankBtn" class="hidden" onclick="setPay('Bank', this)">🏦 Bank</button>
-  <button id="ewalletBtn" class="hidden" onclick="setPay('EWallet', this)">💳 E-Wallet</button>
-  <button onclick="setPay('Grab', this)">🛵 Grab</button>
-  <button onclick="setPay('FoodPanda', this)">🐼 FoodPanda</button>
-</div>
-<div style="background:#f5f5f5;padding:8px;border-radius:6px;margin:8px 0">
-  <label style="font-size:13px;font-weight:bold">💱 Split Payment</label>
-  <div class="split-row">
-    <select id="pay1">
-      <option value="Cash">Cash</option>
-      <option value="GCash">GCash</option>
-      <option value="Bank">Bank</option>
-      <option value="EWallet">E-Wallet</option>
-    </select>
-    <input type="number" id="amt1" placeholder="Amount" oninput="calcSplit()">
-  </div>
-  <div style="font-size:13px">Remaining: ₱<span id="amt2">0.00</span></div>
-</div>
-<div id="accSel" class="hidden" style="margin:8px 0">
-  <label class="lbl">Send To:</label>
-  <select id="acc"></select>
-</div>
-<input type="number" id="cashIn" placeholder="Cash Received" oninput="calcChange()">
-<div style="font-weight:bold;padding:8px;background:#e3f2fd;border-radius:6px;margin-top:6px" id="change"></div>
-<br>
-<button class="btn-green" onclick="checkout()">💾 SAVE</button><br><br>
-<button class="btn-orange" onclick="cashOutModal()">💰 CHARGE / CASH OUT</button>
-</div>
-</div>
-<!-- MY TRANSACTIONS -->
-<div id="vmytrans" class="hidden" style="padding:10px">
-<div class="summary">
-<div class="box blue"><div>Shift Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="myAmt">0.00</span></div></div>
-<div class="box red"><div>Voided</div><div style="font-size:18px;font-weight:bold" id="myVoid">0</div></div>
-</div>
-<table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Status</th></tr></thead><tbody id="myTbody"></tbody></table>
-</div>
-<!-- SHIFT INFO -->
-<div id="vshift" class="hidden" style="padding:10px">
-<div class="box" style="background:#e8f5e9">
-<h3>⏱️ Shift Info</h3>
-<p><strong>Cashier:</strong> <span id="sName"></span></p>
-<p><strong>Shift:</strong> <span id="sLabel"></span></p>
-<p><strong>Started:</strong> <span id="sStart"></span></p>
-<p><strong>Ticket #:</strong> #<span id="sTic"></span></p>
-</div>
-</div>
-<!-- ALL SALES REPORT -->
-<div id="vallsales" class="hidden" style="padding:10px">
-<div class="summary">
-<div class="box green"><div>📅 Today Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="daySale">0.00</span></div></div>
-<div class="box blue"><div>⏱️ Shift Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="shiftSale">0.00</span></div></div>
-<div class="box red"><div>❌ Voided</div><div style="font-size:18px;font-weight:bold">₱<span id="voidSum">0.00</span></div></div>
-</div>
-<table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Cashier</th><th>Shift</th><th>Action</th></tr></thead><tbody id="allTbody"></tbody></table>
-</div>
-<!-- PRODUCT SALES -->
-<div id="vproductsales" class="hidden" style="padding:10px">
-<h3>📈 Product Sales by Shift</h3>
-<div id="prodReport"></div>
-</div>
-<!-- STOCKS -->
-<div id="vstocks" class="hidden" style="padding:10px">
-<h3>📦 Stocks On Hand</h3>
-<div class="stk-box">
-<table><thead><tr><th>Product</th><th>Stock</th><th>Updated</th></tr></thead><tbody id="stkTbody"></tbody></table>
-</div>
-<div style="margin:10px 0">
-<button class="btn-green btn-sm" onclick="stockIn('delivery')">📥 Delivery</button>
-<button class="btn-green btn-sm" onclick="stockIn('transfer')">➡️ Trans In</button>
-<button class="btn-orange btn-sm" onclick="stockOut('transfer')">⬅️ Trans Out</button>
-<button class="btn-red btn-sm" onclick="stockOut('spoil')">🗑️ Spoil</button>
-</div>
-<h4>📜 Stock Log</h4>
-<table><thead><tr><th>Date</th><th>Item</th><th>Type</th><th>Qty</th><th>By</th></tr></thead><tbody id="stkLog"></tbody></table>
-</div>
-<!-- PRICE UPDATE -->
-<div id="vprices" class="hidden" style="padding:10px">
-<h3>💰 Update Product Prices</h3>
-<select id="prodSel" onchange="showPrice()">
-  <option value="">-- Select Product --</option>
-</select>
-<div class="stk-box">
-  <div class="lbl">Current Price:</div><input id="curPrice" type="number" readonly style="background:#f0f0f0">
-  <div class="lbl">New Price:</div><input id="newPrice" type="number" step="1" placeholder="Enter New Price">
-</div>
-<button class="btn-green" onclick="savePrice()">✅ UPDATE PRICE</button>
-<table style="margin-top:20px"><thead><tr><th>Product</th><th>Old</th><th>New</th><th>Date</th><th>By</th></tr></thead><tbody id="priceLog"></tbody></table>
-</div>
-<!-- PAYMENT SETUP -->
-<div id="vpayments" class="hidden" style="padding:10px">
-<h3>🏦 Bank & E-Wallet Accounts</h3>
-<div style="background:#f5f5f5;padding:12px;border-radius:8px;margin-bottom:15px">
-  <select id="accType">
-    <option value="Bank">🏦 Bank</option>
-    <option value="GCash">📱 GCash</option>
-    <option value="EWallet">💳 E-Wallet</option>
-  </select>
-  <input type="text" id="accName" placeholder="Account Name">
-  <input type="text" id="accNum" placeholder="Account/Number">
-  <button class="btn-green" onclick="saveAcc()">✅ Save</button>
-</div>
-<table><thead><tr><th>Type</th><th>Name</th><th>Number</th><th>Action</th></tr></thead><tbody id="accTbody"></tbody></table>
-</div>
-<!-- STOCK ALERTS -->
-<div id="verrors" class="hidden" style="padding:10px">
-<div class="box" style="background:#fff3cd;border:1px solid #ffeeba">
-<h3 style="color:#856404">⚠️ SOLD WITHOUT SUFFICIENT STOCK</h3>
-</div>
-<table><thead><tr><th>Date</th><th>Item</th><th>Sold</th><th>Stock</th><th>Cashier</th><th>Ticket</th></tr></thead><tbody id="errTbody"></tbody></table>
-</div>
-<!-- CASH LOG -->
-<div id="vcashlog" class="hidden" style="padding:10px">
-<h4>💰 Cash Out Records</h4>
-<table><thead><tr><th>Date</th><th>Cashier</th><th>Shift</th><th>Amount</th><th>Note</th></tr></thead><tbody id="cashTbody"></tbody></table>
-<h4 style="margin-top:15px">📱 E-Payments</h4>
-<table><thead><tr><th>Date</th><th>Ticket</th><th>Amount</th><th>Method</th><th>Account</th><th>Cashier</th></tr></thead><tbody id="epTbody"></tbody></table>
-</div>
-</div>
+
 <!-- MODAL -->
 <div id="modal" class="modal hidden"><div class="mbody" id="mcont"></div></div>
+
 <script>
 // ========== CONFIG & DATA ==========
 const PROD = {
-  burgers: [ {n:'Minute Burger',p:43,stock:50},{n:'Cheesy Burger',p:54,stock:50},{n:'Double Minute Burger',p:66,stock:40},{n:'Double Cheesy Burger',p:82,stock:40},{n:'Chicken Time Burger',p:52,stock:50},{n:'Double Chicken Time Burger',p:72,stock:35} ],
-  premium: [ {n:'Black Pepper Burger',p:92,stock:30},{n:'Beef Shawarma Burger',p:94,stock:30},{n:'Crispy Chicken Chimichurri',p:101,stock:25},{n:'Crispy Chicken Roasted Sesame',p:97,stock:25},{n:'50/50 Veggie Chicken Burger',p:89,stock:25},{n:'Bacon Cheese Burger',p:99,stock:25},{n:'Steak Burger',p:145,stock:15},{n:'Chicken Sisig Burger',p:98,stock:30},{n:'Pizza Burger',p:98,stock:20} ],
-  hotdogs: [ {n:'Beef Hungarian',p:114,stock:40},{n:'French Onion Franks',p:94,stock:40},{n:'Cheesydog',p:51,stock:35} ],
-  drinks: [ {n:'Calamansi Tea',p:26,stock:80},{n:'Fruitivist',p:26,stock:80},{n:'Iced Coffee',p:18,stock:80},{n:'Hot Coffee',p:15,stock:60},{n:'Hot Choco',p:26,stock:60},{n:'Bottled Water',p:16,stock:100} ],
-  extras: [ {n:'Egg',p:15,stock:999},{n:'Supreme Cheese',p:15,stock:999},{n:'Coleslaw',p:13,stock:999} ]
+    burgers: [
+        {n:'Minute Burger',p:43,stock:50},
+        {n:'Cheesy Burger',p:54,stock:50},
+        {n:'Double Minute Burger',p:66,stock:40},
+        {n:'Double Cheesy Burger',p:82,stock:40},
+        {n:'Chicken Time Burger',p:52,stock:50},
+        {n:'Double Chicken Time Burger',p:72,stock:35}
+    ],
+    premium: [
+        {n:'Black Pepper Burger',p:92,stock:30},
+        {n:'Beef Shawarma Burger',p:94,stock:30},
+        {n:'Crispy Chicken Chimichurri',p:101,stock:25},
+        {n:'Crispy Chicken Roasted Sesame',p:97,stock:25},
+        {n:'50/50 Veggie Chicken Burger',p:89,stock:25},
+        {n:'Bacon Cheese Burger',p:99,stock:25},
+        {n:'Steak Burger',p:145,stock:15},
+        {n:'Chicken Sisig Burger',p:98,stock:30},
+        {n:'Pizza Burger',p:98,stock:20}
+    ],
+    hotdogs: [
+        {n:'Beef Hungarian',p:114,stock:40},
+        {n:'French Onion Franks',p:94,stock:40},
+        {n:'Cheesydog',p:51,stock:35}
+    ],
+    drinks: [
+        {n:'Calamansi Tea',p:26,stock:80},
+        {n:'Fruitivist',p:26,stock:80},
+        {n:'Iced Coffee',p:18,stock:80},
+        {n:'Hot Coffee',p:15,stock:60},
+        {n:'Hot Choco',p:26,stock:60},
+        {n:'Bottled Water',p:16,stock:100}
+    ],
+    extras: [
+        {n:'Egg',p:15,stock:999},
+        {n:'Supreme Cheese',p:15,stock:999},
+        {n:'Coleslaw',p:13,stock:999}
+    ]
 };
-const SHIFTS = {'1111':{id:'morning',label:'Morning (6AM–2PM)'},'2222':{id:'swing',label:'Swing (2PM–10PM)'},'3333':{id:'graveyard',label:'Graveyard (10PM–6AM)'}};
-const ADMIN_PASS = 'admin123', DISC_RATE = 0.12;
-const $=id=>document.getElementById(id), fmt=n=>n.toFixed(2), dt=>new Date().toLocaleString('en-PH'), D=>new Date().toLocaleDateString('en-PH');
-const allProd=()=>Object.values(PROD).flat(), findProd=n=>allProd().find(x=>x.n.trim().toLowerCase()==n.trim().toLowerCase());
-let user={logged:false,type:'',name:'',shift:'',sLabel:'',start:null}, cat='burgers', cart=[], payM='Cash', discType=null, tic=+localStorage.getItem('tic')||1;
-let trans=JSON.parse(localStorage.getItem('trans')||'[]'), stk=JSON.parse(localStorage.getItem('stk')||'[]'), stkLog=JSON.parse(localStorage.getItem('stkLog')||'[]');
-let cashOuts=JSON.parse(localStorage.getItem('cashOuts')||'[]'), alerts=JSON.parse(localStorage.getItem('alerts')||'[]');
-let priceLogs=JSON.parse(localStorage.getItem('priceLogs')||'[]'), accounts=JSON.parse(localStorage.getItem('accounts')||'[]'), pending=JSON.parse(localStorage.getItem('pending')||'[]');
-const isOnline=()=>navigator.onLine, save=()=>{localStorage.setItem('tic',tic);localStorage.setItem('trans',JSON.stringify(trans));localStorage.setItem('stk',JSON.stringify(stk));localStorage.setItem('stkLog',JSON.stringify(stkLog));localStorage.setItem('cashOuts',JSON.stringify(cashOuts));localStorage.setItem('alerts',JSON.stringify(alerts));localStorage.setItem('priceLogs',JSON.stringify(priceLogs));localStorage.setItem('accounts',JSON.stringify(accounts));localStorage.setItem('pending',JSON.stringify(pending))};
-const getStock=n=>{const s=stk.find(x=>x.n.trim().toLowerCase()==n.trim().toLowerCase());return s?s.qty:findProd(n)?.stock||0};
-const updNet=()=>{$('netStatus').className='online-indicator'+(isOnline()?'':' offline');if(isOnline()&&pending.length){pending=[];save();alert('✅ Synced!')}};
-window.addEventListener('online',updNet);window.addEventListener('offline',updNet);
-// ========== LOGIN — AYOS NA! ==========
-function detectShift(p){$('shiftInfo').textContent = SHIFTS[p] ? '✅ ' + SHIFTS[p].label : ''}
+
+const SHIFTS = {
+    '1111':{id:'morning',label:'Morning (6AM–2PM)'},
+    '2222':{id:'swing',label:'Swing (2PM–10PM)'},
+    '3333':{id:'graveyard',label:'Graveyard (10PM–6AM)'}
+};
+
+const ADMIN_PASS = 'admin123';
+const DISC_RATE = 0.12;
+
+const $ = id => document.getElementById(id);
+const fmt = n => n.toFixed(2);
+const dt = () => new Date().toLocaleString('en-PH');
+const D = () => new Date().toLocaleDateString('en-PH');
+
+const allProd = () => Object.values(PROD).flat();
+const findProd = n => allProd().find(x => x.n.trim().toLowerCase() == n.trim().toLowerCase());
+
+let user = {logged:false, type:'', name:'', shift:'', sLabel:'', start:null};
+let cat = 'burgers', cart = [], payM = 'Cash', discType = null;
+let tic = +localStorage.getItem('tic') || 1;
+
+let trans = JSON.parse(localStorage.getItem('trans') || '[]');
+let stk = JSON.parse(localStorage.getItem('stk') || '[]');
+let stkLog = JSON.parse(localStorage.getItem('stkLog') || '[]');
+let cashOuts = JSON.parse(localStorage.getItem('cashOuts') || '[]');
+let alerts = JSON.parse(localStorage.getItem('alerts') || '[]');
+let priceLogs = JSON.parse(localStorage.getItem('priceLogs') || '[]');
+let accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+let pending = JSON.parse(localStorage.getItem('pending') || '[]');
+
+const isOnline = () => navigator.onLine;
+const save = () => {
+    localStorage.setItem('tic', tic);
+    localStorage.setItem('trans', JSON.stringify(trans));
+    localStorage.setItem('stk', JSON.stringify(stk));
+    localStorage.setItem('stkLog', JSON.stringify(stkLog));
+    localStorage.setItem('cashOuts', JSON.stringify(cashOuts));
+    localStorage.setItem('alerts', JSON.stringify(alerts));
+    localStorage.setItem('priceLogs', JSON.stringify(priceLogs));
+    localStorage.setItem('accounts', JSON.stringify(accounts));
+    localStorage.setItem('pending', JSON.stringify(pending));
+};
+
+const getStock = n => {
+    const s = stk.find(x => x.n.trim().toLowerCase() == n.trim().toLowerCase());
+    return s ? s.qty : (findProd(n)?.stock || 0);
+};
+
+const updNet = () => {
+    $('netStatus').className = 'online-indicator' + (isOnline() ? '' : ' offline');
+    if(isOnline() && pending.length){
+        pending = [];
+        save();
+        alert('✅ Synced!');
+    }
+};
+
+window.addEventListener('online', updNet);
+window.addEventListener('offline', updNet);
+
+// ========== ✅ NAAYOS NA LOGIN FUNCTIONS ==========
+function detectShift(p){
+    $('shiftInfo').textContent = SHIFTS[p] ? '✅ ' + SHIFTS[p].label : '';
+}
+
+// ✅ ITO ANG NAGKAKAMALI KANINA — NAAYOS NA!
 function showForm(t){
-  $('cform').classList.toggle('hidden', t !== 'cashier');
-  $('aform').classList.toggle('hidden', t !== 'admin');
+    // Itago muna pareho
+    $('cform').classList.add('hidden');
+    $('aform').classList.add('hidden');
+    // Ipakita kung alin ang napili
+    if(t === 'cashier'){
+        $('cform').classList.remove('hidden');
+    } else if(t === 'admin'){
+        $('aform').classList.remove('hidden');
+    }
 }
+
 function loginCashier(){
-  const n=$('name').value.trim(), p=$('pass').value.trim();
-  if(!n || !p) return alert('⚠️ Fill all fields!');
-  const s = SHIFTS[p];
-  if(!s) return alert('❌ Wrong passcode!');
-  user = {logged:true, type:'cashier', name:n, shift:s.id, sLabel:s.label, start:new Date()};
-  go();
+    const n = $('name').value.trim();
+    const p = $('pass').value.trim();
+    if(!n || !p) return alert('⚠️ Fill all fields!');
+    const s = SHIFTS[p];
+    if(!s) return alert('❌ Wrong passcode!');
+    user = {logged:true, type:'cashier', name:n, shift:s.id, sLabel:s.label, start:new Date()};
+    go();
 }
+
 function loginAdmin(){
-  if($('apass').value.trim() !== ADMIN_PASS) return alert('❌ Wrong password!');
-  user = {logged:true, type:'admin', name:'ADMIN', shift:'', sLabel:'Admin', start:new Date()};
-  go();
+    if($('apass').value.trim() !== ADMIN_PASS) return alert('❌ Wrong password!');
+    user = {logged:true, type:'admin', name:'ADMIN', shift:'', sLabel:'Admin', start:new Date()};
+    go();
 }
+
 function go(){
-  $('login').classList.add('hidden');
-  $('app').classList.remove('hidden');
-  $('user').textContent = `${user.sLabel} | ${user.name}`;
-  $('tic').textContent = String(tic).padStart(3,'0');
-  updNet();
-  updPayBtns();
-  loadAccSel();
-  const adm = user.type === 'admin';
-  ['nsales','nreceipts','nshift'].forEach(id => $(id).classList.toggle('hidden', adm));
-  ['nasales','nproductsales','nstocks','nprices','npaymentsettings','nalerts','nreports'].forEach(id => $(id).classList.toggle('hidden', !adm));
-  adm ? showView('allsales') : showView('pos');
+    $('login').classList.add('hidden');
+    $('app').classList.remove('hidden');
+    $('user').textContent = `${user.sLabel} | ${user.name}`;
+    $('tic').textContent = String(tic).padStart(3,'0');
+    updNet();
+    updPayBtns();
+    loadAccSel();
+    const adm = user.type === 'admin';
+    ['nsales','nreceipts','nshift'].forEach(id => $(id).classList.toggle('hidden', adm));
+    ['nasales','nproductsales','nstocks','nprices','npaymentsettings','nalerts','nreports'].forEach(id => $(id).classList.toggle('hidden', !adm));
+    adm ? showView('allsales') : showView('pos');
 }
-function logout(){confirm('🚪 Logout?') && location.reload()}
+
+function logout(){
+    if(confirm('🚪 Logout?')) location.reload();
+}
+
 // ========== PRODUCTS & CART ==========
-function setCat(c,b){cat=c;document.querySelectorAll('.cat button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderProds()}
-function renderProds(){$('pgrid').innerHTML=PROD[cat].map(x=>`<div class="card" onclick="addItem('${x.n.replace(/'/g,"\\'")}')"><div style="font-size:13px">${x.n}</div><div style="font-weight:bold;color:#008000">₱${x.p}</div></div>`).join('')}
-function addItem(n){const p=findProd(n),i=cart.findIndex(x=>x.n==n);i>=0?cart[i].q++:cart.push({n,p:p.p,q:1});updCart()}
-function subtotal(){return cart.reduce((s,x)=>s+x.p*x.q,0)}
-function applyDisc(amt){if(!discType)return{sub:amt,disc:0,total:amt};const d=amt*DISC_RATE;return{sub:amt,disc:d,total:amt-d}}
-function toggleDisc(t){discType=t=='none'?null:t;$('btnSr').classList.toggle('applied',discType=='sr');$('btnPwd').classList.toggle('applied',discType=='pwd');$('discNote').textContent=discType?discType=='sr'?'👴 Senior (12%)':'♿ PWD (12%)':'';updCart()}
-function updCart(){const s=subtotal(),{sub,disc,total}=applyDisc(s);$('clist').innerHTML=cart.map((x,i)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #eee">${x.q}x ${x.n}<span>₱${fmt(x.p*x.q)} <button style="background:red;color:#fff;border-radius:50%;width:20px;height:20px" onclick="cart.splice(${i},1);updCart()">×</button></span></div>`).join('');$('subtotal').textContent=fmt(sub);$('gtotal').textContent=fmt(total);disc>0?$('discLine').classList.remove('hidden')||($('discAmt').textContent=fmt(disc)):$('discLine').classList.add('hidden');calcSplit()}
-function setPay(m,b){payM=m;document.querySelectorAll('.pay button').forEach(x=>x.classList.remove('selected'));if(b)b.classList.add('selected');['Bank','EWallet','GCash'].includes(m)?$('accSel').classList.remove('hidden'):$('accSel').classList.add('hidden');$('change').innerHTML=''}
-function calcChange(){const {total}=applyDisc(subtotal()),c=+$('cashIn').value||0;$('change').innerHTML=payM=='Cash'&&c>=total&&total>0?`💰 CHANGE: ₱${fmt(c-total)}`:''}
-function updPayBtns(){const hasB=accounts.some(a=>a.type=='Bank'),hasE=accounts.some(a=>a.type!='Bank'&&a.type!='GCash');$('bankBtn').classList.toggle('hidden',!hasB);$('ewalletBtn').classList.toggle('hidden',!hasE)}
-function loadAccSel(){$('acc').innerHTML='<option value="">-- Select --</option>'+accounts.map((a,i)=>`<option value="${i}">${a.type}: ${a.name} — ${a.number}</option>`).join('')}
-function calcSplit(){const t=applyDisc(subtotal()).total,a1=+$('amt1').value||0;$('amt2').textContent=fmt(Math.max(0,t-a1))}
-// ========== CHECKOUT & SAVE ==========
-function checkout(){const {total}=applyDisc(subtotal()),paid1=+$('amt1').value||0,accIdx=$('acc').value,acc=accIdx!=''?accounts[+accIdx]:null;if(!total)return alert('⚠️ Empty cart!');let payObj={method:payM,split:!!paid1&&paid1<total,amt1:paid1,method1:$('pay1').value,amt2:paid1&&paid1<total?total-paid1:0,method2:'E-Money',account:acc};if(payObj.split);else if(payM=='Cash'&&(+$('cashIn').value||0)<total)return alert('⚠️ Insufficient Cash! Use Split Payment!');const now=dt(),d=D();cart.forEach(x=>{const cur=getStock(x.n),saved=stk.find(s=>s.n.trim().toLowerCase()==x.n.trim().toLowerCase());if(cur<x.q)alerts.unshift({dt:now,date:d,item:x.n,soldQty:x.q,stock:cur,who:user.name,ticket:tic});if(!saved)stk.push({n:x.n,qty:0,dt:now});saved.qty=Math.max(0,saved.qty-x.q);saved.dt=now});trans.unshift({tic,dt:now,date:d,items:[...cart],subtotal:subtotal(),discount:applyDisc(subtotal()).disc,total,pay:payObj,who:user.name,shift:user.sLabel,voided:false,disc:discType});tic++;save();alert(`✅ SAVED! Ticket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${fmt(total)}`);cart=[];discType=null;updCart();$('tic').textContent=String(tic).padStart(3,'0');$('cashIn').value=$('amt1').value='';if(user.type==='cashier')renderMyTrans()}
-// ========== VIEW SWITCHING — AYOS NA ANG ERROR ==========
-function showView(v, btn){
-  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  ['vpos','vmytrans','vshift','vallsales','vproductsales','vstocks','vprices','vpayments','verrors','vcashlog'].forEach(id => $(id).classList.add('hidden'));
-  $(`v${v}`).classList.remove('hidden');
-  if(v=='pos'){renderProds();updPayBtns();loadAccSel()}
-  if(v=='mytrans')renderMyTrans();
-  if(v=='shift')renderShift();
-  if(v=='allsales')renderAllSales();
-  if(v=='productsales')renderProdSales();
-  if(v=='stocks'){renderStocks();renderStkLog()}
-  if(v=='prices'){loadProdSel()}
-  if(v=='payments')renderAccs();
-  if(v=='errors')renderAlerts();
-  if(v=='cashlog')renderCashLog();
+function setCat(c, b){
+    cat = c;
+    document.querySelectorAll('.cat button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderProds();
 }
+
+function renderProds(){
+    $('pgrid').innerHTML = PROD[cat].map(x =>
+        `<div class="card" onclick="addItem('${x.n.replace(/'/g, "\\'")}')">
+            <div style="font-size:13px">${x.n}</div>
+            <div style="font-weight:bold;color:#008000">₱${x.p}</div>
+        </div>`
+    ).join('');
+}
+
+function addItem(n){
+    const p = findProd(n);
+    const i = cart.findIndex(x => x.n == n);
+    i >= 0 ? cart[i].q++ : cart.push({n, p:p.p, q:1});
+    updCart();
+}
+
+function subtotal(){
+    return cart.reduce((s, x) => s + x.p * x.q, 0);
+}
+
+function applyDisc(amt){
+    if(!discType) return {sub:amt, disc:0, total:amt};
+    const d = amt * DISC_RATE;
+    return {sub:amt, disc:d, total:amt-d};
+}
+
+function toggleDisc(t){
+    discType = t == 'none' ? null : t;
+    $('btnSr').classList.toggle('applied', discType == 'sr');
+    $('btnPwd').classList.toggle('applied', discType == 'pwd');
+    $('discNote').textContent = discType ? (discType=='sr'?'👴 Senior (12%)':'♿ PWD (12%)') : '';
+    updCart();
+}
+
+function updCart(){
+    const s = subtotal();
+    const {sub, disc, total} = applyDisc(s);
+    $('clist').innerHTML = cart.map((x, i) =>
+        `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #eee">
+            ${x.q}x ${x.n}
+            <span>₱${fmt(x.p*x.q)}
+            <button style="background:red;color:#fff;border-radius:50%;width:20px;height:20px;margin-left:6px" onclick="cart.splice(${i},1);updCart()">×</button>
+            </span>
+        </div>`
+    ).join('');
+    $('subtotal').textContent = fmt(sub);
+    $('gtotal').textContent = fmt(total);
+    if(disc > 0){
+        $('discLine').classList.remove('hidden');
+        $('discAmt').textContent = fmt(disc);
+    } else {
+        $('discLine').classList.add('hidden');
+    }
+    calcSplit();
+}
+
+function setPay(m, b){
+    payM = m;
+    document.querySelectorAll('.pay button').forEach(x => x.classList.remove('selected'));
+    if(b) b.classList.add('selected');
+    ['Bank','EWallet','GCash'].includes(m) ? $('accSel').classList.remove('hidden') : $('accSel').classList.add('hidden');
+    $('change').innerHTML = '';
+}
+
+function calcChange(){
+    const {total} = applyDisc(subtotal());
+    const c = +$('cashIn').value || 0;
+    $('change').innerHTML = (payM == 'Cash' && c >= total && total > 0) ?
+        `💰 CHANGE: ₱${fmt(c - total)}` : '';
+}
+
+function updPayBtns(){
+    const hasB = accounts.some(a => a.type == 'Bank');
+    const hasE = accounts.some(a => a.type != 'Bank' && a.type != 'GCash');
+    $('bankBtn').classList.toggle('hidden', !hasB);
+    $('ewalletBtn').classList.toggle('hidden', !hasE);
+}
+
+function loadAccSel(){
+    $('acc').innerHTML = '<option value="">-- Select --</option>' +
+        accounts.map((a, i) => `<option value="${i}">${a.type}: ${a.name} — ${a.number}</option>`).join('');
+}
+
+function calcSplit(){
+    const t = applyDisc(subtotal()).total;
+    const a1 = +$('amt1').value || 0;
+    $('amt2').textContent = fmt(Math.max(0, t - a1));
+}
+
+// ========== CHECKOUT & SAVE ==========
+function checkout(){
+    const {total} = applyDisc(subtotal());
+    const paid1 = +$('amt1').value || 0;
+    const accIdx = $('acc').value;
+    const acc = accIdx != '' ? accounts[+accIdx] : null;
+
+    if(!total) return alert('⚠️ Empty cart!');
+
+    const payObj = {
+        method: payM,
+        split: !!paid1 && paid1 < total,
+        amt1: paid1,
+        method1: $('pay1').value,
+        amt2: (paid1 && paid1 < total) ? total - paid1 : 0,
+        method2: 'E-Money',
+        account: acc
+    };
+
+    if(!payObj.split && payM == 'Cash' && (+$('cashIn').value || 0) < total){
+        return alert('⚠️ Insufficient Cash! Use Split Payment!');
+    }
+
+    const now = dt();
+    const d = D();
+
+    cart.forEach(x => {
+        const cur = getStock(x.n);
+        const saved = stk.find(s => s.n.trim().toLowerCase() == x.n.trim().toLowerCase());
+        if(cur < x.q){
+            alerts.unshift({dt:now, date:d, item:x.n, soldQty:x.q, stock:cur, who:user.name, ticket:tic});
+        }
+        if(!saved){
+            stk.push({n:x.n, qty:0, dt:now});
+        } else {
+            saved.qty = Math.max(0, saved.qty - x.q);
+            saved.dt = now;
+        }
+    });
+
+    trans.unshift({
+        tic, dt:now, date:d, items:[...cart],
+        subtotal:subtotal(), discount:applyDisc(subtotal()).disc,
+        total, pay:payObj, who:user.name, shift:user.sLabel,
+        voided:false, disc:discType
+    });
+
+    tic++;
+    save();
+    alert(`✅ SAVED! Ticket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${fmt(total)}`);
+
+    cart = [];
+    discType = null;
+    updCart();
+    $('tic').textContent = String(tic).padStart(3,'0');
+    $('cashIn').value = $('amt1').value = '';
+    if(user.type === 'cashier') renderMyTrans();
+}
+
+// ========== VIEW SWITCHING ==========
+function showView(v, btn){
+    document.querySelectorAll('.nav button').forEach(x => x.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    ['vpos','vmytrans','vshift','vallsales','vproductsales','vstocks','vprices','vpayments','verrors','vcashlog'].forEach(id => $(id).classList.add('hidden'));
+    $(`v${v}`).classList.remove('hidden');
+
+    if(v == 'pos'){ renderProds(); updPayBtns(); loadAccSel(); }
+    if(v == 'mytrans') renderMyTrans();
+    if(v == 'shift') renderShift();
+    if(v == 'allsales') renderAllSales();
+    if(v == 'productsales') renderProdSales();
+    if(v == 'stocks'){ renderStocks(); renderStkLog(); }
+    if(v == 'prices'){ loadProdSel(); }
+    if(v == 'payments') renderAccs();
+    if(v == 'errors') renderAlerts();
+    if(v == 'cashlog') renderCashLog();
+}
+
 // ========== CASHIER VIEWS ==========
-function renderShift(){$('sName').textContent=user.name;$('sLabel').textContent=user.sLabel;$('sStart').textContent=user.start.toLocaleString('en-PH');$('sTic').textContent=String(tic).padStart(3,'0')}
-function renderMyTrans(){const mt=trans.filter(x=>x.who==user.name);let sum=0,vd=0;mt.forEach(x=>x.voided?vd++:sum+=x.total);$('myAmt').textContent=fmt(sum);$('myVoid').textContent=vd;$('myTbody').innerHTML=mt.length?mt.map(x=>{let pm=x.pay?.method||x.pay,cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';if(x.voided)cls='void';return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${pm}</span></td><td>${x.voided?'❌ VOIDED':'✅ COUNTED'}</td></tr>`}).join(''):'<tr><td colspan="6" class="empty">No transactions yet</td></tr>'}
+function renderShift(){
+    $('sName').textContent = user.name;
+    $('sLabel').textContent = user.sLabel;
+    $('sStart').textContent = user.start.toLocaleString('en-PH');
+    $('sTic').textContent = String(tic).padStart(3,'0');
+}
+
+function renderMyTrans(){
+    const mt = trans.filter(x => x.who == user.name);
+    let sum = 0, vd = 0;
+    mt.forEach(x => x.voided ? vd++ : sum += x.total);
+    $('myAmt').textContent = fmt(sum);
+    $('myVoid').textContent = vd;
+    $('myTbody').innerHTML = mt.length ? mt.map(x => {
+        let pm = x.pay?.method || x.pay;
+        let cls = {Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm] || '';
+        if(x.voided) cls = 'void';
+        return `<tr>
+            <td><b>#${String(x.tic).padStart(3,'0')}</b></td>
+            <td>${x.dt}</td>
+            <td>${x.items.length} item(s)</td>
+            <td>₱${fmt(x.total)}</td>
+            <td><span class="tag ${cls}">${pm}</span></td>
+            <td>${x.voided?'❌ VOIDED':'✅ COUNTED'}</td>
+        </tr>`;
+    }).join('') : '<tr><td colspan="6" class="empty">No transactions yet</td></tr>';
+}
+
 // ========== ADMIN — SALES ==========
-function voidTrans(t){confirm(`Void Ticket #${String(t).padStart(3,'0')}?`)&&(trans.find(x=>x.tic==t).voided=true,save(),renderAllSales(),renderMyTrans())}
-function renderAllSales(){const today=D();let dsum=0,ssum=0,vsum=0;trans.forEach(x=>{if(x.voided)return vsum+=x.total;if(x.date==today)dsum+=x.total;ssum+=x.total});$('daySale').textContent=fmt(dsum);$('shiftSale').textContent=fmt(ssum);$('voidSum').textContent=fmt(vsum);$('allTbody').innerHTML=trans.length?trans.map(x=>{let pm=x.pay?.method||x.pay,cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';if(x.voided)cls='void';return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${pm}</span></td><td>${x.who}</td><td>${x.shift}</td><td>${x.voided?'<span class="tag void">VOIDED</span>':`<button class="btn-sm" onclick="voidTrans(${x.tic})">VOID</button>`}</td></tr>`}).join(''):'<tr><td colspan="8" class="empty">No sales</td></tr>'}
+function voidTrans(t){
+    if(confirm(`Void Ticket #${String(t).padStart(3,'0')}?`)){
+        trans.find(x => x.tic == t).voided = true;
+        save(); renderAllSales(); renderMyTrans();
+    }
+}
+
+function renderAllSales(){
+    const today = D();
+    let dsum = 0, ssum = 0, vsum = 0;
+    trans.forEach(x => {
+        if(x.voided){ vsum += x.total; return; }
+        if(x.date == today) dsum += x.total;
+        ssum += x.total;
+    });
+    $('daySale').textContent = fmt(dsum);
+    $('shiftSale').textContent = fmt(ssum);
+    $('voidSum').textContent = fmt(vsum);
+    $('allTbody').innerHTML = trans.length ? trans.map(x => {
+        let pm = x.pay?.method || x.pay;
+        let cls = {Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm] || '';
+        if(x.voided) cls = 'void';
+        return `<tr>
+            <td><b>#${String(x.tic).padStart(3,'0')}</b></td>
+            <td>${x.dt}</td>
+            <td>${x.items.length} item(s)</td>
+            <td>₱${fmt(x.total)}</td>
+            <td><span class="tag ${cls}">${pm}</span></td>
+            <td>${x.who}</td>
+            <td>${x.shift}</td>
+            <td>${x.voided?'<span class="tag void">VOIDED</span>':`<button class="btn-sm" onclick="voidTrans(${x.tic})">VOID</button>`}</td>
+        </tr>`;
+    }).join('') : '<tr><td colspan="8" class="empty">No sales</td></tr>';
+}
+
 // ========== ADMIN — PRODUCT SALES ==========
-function renderProdSales(){const g={};trans.filter(t=>!t.voided).forEach(tx=>{const k=`${tx.shift}||${tx.date.split(',')[0]}`;if(!g[k])g[k]={shift:tx.shift,date:tx.date.split(',')[0],p:{}};tx.items.forEach(it=>{if(!g[k].p[it.n])g[k].p[it.n]={q:0,s:0};g[k].p[it.n].q+=it.q;g[k].p[it.n].s+=it.p*it.q})});$('prodReport').innerHTML=Object.entries(g).map(([k,v])=>`<div class="shift-group"><h4>${v.shift} — ${v.date}</h4><table><thead><tr><th>Product</th><th>Qty</th><th>Sales</th></tr></thead>${Object.entries(v.p).sort((a,b)=>b[1].s-a[1].s).map(([pn,ps])=>`<tr><td>${pn}</td><td>${ps.q}</td><td>₱${fmt(ps.s)}</td></tr>`).join('')}</table></div>`).join('')||'<div class="empty">No sales yet</div>'}
+function renderProdSales(){
+    const g = {};
+    trans.filter(t => !t.voided).forEach(tx => {
+        const k = `${tx.shift}||${tx.date.split(',')[0]}`;
+        if(!g[k]) g[k] = {shift:tx.shift, date:tx.date.split(',')[0], p:{}};
+        tx.items.forEach(it => {
+            if(!g[k].p[it.n]) g[k].p[it.n] = {q:0, s:0};
+            g[k].p[it.n].q += it.q;
+            g[k].p[it.n].s += it.p * it.q;
+        });
+    });
+    $('prodReport').innerHTML = Object.entries(g).map(([k,v]) =>
+        `<div class="shift-group">
+            <h4>${v.shift} — ${v.date}</h4>
+            <table><thead><tr><th>Product</th><th>Qty</th><th>Sales</th></tr></thead>
+            ${Object.entries(v.p).sort((a,b)=>b[1].s-a[1].s).map(([pn,ps])=>
+                `<tr><td>${pn}</td><td>${ps.q}</td><td>₱${fmt(ps.s)}</td></tr>`
+            ).join('')}
+            </table>
+        </div>`
+    ).join('') || '<div class="empty">No sales yet</div>';
+}
+
 // ========== ADMIN — STOCKS ==========
-function renderStocks(){$('stkTbody').innerHTML=allProd().map(p=>{const q=getStock(p.n),u=(stk.find(s=>s.n==p.n)||{}).dt||'Initial';return`<tr><td>${p.n}</td><td>${q}</td><td>${u}</td></tr>`}).join('')}
-function stockIn(type){const n=prompt('Product Name:'),q=+prompt('Quantity:');if(!n||q<=0)return;const saved=stk.find(s=>s.n.trim().toLowerCase()==n.trim().toLowerCase()),now=dt();if(!saved){const p=findProd(n);if(!p)return alert('❌ Product not found!');stk.push({n,qty:p.stock+q,dt:now})}else{saved.qty+=q;saved.dt=now}stkLog.unshift({dt:now,item:n,type=='delivery'?'Delivery':'Transfer In',qty:q,by:user.name});save();renderStocks();renderStkLog()}
-function stockOut(type){const n=prompt('Product Name:'),q=+prompt('Quantity:');if(!n||q<=0)return;const saved=stk.find(s=>s.n.trim().toLowerCase()==n.trim().toLowerCase());if(!saved)return alert('❌ Not found!');saved.qty=Math.max(0,saved.qty-q);stkLog.unshift({dt:dt(),item:n,type=='spoil'?'Spoilage':'Transfer Out',qty:-q,by:user.name});save();renderStocks();renderStkLog()}
-function renderStkLog(){$('stkLog').innerHTML=stkLog.map(x=>`<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.type}</td><td>${x.qty}</td><td>${x.by}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No logs</td></tr>'}
+function renderStocks(){
+    $('stkTbody').innerHTML = allProd().map(p => {
+        const q = getStock(p.n);
+        const u = (stk.find(s => s.n == p.n) || {}).dt || 'Initial';
+        return `<tr><td>${p.n}</td><td>${q}</td><td>${u}</td></tr>`;
+    }).join('');
+}
+
+function stockIn(type){
+    const n = prompt('Product Name:');
+    const q = +prompt('Quantity:');
+    if(!n || q <= 0) return;
+    const saved = stk.find(s => s.n.trim().toLowerCase() == n.trim().toLowerCase());
+    const now = dt();
+    if(!saved){
+        const p = findProd(n);
+        if(!p) return alert('❌ Product not found!');
+        stk.push({n, qty:p.stock+q, dt:now});
+    } else {
+        saved.qty += q;
+        saved.dt = now;
+    }
+    stkLog.unshift({dt:now, item:n, type:type=='delivery'?'Delivery':'Transfer In', qty:q, by:user.name});
+    save(); renderStocks(); renderStkLog();
+}
+
+function stockOut(type){
+    const n = prompt('Product Name:');
+    const q = +prompt('Quantity:');
+    if(!n || q <= 0) return;
+    const saved = stk.find(s => s.n.trim().toLowerCase() == n.trim().toLowerCase());
+    if(!saved) return alert('❌ Not found!');
+    saved.qty = Math.max(0, saved.qty - q);
+    stkLog.unshift({dt:dt(), item:n, type:type=='spoil'?'Spoilage':'Transfer Out', qty:-q, by:user.name});
+    save(); renderStocks(); renderStkLog();
+}
+
+function renderStkLog(){
+    $('stkLog').innerHTML = stkLog.map(x =>
+        `<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.type}</td><td>${x.qty}</td><td>${x.by}</td></tr>`
+    ).join('') || '<tr><td colspan="5" class="empty">No logs</td></tr>';
+}
+
 // ========== PRICE UPDATE ==========
-function loadProdSel(){$('prodSel').innerHTML='<option value="">-- Select Product --</option>'+allProd().map(p=>`<option value="${p.n}">${p.n} — ₱${p.p}</option>`).join('')}
-function showPrice(){const n=$('prodSel').value;$('curPrice').value=n?findProd(n).p:''}
-function savePrice(){const n=$('prodSel').value,oldP=+$('curPrice').value||0,newP=+$('newPrice').value||0;if(!n||newP<=0)return alert('⚠️ Invalid!');if(newP==oldP)return alert('⚠️ Same price!');const p=findProd(n);if(!p)return alert('❌ Not found!');p.p=newP;priceLogs.unshift({item:n,old:oldP,new:newP,dt:dt(),by:user.name});save();alert('✅ Price Updated!');$('newPrice').value='';loadProdSel();renderPriceLog()}
-function renderPriceLog(){$('priceLog').innerHTML=priceLogs.map(x=>`<tr><td>${x.item}</td><td>₱${fmt(x.old)}</td><td>₱${fmt(x.new)}</td><td>${x.dt}</td><td>${x.by}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No changes</td></tr>'}
+function loadProdSel(){
+    $('prodSel').innerHTML = '<option value="">-- Select Product --</option>' +
+        allProd().map(p => `<option value="${p.n}">${p.n} — ₱${p.p}</option>`).join('');
+}
+
+function showPrice(){
+    const n = $('prodSel').value;
+    $('curPrice').value = n ? findProd(n).p : '';
+}
+
+function savePrice(){
+    const n = $('prodSel').value;
+    const oldP = +$('curPrice').value || 0;
+    const newP = +$('newPrice').value || 0;
+    if(!n || newP <= 0) return alert('⚠️ Invalid!');
+    if(newP == oldP) return alert('⚠️ Same price!');
+    const p = findProd(n);
+    if(!p) return alert('❌ Not found!');
+    p.p = newP;
+    priceLogs.unshift({item:n, old:oldP, new:newP, dt:dt(), by:user.name});
+    save(); alert('✅ Price Updated!');
+    $('newPrice').value = '';
+    loadProdSel();
+    renderPriceLog();
+}
+
+function renderPriceLog(){
+    $('priceLog').innerHTML = priceLogs.map(x =>
+        `<tr><td>${x.item}</td><td>₱${fmt(x.old)}</td><td>₱${fmt(x.new)}</td><td>${x.dt}</td><td>${x.by}</td></tr>`
+    ).join('') || '<tr><td colspan="5" class="empty">No changes</td></tr>';
+}
+
 // ========== PAYMENT ACCOUNTS ==========
-function saveAcc(){const t=$('accType').value,n=$('accName').value.trim(),num=$('accNum').value.trim();if(!n||!num)return alert('⚠️ Fill all fields!');accounts.push({type:t,name:n,number:num,by:user.name,dt:dt()});save();alert('✅ Saved!');$('accName').value=$('accNum').value='';renderAccs();updPayBtns()}
-function renderAccs(){$('accTbody').innerHTML=accounts.length?accounts.map((a,i)=>`<tr><td>${a.type}</td><td>${a.name}</td><td>${a.number}</td><td><button class="btn-red btn-sm" onclick="accounts.splice(${i},1);save();renderAccs();updPayBtns()">Delete</button></td></tr>`).join(''):'<tr><td colspan="4" class="empty">No accounts yet</td></tr>'}
+function saveAcc(){
+    const t = $('accType').value;
+    const n = $('accName').value.trim();
+    const num = $('accNum').value.trim();
+    if(!n || !num) return alert('⚠️ Fill all fields!');
+    accounts.push({type:t, name:n, number:num, by:user.name, dt:dt()});
+    save(); alert('✅ Saved!');
+    $('accName').value = $('accNum').value = '';
+    renderAccs(); updPayBtns();
+}
+
+function renderAccs(){
+    $('accTbody').innerHTML = accounts.length ? accounts.map((a,i) =>
+        `<tr><td>${a.type}</td><td>${a.name}</td><td>${a.number}</td><td><button class="btn-red btn-sm" onclick="accounts.splice(${i},1);save();renderAccs();updPayBtns()">Delete</button></td></tr>`
+    ).join('') : '<tr><td colspan="4" class="empty">No accounts yet</td></tr>';
+}
+
 // ========== ALERTS & CASH LOG ==========
-function renderAlerts(){$('errTbody').innerHTML=alerts.map(x=>`<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.soldQty}</td><td>${x.stock}</td><td>${x.who}</td><td>#${String(x.ticket).padStart(3,'0')}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">✅ No alerts</td></tr>'}
-function cashOutModal(){const amt=+prompt('Amount to Cash Out:'),note=prompt('Remarks:');if(!amt||amt<=0)return;cashOuts.unshift({dt:dt(),date:D(),who:user.name,shift:user.sLabel,amt,note:note||''});save();alert('✅ Recorded!');if(user.type==='admin')renderCashLog()}
-function renderCashLog(){$('cashTbody').innerHTML=cashOuts.map(x=>`<tr><td>${x.dt}</td><td>${x.who}</td><td>${x.shift}</td><td>₱${fmt(x.amt)}</td><td>${x.note}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No records</td></tr>';const ep=trans.filter(x=>!['Cash','Split'].includes(x.pay?.method||x.pay));$('epTbody').innerHTML=ep.map(x=>`<tr><td>${x.dt}</td><td>#${String(x.tic).padStart(3,'0')}</td><td>₱${fmt(x.total)}</td><td>${x.pay?.method||x.pay}</td><td>${x.pay?.account?`${x.pay.account.name}`:'—'}</td><td>${x.who}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No e-payments</td></tr>'}
+function renderAlerts(){
+    $('errTbody').innerHTML = alerts.map(x =>
+        `<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.soldQty}</td><td>${x.stock}</td><td>${x.who}</td><td>#${String(x.ticket).padStart(3,'0')}</td></tr>`
+    ).join('') || '<tr><td colspan="6" class="empty">✅ No alerts</td></tr>';
+}
+
+function cashOutModal(){
+    const amt = +prompt('Amount to Cash Out:');
+    const note = prompt('Remarks:');
+    if(!amt || amt <= 0) return;
+    cashOuts.unshift({dt:dt(), date:D(), who:user.name, shift:user.sLabel, amt, note:note||''});
+    save(); alert('✅ Recorded!');
+    if(user.type === 'admin') renderCashLog();
+}
+
+function renderCashLog(){
+    $('cashTbody').innerHTML = cashOuts.map(x =>
+        `<tr><td>${x.dt}</td><td>${x.who}</td><td>${x.shift}</td><td>₱${fmt(x.amt)}</td><td>${x.note}</td></tr>`
+    ).join('') || '<tr><td colspan="5" class="empty">No records</td></tr>';
+
+    const ep = trans.filter(x => !['Cash','Split'].includes(x.pay?.method || x.pay));
+    $('epTbody').innerHTML = ep.map(x =>
+        `<tr><td>${x.dt}</td><td>#${String(x.tic).padStart(3,'0')}</td><td>₱${fmt(x.total)}</td><td>${x.pay?.method || x.pay}</td><td>${x.pay?.account?`${x.pay.account.name}`:'—'}</td><td>${x.who}</td></tr>`
+    ).join('') || '<tr><td colspan="6" class="empty">No e-payments</td></tr>';
+}
 </script>
 </body>
 </html>
