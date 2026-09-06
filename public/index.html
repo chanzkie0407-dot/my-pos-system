@@ -16,8 +16,7 @@ th{background:#f9f9f9}
 .tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:bold}
 .tag.cash{background:#e8f5e9;color:#2e7d32}
 .tag.gcash{background:#e3f2fd;color:#1565c0}
-.tag.grab{background:#fff3e0;color:#e65100}
-.tag.fp{background:#f3e5f5;color:#7b1fa2}
+.tag.maya{background:#ede7f6;color:#512da8}
 .tag.bank{background:#e8eaf6;color:#283593}
 .tag.ewallet{background:#fce4ec;color:#ad1457}
 .tag.split{background:#e0f2f1;color:#00695c}
@@ -59,6 +58,7 @@ th{background:#f9f9f9}
 .hint{font-size:12px;color:#888;margin-top:-6px;margin-bottom:10px}
 .online-indicator{display:inline-block;width:10px;height:10px;border-radius:50%;background:#4caf50;margin-right:6px}
 .online-indicator.offline{background:#f44336}
+.pay-detail{background:#f5f5f5;padding:8px;border-radius:6px;margin:6px 0}
 }
 </style>
 </head>
@@ -140,9 +140,20 @@ th{background:#f9f9f9}
         <button onclick="setPay('Grab',this)">🛵 Grab</button>
         <button onclick="setPay('FoodPanda',this)">🐼 FoodPanda</button>
       </div>
+
+      <!-- ✅ BAGONG: BANK / E-WALLET SELECTOR -->
+      <div id="payTypeSel" class="hidden pay-detail">
+        <label class="lbl" id="payTypeLabel">Piliin ang Uri:</label>
+        <select id="payType" onchange="updatePayType()">
+          <option value="">-- Pumili --</option>
+        </select>
+        <input type="text" id="payAccountNo" placeholder="Account / Reference No." style="margin-top:6px">
+      </div>
+
       <div id="cashWarn" class="warn-box hidden">
         ⚠️ <strong>INSUFFICIENT CASH!</strong><br>Maglagay ng sapat na halaga o gamitin ang 💱 SPLIT PAYMENT.
       </div>
+
       <div style="background:#f5f5f5;padding:8px;border-radius:6px;margin:8px 0">
         <label class="lbl">💱 Split Payment</label>
         <div class="split-row">
@@ -156,10 +167,12 @@ th{background:#f9f9f9}
         </div>
         <div style="font-size:13px">Remaining: ₱<span id="amt2">0.00</span></div>
       </div>
+
       <div id="accSel" class="hidden" style="margin:8px 0">
         <label class="lbl">Send To:</label>
         <select id="acc"></select>
       </div>
+
       <input type="number" id="cashIn" placeholder="Cash Received" oninput="calcCheck()">
       <div style="font-weight:bold;padding:8px;background:#e3f2fd;border-radius:6px;margin-top:6px" id="change"></div>
       <br>
@@ -264,13 +277,28 @@ th{background:#f9f9f9}
     <table><thead><tr><th>Date</th><th>Cashier</th><th>Shift</th><th>Amount</th><th>Note</th></tr></thead>
     <tbody id="cashTbody"></tbody></table>
     <h4 style="margin-top:15px">📱 E-Payments</h4>
-    <table><thead><tr><th>Date</th><th>Ticket</th><th>Amount</th><th>Method</th><th>Account</th><th>Cashier</th></tr></thead>
+    <table><thead><tr><th>Date</th><th>Ticket</th><th>Amount</th><th>Method</th><th>Provider</th><th>Account/Ref</th><th>Cashier</th></tr></thead>
     <tbody id="epTbody"></tbody></table>
   </div>
 </div>
 
 <script>
-// ========== CONFIG & DATA ==========
+// ========== ✅ LISTAHAN NG MGA BANGKO AT E-WALLET ==========
+const BANK_LIST = [
+  'BDO Unibank', 'Bank of the Philippine Islands (BPI)', 'Metrobank',
+  'Landbank of the Philippines', 'Philippine National Bank (PNB)',
+  'China Bank', 'Rizal Commercial Banking Corp (RCBC)', 'Security Bank',
+  'UnionBank', 'EastWest Bank', 'Asia United Bank (AUB)',
+  'Development Bank of the Philippines (DBP)', 'Philippine Savings Bank (PSBank)',
+  'Bank of Commerce', 'Maybank Philippines', 'Citi Philippines', 'Standard Chartered',
+  'Hongkong & Shanghai Bank (HSBC)', 'AllBank', 'UCPB Savings Bank', 'Iba pa...'
+];
+
+const EWALLET_LIST = [
+  'GCash', 'Maya (PayMaya)', 'ShopeePay', 'GrabPay', 'Lazada Wallet',
+  'Coins.ph', 'Alipay', 'WeChat Pay', 'LuLu Money PH', 'Starpay', 'Iba pa...'
+];
+
 const PROD = {
     burgers: [
         {n:'Minute Burger',p:43,stock:50},
@@ -383,6 +411,20 @@ function go(){
 }
 function logout(){if(confirm('🚪 Logout?'))location.reload();}
 
+// ========== ✅ BAGONG: I-LOAD ANG LISTAHAN NG BANGKO O E-WALLET ==========
+function loadPayTypeList(type){
+    const sel=$('payType');
+    sel.innerHTML='<option value="">-- Pumili --</option>';
+    if(type==='Bank'){
+        $('payTypeLabel').textContent='🏦 Piliin ang Bangko:';
+        BANK_LIST.forEach(b=>sel.innerHTML+=`<option value="${b}">${b}</option>`);
+    } else if(type==='EWallet'){
+        $('payTypeLabel').textContent='💳 Piliin ang E-Wallet:';
+        EWALLET_LIST.forEach(w=>sel.innerHTML+=`<option value="${w}">${w}</option>`);
+    }
+}
+function updatePayType(){/* pwede dagdagan dito kung kailangan */}
+
 // ========== POS & CART ==========
 function setCat(c,b){cat=c;document.querySelectorAll('.cat button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderProds();}
 function renderProds(){
@@ -408,6 +450,14 @@ function calcCheck(){
 }
 function setPay(m,b){
     payM=m;document.querySelectorAll('.pay button').forEach(x=>x.classList.remove('selected'));if(b)b.classList.add('selected');
+
+    // ✅ Ipakita ang Bank/E-Wallet selector kung kailangan
+    if(m==='Bank'||m==='EWallet'){
+        $('payTypeSel').classList.remove('hidden');
+        loadPayTypeList(m);
+    } else {
+        $('payTypeSel').classList.add('hidden');
+    }
     ['Bank','EWallet','GCash'].includes(m)?$('accSel').classList.remove('hidden'):$('accSel').classList.add('hidden');
     calcCheck();
 }
@@ -422,6 +472,11 @@ function calcSplit(){const t=applyDisc(subtotal()).total,a1=+$('amt1').value||0;
 function checkout(){
     const {total}=applyDisc(subtotal()),paid1=+$('amt1').value||0,accIdx=$('acc').value,acc=accIdx!=''?accounts[+accIdx]:null;
     if(!total)return alert('⚠️ Empty cart!');
+
+    // ✅ Kunin ang napiling Bank/E-Wallet
+    const payProvider=$('payType').value||'';
+    const payRef=$('payAccountNo').value.trim()||'';
+
     if(paid1===0&&payM==='Cash'){const cv=+$('cashIn').value||0;if(cv<total)return alert('⚠️ INSUFFICIENT CASH!\n\nMaglagay ng sapat na halaga o gamitin ang 💱 SPLIT PAYMENT.');}
     const now=dt(),d=D();
     cart.forEach(x=>{
@@ -429,9 +484,30 @@ function checkout(){
         if(cur<x.q)alerts.unshift({dt:now,date:d,item:x.n,soldQty:x.q,stock:cur,who:user.name,ticket:tic});
         if(!sv)stk.push({n:x.n,qty:0,dt:now});else{sv.qty=Math.max(0,sv.qty-x.q);sv.dt=now;}
     });
-    trans.unshift({tic,dt:now,date:d,items:[...cart],subtotal:subtotal(),discount:applyDisc(subtotal()).disc,total,pay:{method:payM,split:!!paid1,amt1:paid1,account:acc},who:user.name,shift:user.sLabel,voided:false,disc:discType});
-    tic++;save();alert(`✅ SAVED! Ticket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${fmt(total)}`);
-    cart=[];discType=null;updCart();$('tic').textContent=String(tic).padStart(3,'0');$('cashIn').value=$('amt1').value='';
+
+    // ✅ Isama ang Bank/E-Wallet provider sa record
+    trans.unshift({
+        tic,dt:now,date:d,items:[...cart],subtotal:subtotal(),discount:applyDisc(subtotal()).disc,total,
+        pay:{
+            method:payM,
+            split:!!paid1,
+            amt1:paid1,
+            provider:payProvider,
+            reference:payRef,
+            account:acc
+        },
+        who:user.name,shift:user.sLabel,voided:false,disc:discType
+    });
+
+    tic++;save();
+    let msg=`✅ SAVED! Ticket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${fmt(total)}`;
+    if(payProvider)msg+=`\nPaid via: ${payProvider}`;
+    alert(msg);
+
+    cart=[];discType=null;updCart();
+    $('tic').textContent=String(tic).padStart(3,'0');
+    $('cashIn').value=$('amt1').value='';
+    $('payType').value='';$('payAccountNo').value='';
     user.type==='cashier'&&renderMyTrans();
 }
 
@@ -459,9 +535,11 @@ function renderMyTrans(){
     mt.forEach(x=>x.voided?vd++:sum+=x.total);
     $('myAmt').textContent=fmt(sum);$('myVoid').textContent=vd;
     $('myTbody').innerHTML=mt.length?mt.map(x=>{
-        let pm=x.pay?.method||x.pay,cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';
+        let pm=x.pay?.method||x.pay,prov=x.pay?.provider||'';
+        let cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';
         if(x.voided)cls='void';
-        return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${pm}</span></td><td>${x.voided?'❌ VOIDED':'✅ COUNTED'}</td></tr>`;
+        let disp=pm;if(prov)disp+=' ('+prov+')';
+        return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${disp}</span></td><td>${x.voided?'❌ VOIDED':'✅ COUNTED'}</td></tr>`;
     }).join(''):'<tr><td colspan=6 class="empty">No transactions yet</td></tr>';
 }
 
@@ -472,9 +550,11 @@ function renderAllSales(){
     trans.forEach(x=>{if(x.voided){vsum+=x.total;return;}if(x.date==today)dsum+=x.total;ssum+=x.total;});
     $('daySale').textContent=fmt(dsum);$('shiftSale').textContent=fmt(ssum);$('voidSum').textContent=fmt(vsum);
     $('allTbody').innerHTML=trans.length?trans.map(x=>{
-        let pm=x.pay?.method||x.pay,cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';
+        let pm=x.pay?.method||x.pay,prov=x.pay?.provider||'';
+        let cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';
         if(x.voided)cls='void';
-        return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${pm}</span></td><td>${x.who}</td><td>${x.shift}</td><td>${x.voided?'<span class="tag void">VOIDED</span>':`<button class="btn-sm btn-red" onclick="voidTrans(${x.tic})">VOID</button>`}</td></tr>`;
+        let disp=pm;if(prov)disp+=' ('+prov+')';
+        return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${disp}</span></td><td>${x.who}</td><td>${x.shift}</td><td>${x.voided?'<span class="tag void">VOIDED</span>':`<button class="btn-sm btn-red" onclick="voidTrans(${x.tic})">VOID</button>`}</td></tr>`;
     }).join(''):'<tr><td colspan=8 class="empty">No sales</td></tr>';
 }
 
@@ -527,7 +607,7 @@ function renderAlerts(){$('errTbody').innerHTML=alerts.map(x=>`<tr><td>${x.dt}</
 function cashOutModal(){const amt=+prompt('Amount to Cash Out:'),note=prompt('Remarks:');if(!amt||amt<=0)return;cashOuts.unshift({dt:dt(),date:D(),who:user.name,shift:user.sLabel,amt,note:note||''});save();alert('✅ Recorded!');renderCashLog();}
 function renderCashLog(){
     $('cashTbody').innerHTML=cashOuts.map(x=>`<tr><td>${x.dt}</td><td>${x.who}</td><td>${x.shift}</td><td>₱${fmt(x.amt)}</td><td>${x.note}</td></tr>`).join('')||'<tr><td colspan=5 class="empty">No records</td></tr>';
-    $('epTbody').innerHTML=trans.filter(x=>x.pay?.method!=='Cash').map(x=>`<tr><td>${x.dt}</td><td>#${String(x.tic).padStart(3,'0')}</td><td>₱${fmt(x.total)}</td><td>${x.pay?.method}</td><td>${x.pay?.account?.name||'-'}</td><td>${x.who}</td></tr>`).join('')||'<tr><td colspan=6 class="empty">No e-payments</td></tr>';
+    $('epTbody').innerHTML=trans.filter(x=>x.pay?.method!=='Cash').map(x=>`<tr><td>${x.dt}</td><td>#${String(x.tic).padStart(3,'0')}</td><td>₱${fmt(x.total)}</td><td>${x.pay?.method}</td><td>${x.pay?.provider||'-'}</td><td>${x.pay?.reference||x.pay?.account?.name||'-'}</td><td>${x.who}</td></tr>`).join('')||'<tr><td colspan=7 class="empty">No e-payments</td></tr>';
 }
 </script>
 </body>
