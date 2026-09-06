@@ -62,7 +62,6 @@ th{background:#f9f9f9}
 </style>
 </head>
 <body>
-
 <!-- LOGIN -->
 <div id="login" class="modal">
 <div class="mbody">
@@ -85,7 +84,6 @@ th{background:#f9f9f9}
 </div>
 </div>
 </div>
-
 <!-- MAIN APP -->
 <div id="app" class="hidden">
 <div class="topbar">
@@ -104,7 +102,6 @@ th{background:#f9f9f9}
   <button onclick="logout()">🚪 Logout</button>
 </div>
 </div>
-
 <!-- POS SCREEN -->
 <div id="vpos" class="panels hidden">
 <div class="prod">
@@ -163,7 +160,6 @@ th{background:#f9f9f9}
 <button class="btn-orange" onclick="cashOutModal()">💰 CHARGE / CASH OUT</button>
 </div>
 </div>
-
 <!-- MY TRANSACTIONS -->
 <div id="vmytrans" class="hidden" style="padding:10px">
 <div class="summary">
@@ -172,7 +168,6 @@ th{background:#f9f9f9}
 </div>
 <table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Status</th></tr></thead><tbody id="myTbody"></tbody></table>
 </div>
-
 <!-- SHIFT INFO -->
 <div id="vshift" class="hidden" style="padding:10px">
 <div class="box" style="background:#e8f5e9">
@@ -183,7 +178,6 @@ th{background:#f9f9f9}
 <p><strong>Ticket #:</strong> #<span id="sTic"></span></p>
 </div>
 </div>
-
 <!-- ALL SALES REPORT -->
 <div id="vallsales" class="hidden" style="padding:10px">
 <div class="summary">
@@ -193,13 +187,11 @@ th{background:#f9f9f9}
 </div>
 <table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Cashier</th><th>Shift</th><th>Action</th></tr></thead><tbody id="allTbody"></tbody></table>
 </div>
-
 <!-- PRODUCT SALES -->
 <div id="vproductsales" class="hidden" style="padding:10px">
 <h3>📈 Product Sales by Shift</h3>
 <div id="prodReport"></div>
 </div>
-
 <!-- STOCKS -->
 <div id="vstocks" class="hidden" style="padding:10px">
 <h3>📦 Stocks On Hand</h3>
@@ -215,7 +207,6 @@ th{background:#f9f9f9}
 <h4>📜 Stock Log</h4>
 <table><thead><tr><th>Date</th><th>Item</th><th>Type</th><th>Qty</th><th>By</th></tr></thead><tbody id="stkLog"></tbody></table>
 </div>
-
 <!-- PRICE UPDATE -->
 <div id="vprices" class="hidden" style="padding:10px">
 <h3>💰 Update Product Prices</h3>
@@ -229,7 +220,6 @@ th{background:#f9f9f9}
 <button class="btn-green" onclick="savePrice()">✅ UPDATE PRICE</button>
 <table style="margin-top:20px"><thead><tr><th>Product</th><th>Old</th><th>New</th><th>Date</th><th>By</th></tr></thead><tbody id="priceLog"></tbody></table>
 </div>
-
 <!-- PAYMENT SETUP -->
 <div id="vpayments" class="hidden" style="padding:10px">
 <h3>🏦 Bank & E-Wallet Accounts</h3>
@@ -245,7 +235,6 @@ th{background:#f9f9f9}
 </div>
 <table><thead><tr><th>Type</th><th>Name</th><th>Number</th><th>Action</th></tr></thead><tbody id="accTbody"></tbody></table>
 </div>
-
 <!-- STOCK ALERTS -->
 <div id="verrors" class="hidden" style="padding:10px">
 <div class="box" style="background:#fff3cd;border:1px solid #ffeeba">
@@ -253,7 +242,6 @@ th{background:#f9f9f9}
 </div>
 <table><thead><tr><th>Date</th><th>Item</th><th>Sold</th><th>Stock</th><th>Cashier</th><th>Ticket</th></tr></thead><tbody id="errTbody"></tbody></table>
 </div>
-
 <!-- CASH LOG -->
 <div id="vcashlog" class="hidden" style="padding:10px">
 <h4>💰 Cash Out Records</h4>
@@ -262,10 +250,8 @@ th{background:#f9f9f9}
 <table><thead><tr><th>Date</th><th>Ticket</th><th>Amount</th><th>Method</th><th>Account</th><th>Cashier</th></tr></thead><tbody id="epTbody"></tbody></table>
 </div>
 </div>
-
 <!-- MODAL -->
 <div id="modal" class="modal hidden"><div class="mbody" id="mcont"></div></div>
-
 <script>
 // ========== CONFIG & DATA ==========
 const PROD = {
@@ -287,7 +273,6 @@ const isOnline=()=>navigator.onLine, save=()=>{localStorage.setItem('tic',tic);l
 const getStock=n=>{const s=stk.find(x=>x.n.trim().toLowerCase()==n.trim().toLowerCase());return s?s.qty:findProd(n)?.stock||0};
 const updNet=()=>{$('netStatus').className='online-indicator'+(isOnline()?'':' offline');if(isOnline()&&pending.length){pending=[];save();alert('✅ Synced!')}};
 window.addEventListener('online',updNet);window.addEventListener('offline',updNet);
-
 // ========== LOGIN — AYOS NA! ==========
 function detectShift(p){$('shiftInfo').textContent = SHIFTS[p] ? '✅ ' + SHIFTS[p].label : ''}
 function showForm(t){
@@ -321,7 +306,6 @@ function go(){
   adm ? showView('allsales') : showView('pos');
 }
 function logout(){confirm('🚪 Logout?') && location.reload()}
-
 // ========== PRODUCTS & CART ==========
 function setCat(c,b){cat=c;document.querySelectorAll('.cat button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderProds()}
 function renderProds(){$('pgrid').innerHTML=PROD[cat].map(x=>`<div class="card" onclick="addItem('${x.n.replace(/'/g,"\\'")}')"><div style="font-size:13px">${x.n}</div><div style="font-weight:bold;color:#008000">₱${x.p}</div></div>`).join('')}
@@ -335,10 +319,8 @@ function calcChange(){const {total}=applyDisc(subtotal()),c=+$('cashIn').value||
 function updPayBtns(){const hasB=accounts.some(a=>a.type=='Bank'),hasE=accounts.some(a=>a.type!='Bank'&&a.type!='GCash');$('bankBtn').classList.toggle('hidden',!hasB);$('ewalletBtn').classList.toggle('hidden',!hasE)}
 function loadAccSel(){$('acc').innerHTML='<option value="">-- Select --</option>'+accounts.map((a,i)=>`<option value="${i}">${a.type}: ${a.name} — ${a.number}</option>`).join('')}
 function calcSplit(){const t=applyDisc(subtotal()).total,a1=+$('amt1').value||0;$('amt2').textContent=fmt(Math.max(0,t-a1))}
-
 // ========== CHECKOUT & SAVE ==========
 function checkout(){const {total}=applyDisc(subtotal()),paid1=+$('amt1').value||0,accIdx=$('acc').value,acc=accIdx!=''?accounts[+accIdx]:null;if(!total)return alert('⚠️ Empty cart!');let payObj={method:payM,split:!!paid1&&paid1<total,amt1:paid1,method1:$('pay1').value,amt2:paid1&&paid1<total?total-paid1:0,method2:'E-Money',account:acc};if(payObj.split);else if(payM=='Cash'&&(+$('cashIn').value||0)<total)return alert('⚠️ Insufficient Cash! Use Split Payment!');const now=dt(),d=D();cart.forEach(x=>{const cur=getStock(x.n),saved=stk.find(s=>s.n.trim().toLowerCase()==x.n.trim().toLowerCase());if(cur<x.q)alerts.unshift({dt:now,date:d,item:x.n,soldQty:x.q,stock:cur,who:user.name,ticket:tic});if(!saved)stk.push({n:x.n,qty:0,dt:now});saved.qty=Math.max(0,saved.qty-x.q);saved.dt=now});trans.unshift({tic,dt:now,date:d,items:[...cart],subtotal:subtotal(),discount:applyDisc(subtotal()).disc,total,pay:payObj,who:user.name,shift:user.sLabel,voided:false,disc:discType});tic++;save();alert(`✅ SAVED! Ticket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${fmt(total)}`);cart=[];discType=null;updCart();$('tic').textContent=String(tic).padStart(3,'0');$('cashIn').value=$('amt1').value='';if(user.type==='cashier')renderMyTrans()}
-
 // ========== VIEW SWITCHING — AYOS NA ANG ERROR ==========
 function showView(v, btn){
   document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
@@ -356,34 +338,27 @@ function showView(v, btn){
   if(v=='errors')renderAlerts();
   if(v=='cashlog')renderCashLog();
 }
-
 // ========== CASHIER VIEWS ==========
 function renderShift(){$('sName').textContent=user.name;$('sLabel').textContent=user.sLabel;$('sStart').textContent=user.start.toLocaleString('en-PH');$('sTic').textContent=String(tic).padStart(3,'0')}
 function renderMyTrans(){const mt=trans.filter(x=>x.who==user.name);let sum=0,vd=0;mt.forEach(x=>x.voided?vd++:sum+=x.total);$('myAmt').textContent=fmt(sum);$('myVoid').textContent=vd;$('myTbody').innerHTML=mt.length?mt.map(x=>{let pm=x.pay?.method||x.pay,cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';if(x.voided)cls='void';return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${pm}</span></td><td>${x.voided?'❌ VOIDED':'✅ COUNTED'}</td></tr>`}).join(''):'<tr><td colspan="6" class="empty">No transactions yet</td></tr>'}
-
 // ========== ADMIN — SALES ==========
 function voidTrans(t){confirm(`Void Ticket #${String(t).padStart(3,'0')}?`)&&(trans.find(x=>x.tic==t).voided=true,save(),renderAllSales(),renderMyTrans())}
 function renderAllSales(){const today=D();let dsum=0,ssum=0,vsum=0;trans.forEach(x=>{if(x.voided)return vsum+=x.total;if(x.date==today)dsum+=x.total;ssum+=x.total});$('daySale').textContent=fmt(dsum);$('shiftSale').textContent=fmt(ssum);$('voidSum').textContent=fmt(vsum);$('allTbody').innerHTML=trans.length?trans.map(x=>{let pm=x.pay?.method||x.pay,cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';if(x.voided)cls='void';return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${pm}</span></td><td>${x.who}</td><td>${x.shift}</td><td>${x.voided?'<span class="tag void">VOIDED</span>':`<button class="btn-sm" onclick="voidTrans(${x.tic})">VOID</button>`}</td></tr>`}).join(''):'<tr><td colspan="8" class="empty">No sales</td></tr>'}
-
 // ========== ADMIN — PRODUCT SALES ==========
 function renderProdSales(){const g={};trans.filter(t=>!t.voided).forEach(tx=>{const k=`${tx.shift}||${tx.date.split(',')[0]}`;if(!g[k])g[k]={shift:tx.shift,date:tx.date.split(',')[0],p:{}};tx.items.forEach(it=>{if(!g[k].p[it.n])g[k].p[it.n]={q:0,s:0};g[k].p[it.n].q+=it.q;g[k].p[it.n].s+=it.p*it.q})});$('prodReport').innerHTML=Object.entries(g).map(([k,v])=>`<div class="shift-group"><h4>${v.shift} — ${v.date}</h4><table><thead><tr><th>Product</th><th>Qty</th><th>Sales</th></tr></thead>${Object.entries(v.p).sort((a,b)=>b[1].s-a[1].s).map(([pn,ps])=>`<tr><td>${pn}</td><td>${ps.q}</td><td>₱${fmt(ps.s)}</td></tr>`).join('')}</table></div>`).join('')||'<div class="empty">No sales yet</div>'}
-
 // ========== ADMIN — STOCKS ==========
 function renderStocks(){$('stkTbody').innerHTML=allProd().map(p=>{const q=getStock(p.n),u=(stk.find(s=>s.n==p.n)||{}).dt||'Initial';return`<tr><td>${p.n}</td><td>${q}</td><td>${u}</td></tr>`}).join('')}
 function stockIn(type){const n=prompt('Product Name:'),q=+prompt('Quantity:');if(!n||q<=0)return;const saved=stk.find(s=>s.n.trim().toLowerCase()==n.trim().toLowerCase()),now=dt();if(!saved){const p=findProd(n);if(!p)return alert('❌ Product not found!');stk.push({n,qty:p.stock+q,dt:now})}else{saved.qty+=q;saved.dt=now}stkLog.unshift({dt:now,item:n,type=='delivery'?'Delivery':'Transfer In',qty:q,by:user.name});save();renderStocks();renderStkLog()}
 function stockOut(type){const n=prompt('Product Name:'),q=+prompt('Quantity:');if(!n||q<=0)return;const saved=stk.find(s=>s.n.trim().toLowerCase()==n.trim().toLowerCase());if(!saved)return alert('❌ Not found!');saved.qty=Math.max(0,saved.qty-q);stkLog.unshift({dt:dt(),item:n,type=='spoil'?'Spoilage':'Transfer Out',qty:-q,by:user.name});save();renderStocks();renderStkLog()}
 function renderStkLog(){$('stkLog').innerHTML=stkLog.map(x=>`<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.type}</td><td>${x.qty}</td><td>${x.by}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No logs</td></tr>'}
-
 // ========== PRICE UPDATE ==========
 function loadProdSel(){$('prodSel').innerHTML='<option value="">-- Select Product --</option>'+allProd().map(p=>`<option value="${p.n}">${p.n} — ₱${p.p}</option>`).join('')}
 function showPrice(){const n=$('prodSel').value;$('curPrice').value=n?findProd(n).p:''}
 function savePrice(){const n=$('prodSel').value,oldP=+$('curPrice').value||0,newP=+$('newPrice').value||0;if(!n||newP<=0)return alert('⚠️ Invalid!');if(newP==oldP)return alert('⚠️ Same price!');const p=findProd(n);if(!p)return alert('❌ Not found!');p.p=newP;priceLogs.unshift({item:n,old:oldP,new:newP,dt:dt(),by:user.name});save();alert('✅ Price Updated!');$('newPrice').value='';loadProdSel();renderPriceLog()}
 function renderPriceLog(){$('priceLog').innerHTML=priceLogs.map(x=>`<tr><td>${x.item}</td><td>₱${fmt(x.old)}</td><td>₱${fmt(x.new)}</td><td>${x.dt}</td><td>${x.by}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No changes</td></tr>'}
-
 // ========== PAYMENT ACCOUNTS ==========
 function saveAcc(){const t=$('accType').value,n=$('accName').value.trim(),num=$('accNum').value.trim();if(!n||!num)return alert('⚠️ Fill all fields!');accounts.push({type:t,name:n,number:num,by:user.name,dt:dt()});save();alert('✅ Saved!');$('accName').value=$('accNum').value='';renderAccs();updPayBtns()}
 function renderAccs(){$('accTbody').innerHTML=accounts.length?accounts.map((a,i)=>`<tr><td>${a.type}</td><td>${a.name}</td><td>${a.number}</td><td><button class="btn-red btn-sm" onclick="accounts.splice(${i},1);save();renderAccs();updPayBtns()">Delete</button></td></tr>`).join(''):'<tr><td colspan="4" class="empty">No accounts yet</td></tr>'}
-
 // ========== ALERTS & CASH LOG ==========
 function renderAlerts(){$('errTbody').innerHTML=alerts.map(x=>`<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.soldQty}</td><td>${x.stock}</td><td>${x.who}</td><td>#${String(x.ticket).padStart(3,'0')}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">✅ No alerts</td></tr>'}
 function cashOutModal(){const amt=+prompt('Amount to Cash Out:'),note=prompt('Remarks:');if(!amt||amt<=0)return;cashOuts.unshift({dt:dt(),date:D(),who:user.name,shift:user.sLabel,amt,note:note||''});save();alert('✅ Recorded!');if(user.type==='admin')renderCashLog()}
