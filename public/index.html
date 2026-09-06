@@ -39,12 +39,13 @@ th{background:#f9f9f9}
 .pay button.selected{background:#e8f5e9;color:#008000;border:2px solid #00a000}
 .btn-green{background:#00a000;color:#fff;width:100%;font-weight:bold}
 .btn-orange{background:#ff9800;color:#fff;width:100%}
+.btn-blue{background:#2196f3;color:#fff;width:100%}
 .btn-red{background:#d32f2f;color:#fff;width:100%}
 .btn-sm{padding:6px 10px;font-size:13px;width:auto;margin:2px}
 .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
 .box{background:#fff;padding:10px;border-radius:8px;text-align:center}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;padding:15px;z-index:999}
-.mbody{background:#fff;border-radius:12px;padding:20px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto}
+.mbody{background:#fff;border-radius:12px;padding:20px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;text-align:center}
 .stk-box{background:#e8f5e9;padding:12px;border-radius:8px;margin:10px 0}
 .split-row{display:flex;gap:6px;align-items:center;margin:6px 0}
 .split-row input,.split-row select{flex:1;margin:0}
@@ -58,8 +59,11 @@ th{background:#f9f9f9}
 .hint{font-size:12px;color:#888;margin-top:-6px;margin-bottom:10px}
 .online-indicator{display:inline-block;width:10px;height:10px;border-radius:50%;background:#4caf50;margin-right:6px}
 .online-indicator.offline{background:#f44336}
-.pay-detail{background:#f5f5f5;padding:8px;border-radius:6px;margin:6px 0}
-}
+.pay-item{padding:10px;border:2px solid #eee;border-radius:8px;margin:6px 0;cursor:pointer;transition:all 0.2s}
+.pay-item:hover{border-color:#00a000;background:#f1f8f1}
+.pay-item.selected{border-color:#00a000;background:#e8f5e9}
+.qr-container{padding:20px;background:#fff;border-radius:12px;margin-top:10px}
+.qr-container canvas{width:280px !important;height:280px !important;margin:0 auto;display:block}
 </style>
 </head>
 <body>
@@ -81,8 +85,33 @@ th{background:#f9f9f9}
       <button class="btn-green" onclick="loginCashier()">✅ Start Shift</button>
     </div>
     <div id="aform" class="hidden">
-      <input type="password" id="apass" placeholder="Admin Password">
+      <input type="password" id="apass" placeholder="Admin Password (admin123)">
       <button class="btn-green" onclick="loginAdmin()">🔐 Login as Admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR CODE MODAL -->
+<div id="qrModal" class="modal hidden">
+  <div class="mbody">
+    <h3>📱 SCAN TO PAY</h3>
+    <div class="qr-container" id="qrDisplay">Generating QR Code...</div>
+    <p style="margin-top:10px;font-size:14px"><strong id="qrAccName"></strong></p>
+    <p style="font-size:13px;color:#555" id="qrAccNum"></p>
+    <p style="font-size:12px;color:#888;margin-top:8px">Total: ₱<span id="qrAmount">0.00</span></p>
+    <button class="btn-green" onclick="closeQrModal()" style="margin-top:15px">✅ CLOSE</button>
+  </div>
+</div>
+
+<!-- CASH OUT MODAL -->
+<div id="cashOutModal" class="modal hidden">
+  <div class="mbody">
+    <h3>💰 CASH OUT / CHARGE</h3>
+    <input type="number" id="cashOutAmt" placeholder="Amount">
+    <input type="text" id="cashOutNote" placeholder="Note / Description">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn-green" onclick="saveCashOut()">✅ SAVE</button>
+      <button class="btn-red" onclick="closeCashOutModal()">❌ CANCEL</button>
     </div>
   </div>
 </div>
@@ -141,13 +170,11 @@ th{background:#f9f9f9}
         <button onclick="setPay('FoodPanda',this)">🐼 FoodPanda</button>
       </div>
 
-      <!-- ✅ BAGONG: BANK / E-WALLET SELECTOR -->
-      <div id="payTypeSel" class="hidden pay-detail">
-        <label class="lbl" id="payTypeLabel">Piliin ang Uri:</label>
-        <select id="payType" onchange="updatePayType()">
-          <option value="">-- Pumili --</option>
-        </select>
-        <input type="text" id="payAccountNo" placeholder="Account / Reference No." style="margin-top:6px">
+      <div id="accSelectSection" class="hidden">
+        <label class="lbl">📱 Piliin ang Account:</label>
+        <div id="accList" style="margin:6px 0 10px 0;max-height:180px;overflow-y:auto"></div>
+        <button id="showQrBtn" class="btn-blue" onclick="showQrCodeModal()" style="display:none;margin:6px 0">📱 SHOW QR CODE</button>
+        <input type="text" id="payRef" placeholder="Reference / Contact No." style="margin-top:6px">
       </div>
 
       <div id="cashWarn" class="warn-box hidden">
@@ -166,11 +193,6 @@ th{background:#f9f9f9}
           <input type="number" id="amt1" placeholder="Amount" oninput="calcSplit()">
         </div>
         <div style="font-size:13px">Remaining: ₱<span id="amt2">0.00</span></div>
-      </div>
-
-      <div id="accSel" class="hidden" style="margin:8px 0">
-        <label class="lbl">Send To:</label>
-        <select id="acc"></select>
       </div>
 
       <input type="number" id="cashIn" placeholder="Cash Received" oninput="calcCheck()">
@@ -205,7 +227,7 @@ th{background:#f9f9f9}
   <div id="vallsales" class="hidden" style="padding:10px">
     <div class="summary">
       <div class="box"><div>📅 Today Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="daySale">0.00</span></div></div>
-      <div class="box"><div>⏱️ Shift Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="shiftSale">0.00</span></div></div>
+      <div class="box"><div>⏱️ All Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="shiftSale">0.00</span></div></div>
       <div class="box"><div>❌ Voided</div><div style="font-size:18px;font-weight:bold">₱<span id="voidSum">0.00</span></div></div>
     </div>
     <table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Cashier</th><th>Shift</th><th>Action</th></tr></thead>
@@ -249,18 +271,23 @@ th{background:#f9f9f9}
   </div>
 
   <div id="vpayments" class="hidden" style="padding:10px">
-    <h3>🏦 Bank & E-Wallet Accounts</h3>
+    <h3>🏦 Add Payment Receiver Account</h3>
     <div class="stk-box">
-      <select id="accType">
+      <select id="accType" onchange="updateProviderList()">
         <option value="Bank">🏦 Bank</option>
         <option value="GCash">📱 GCash</option>
         <option value="EWallet">💳 E-Wallet</option>
       </select>
-      <input type="text" id="accName" placeholder="Account Name">
-      <input type="text" id="accNum" placeholder="Account/Number">
-      <button class="btn-green" onclick="saveAcc()">✅ Save</button>
+      <label class="lbl" style="margin-top:8px;display:block">Provider:</label>
+      <select id="providerSel">
+        <option value="">-- Pumili --</option>
+      </select>
+      <input type="text" id="accName" placeholder="Account / Business Name">
+      <input type="text" id="accNum" placeholder="Account Number / Reference No.">
+      <button class="btn-green" onclick="saveAcc()">✅ SAVE ACCOUNT</button>
     </div>
-    <table><thead><tr><th>Type</th><th>Name</th><th>Number</th><th>Action</th></tr></thead>
+    <h4 style="margin-top:20px">📋 Saved Payment Receivers</h4>
+    <table><thead><tr><th>Type</th><th>Provider</th><th>Account Name</th><th>Account No.</th><th>Action</th></tr></thead>
     <tbody id="accTbody"></tbody></table>
   </div>
 
@@ -282,23 +309,21 @@ th{background:#f9f9f9}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 <script>
-// ========== ✅ LISTAHAN NG MGA BANGKO AT E-WALLET ==========
+// ========== BANK & E-WALLET LISTS ==========
 const BANK_LIST = [
   'BDO Unibank', 'Bank of the Philippine Islands (BPI)', 'Metrobank',
   'Landbank of the Philippines', 'Philippine National Bank (PNB)',
   'China Bank', 'Rizal Commercial Banking Corp (RCBC)', 'Security Bank',
   'UnionBank', 'EastWest Bank', 'Asia United Bank (AUB)',
   'Development Bank of the Philippines (DBP)', 'Philippine Savings Bank (PSBank)',
-  'Bank of Commerce', 'Maybank Philippines', 'Citi Philippines', 'Standard Chartered',
-  'Hongkong & Shanghai Bank (HSBC)', 'AllBank', 'UCPB Savings Bank', 'Iba pa...'
+  'Bank of Commerce', 'Maybank Philippines', 'HSBC Philippines', 'Standard Chartered',
+  'Iba pang Bangko...'
 ];
+const WALLET_LIST = ['GCash','Maya','ShopeePay','GrabPay','Lazada Wallet','Coins.ph','Alipay','WeChat Pay','Iba pang E-Wallet...'];
 
-const EWALLET_LIST = [
-  'GCash', 'Maya (PayMaya)', 'ShopeePay', 'GrabPay', 'Lazada Wallet',
-  'Coins.ph', 'Alipay', 'WeChat Pay', 'LuLu Money PH', 'Starpay', 'Iba pa...'
-];
-
+// ========== PRODUCT DATA ==========
 const PROD = {
     burgers: [
         {n:'Minute Burger',p:43,stock:50},
@@ -353,6 +378,7 @@ const findProd = n => allProd().find(x => x.n.trim().toLowerCase() == n.trim().t
 let user = {logged:false, type:'', name:'', shift:'', sLabel:'', start:null};
 let cat = 'burgers', cart = [], payM = 'Cash', discType = null;
 let tic = +localStorage.getItem('tic') || 1;
+let selectedAccount = null;
 
 let trans = JSON.parse(localStorage.getItem('trans') || '[]');
 let stk = JSON.parse(localStorage.getItem('stk') || '[]');
@@ -385,6 +411,39 @@ const updNet = () => {
 window.addEventListener('online', updNet);
 window.addEventListener('offline', updNet);
 
+// ========== UPDATE PROVIDER LIST ==========
+function updateProviderList(){
+    const type = $('accType').value;
+    const sel = $('providerSel');
+    sel.innerHTML = '<option value="">-- Pumili --</option>';
+    if(type === 'Bank') BANK_LIST.forEach(b => sel.innerHTML += `<option value="${b}">${b}</option>`);
+    else if(type === 'GCash') sel.innerHTML += '<option value="GCash">GCash</option>';
+    else if(type === 'EWallet') WALLET_LIST.forEach(w => sel.innerHTML += `<option value="${w}">${w}</option>`);
+}
+
+// ========== QR CODE ==========
+function buildQrText(acc, amount){
+    return `PAYMENT TO: ${acc.name}\nPROVIDER: ${acc.provider}\nACCOUNT: ${acc.number}\nAMOUNT: ₱${fmt(amount)}\nDATE: ${D()}`;
+}
+function showQrCodeModal(){
+    if(!selectedAccount) return alert('⚠️ Pumili muna ng account!');
+    const {total} = applyDisc(subtotal());
+    $('qrAmount').textContent = fmt(total);
+    $('qrAccName').textContent = selectedAccount.name;
+    const num = selectedAccount.number;
+    $('qrAccNum').textContent = num.length > 8 ? '****' + num.slice(-4) : num;
+    $('qrModal').classList.remove('hidden');
+    if(typeof QRCode !== 'undefined'){
+        QRCode.toCanvas(buildQrText(selectedAccount, total), {width:280, margin:2}, function(err, canvas){
+            if(err){$('qrDisplay').innerHTML='❌ Failed to generate QR';return;}
+            $('qrDisplay').innerHTML='';
+            canvas.style.display='block'; canvas.style.margin='0 auto';
+            $('qrDisplay').appendChild(canvas);
+        });
+    } else { $('qrDisplay').innerHTML='📱 Loading...'; }
+}
+function closeQrModal(){$('qrModal').classList.add('hidden')}
+
 // ========== LOGIN ==========
 function detectShift(p){$('shiftInfo').textContent = SHIFTS[p] ? '✅ ' + SHIFTS[p].label : ''}
 function showForm(t){$('cform').classList.add('hidden');$('aform').classList.add('hidden');if(t==='cashier')$('cform').classList.remove('hidden');else if(t==='admin')$('aform').classList.remove('hidden')}
@@ -402,7 +461,7 @@ function go(){
     $('login').classList.add('hidden');$('app').classList.remove('hidden');
     $('user').textContent = `${user.sLabel} | ${user.name}`;
     $('tic').textContent = String(tic).padStart(3,'0');
-    updNet();updPayBtns();loadAccSel();
+    updNet();updPayBtns();
     $('sName').textContent=user.name;$('sLabel').textContent=user.sLabel;$('sStart').textContent=user.start?.toLocaleString('en-PH')||'-';
     const adm=user.type==='admin';
     ['nsales','nreceipts','nshift'].forEach(id=>$(id).classList.toggle('hidden',adm));
@@ -410,20 +469,6 @@ function go(){
     adm?showView('allsales'):showView('pos');
 }
 function logout(){if(confirm('🚪 Logout?'))location.reload();}
-
-// ========== ✅ BAGONG: I-LOAD ANG LISTAHAN NG BANGKO O E-WALLET ==========
-function loadPayTypeList(type){
-    const sel=$('payType');
-    sel.innerHTML='<option value="">-- Pumili --</option>';
-    if(type==='Bank'){
-        $('payTypeLabel').textContent='🏦 Piliin ang Bangko:';
-        BANK_LIST.forEach(b=>sel.innerHTML+=`<option value="${b}">${b}</option>`);
-    } else if(type==='EWallet'){
-        $('payTypeLabel').textContent='💳 Piliin ang E-Wallet:';
-        EWALLET_LIST.forEach(w=>sel.innerHTML+=`<option value="${w}">${w}</option>`);
-    }
-}
-function updatePayType(){/* pwede dagdagan dito kung kailangan */}
 
 // ========== POS & CART ==========
 function setCat(c,b){cat=c;document.querySelectorAll('.cat button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderProds();}
@@ -448,66 +493,62 @@ function calcCheck(){
     if(payM==='Cash'&&cv>0&&cv<total){$('cashWarn').classList.remove('hidden');}else{$('cashWarn').classList.add('hidden');}
     $('change').innerHTML=(payM==='Cash'&&cv>=total&&total>0)?`💰 CHANGE: ₱${fmt(cv-total)}`:'';
 }
+
+// ========== ACCOUNT SELECTION ==========
+function loadAccountsList(filterType){
+    const list = $('accList');
+    let filtered = [];
+    if(filterType==='GCash')filtered=accounts.filter(a=>a.type==='GCash');
+    else if(filterType==='Bank')filtered=accounts.filter(a=>a.type==='Bank');
+    else if(filterType==='EWallet')filtered=accounts.filter(a=>a.type==='EWallet');
+    selectedAccount=null;$('showQrBtn').style.display='none';
+    if(!filtered.length){list.innerHTML='<div class="empty">⚠️ Walang account. Magtanong sa Admin.</div>';return;}
+    list.innerHTML=filtered.map((a,i)=>{
+        const dsp=a.number.length>8?'****'+a.number.slice(-4):a.number;
+        return `<div class="pay-item" id="acc-item-${i}" onclick="selectThisAccount(${i},'${filterType}')"><strong>${a.provider}</strong> — ${a.name}<br><small style="color:#555">${dsp}</small></div>`;
+    }).join('');
+}
+function selectThisAccount(idx,filterType){
+    let filtered=[];
+    if(filterType==='GCash')filtered=accounts.filter(a=>a.type==='GCash');
+    else if(filterType==='Bank')filtered=accounts.filter(a=>a.type==='Bank');
+    else if(filterType==='EWallet')filtered=accounts.filter(a=>a.type==='EWallet');
+    selectedAccount=filtered[idx];
+    document.querySelectorAll('.pay-item').forEach(e=>e.classList.remove('selected'));
+    $(`acc-item-${idx}`).classList.add('selected');
+    $('showQrBtn').style.display='block';
+}
 function setPay(m,b){
     payM=m;document.querySelectorAll('.pay button').forEach(x=>x.classList.remove('selected'));if(b)b.classList.add('selected');
-
-    // ✅ Ipakita ang Bank/E-Wallet selector kung kailangan
-    if(m==='Bank'||m==='EWallet'){
-        $('payTypeSel').classList.remove('hidden');
-        loadPayTypeList(m);
-    } else {
-        $('payTypeSel').classList.add('hidden');
-    }
-    ['Bank','EWallet','GCash'].includes(m)?$('accSel').classList.remove('hidden'):$('accSel').classList.add('hidden');
+    if(['Bank','EWallet','GCash'].includes(m)){$('accSelectSection').classList.remove('hidden');loadAccountsList(m);}
+    else{$('accSelectSection').classList.add('hidden');selectedAccount=null;}
     calcCheck();
 }
 function updPayBtns(){
-    const hasB=accounts.some(a=>a.type=='Bank'),hasE=accounts.some(a=>a.type!='Bank'&&a.type!='GCash');
+    const hasB=accounts.some(a=>a.type==='Bank'),hasE=accounts.some(a=>a.type==='EWallet');
     $('bankBtn').classList.toggle('hidden',!hasB);$('ewalletBtn').classList.toggle('hidden',!hasE);
 }
-function loadAccSel(){$('acc').innerHTML='<option value="">-- Select --</option>'+accounts.map((a,i)=>`<option value="${i}">${a.type}: ${a.name} — ${a.number}</option>`).join('');}
 function calcSplit(){const t=applyDisc(subtotal()).total,a1=+$('amt1').value||0;$('amt2').textContent=fmt(Math.max(0,t-a1));}
 
-// ========== CHECKOUT WITH PROTECTION ==========
+// ========== CHECKOUT ==========
 function checkout(){
-    const {total}=applyDisc(subtotal()),paid1=+$('amt1').value||0,accIdx=$('acc').value,acc=accIdx!=''?accounts[+accIdx]:null;
+    const {total}=applyDisc(subtotal()),paid1=+$('amt1').value||0;
     if(!total)return alert('⚠️ Empty cart!');
-
-    // ✅ Kunin ang napiling Bank/E-Wallet
-    const payProvider=$('payType').value||'';
-    const payRef=$('payAccountNo').value.trim()||'';
-
-    if(paid1===0&&payM==='Cash'){const cv=+$('cashIn').value||0;if(cv<total)return alert('⚠️ INSUFFICIENT CASH!\n\nMaglagay ng sapat na halaga o gamitin ang 💱 SPLIT PAYMENT.');}
+    if(paid1===0&&payM==='Cash'){const cv=+$('cashIn').value||0;if(cv<total)return alert('⚠️ INSUFFICIENT CASH!');}
     const now=dt(),d=D();
     cart.forEach(x=>{
         const cur=getStock(x.n),sv=stk.find(s=>s.n.trim().toLowerCase()==x.n.trim().toLowerCase());
         if(cur<x.q)alerts.unshift({dt:now,date:d,item:x.n,soldQty:x.q,stock:cur,who:user.name,ticket:tic});
-        if(!sv)stk.push({n:x.n,qty:0,dt:now});else{sv.qty=Math.max(0,sv.qty-x.q);sv.dt=now;}
+        if(!sv)stk.push({n:x.n,qty:Math.max(0,(findProd(x.n)?.stock||0)-x.q),dt:now});
+        else{sv.qty=Math.max(0,sv.qty-x.q);sv.dt=now;}
     });
-
-    // ✅ Isama ang Bank/E-Wallet provider sa record
-    trans.unshift({
-        tic,dt:now,date:d,items:[...cart],subtotal:subtotal(),discount:applyDisc(subtotal()).disc,total,
-        pay:{
-            method:payM,
-            split:!!paid1,
-            amt1:paid1,
-            provider:payProvider,
-            reference:payRef,
-            account:acc
-        },
-        who:user.name,shift:user.sLabel,voided:false,disc:discType
-    });
-
+    trans.unshift({tic,dt:now,date:d,items:[...cart],subtotal:subtotal(),discount:applyDisc(subtotal()).disc,total,pay:{method:payM,split:!!paid1,amt1:paid1,account:selectedAccount,reference:$('payRef').value.trim()},who:user.name,shift:user.sLabel,voided:false,disc:discType});
     tic++;save();
-    let msg=`✅ SAVED! Ticket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${fmt(total)}`;
-    if(payProvider)msg+=`\nPaid via: ${payProvider}`;
-    alert(msg);
-
+    alert(`✅ SAVED! Ticket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${fmt(total)}`);
     cart=[];discType=null;updCart();
     $('tic').textContent=String(tic).padStart(3,'0');
-    $('cashIn').value=$('amt1').value='';
-    $('payType').value='';$('payAccountNo').value='';
+    $('cashIn').value=$('amt1').value=$('payRef').value='';
+    $('accSelectSection').classList.add('hidden');selectedAccount=null;
     user.type==='cashier'&&renderMyTrans();
 }
 
@@ -516,14 +557,13 @@ function showView(v,btn){
     document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');
     ['vpos','vmytrans','vshift','vallsales','vproductsales','vstocks','vprices','vpayments','verrors','vcashlog'].forEach(id=>$(id).classList.add('hidden'));
     $(`v${v}`).classList.remove('hidden');
-    if(v=='pos'){renderProds();updPayBtns();loadAccSel();}
+    if(v=='pos'){renderProds();updPayBtns();}
     if(v=='mytrans')renderMyTrans();
     if(v=='shift')renderShift();
     if(v=='allsales')renderAllSales();
     if(v=='productsales')renderProdSales();
     if(v=='stocks'){renderStocks();renderStkLog();}
-    if(v=='prices'){}
-    if(v=='payments')renderAccs();
+    if(v=='payments'){updateProviderList();renderAccs();}
     if(v=='errors')renderAlerts();
     if(v=='cashlog')renderCashLog();
 }
@@ -535,10 +575,10 @@ function renderMyTrans(){
     mt.forEach(x=>x.voided?vd++:sum+=x.total);
     $('myAmt').textContent=fmt(sum);$('myVoid').textContent=vd;
     $('myTbody').innerHTML=mt.length?mt.map(x=>{
-        let pm=x.pay?.method||x.pay,prov=x.pay?.provider||'';
-        let cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';
+        let pm=x.pay?.method||x.pay,prov=x.pay?.account?.provider||'';
+        let cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Split:'split'}[pm]||'';
         if(x.voided)cls='void';
-        let disp=pm;if(prov)disp+=' ('+prov+')';
+        let disp=pm;if(prov)disp+=` (${prov})`;
         return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${disp}</span></td><td>${x.voided?'❌ VOIDED':'✅ COUNTED'}</td></tr>`;
     }).join(''):'<tr><td colspan=6 class="empty">No transactions yet</td></tr>';
 }
@@ -550,10 +590,10 @@ function renderAllSales(){
     trans.forEach(x=>{if(x.voided){vsum+=x.total;return;}if(x.date==today)dsum+=x.total;ssum+=x.total;});
     $('daySale').textContent=fmt(dsum);$('shiftSale').textContent=fmt(ssum);$('voidSum').textContent=fmt(vsum);
     $('allTbody').innerHTML=trans.length?trans.map(x=>{
-        let pm=x.pay?.method||x.pay,prov=x.pay?.provider||'';
-        let cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';
+        let pm=x.pay?.method||x.pay,prov=x.pay?.account?.provider||'';
+        let cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Split:'split'}[pm]||'';
         if(x.voided)cls='void';
-        let disp=pm;if(prov)disp+=' ('+prov+')';
+        let disp=pm;if(prov)disp+=` (${prov})`;
         return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${disp}</span></td><td>${x.who}</td><td>${x.shift}</td><td>${x.voided?'<span class="tag void">VOIDED</span>':`<button class="btn-sm btn-red" onclick="voidTrans(${x.tic})">VOID</button>`}</td></tr>`;
     }).join(''):'<tr><td colspan=8 class="empty">No sales</td></tr>';
 }
@@ -578,37 +618,77 @@ function stockIn(type){
 }
 function stockOut(type){
     const n=prompt('Product Name:'),q=+prompt('Quantity:');if(!n||q<=0)return;
-    const sv=stk.find(s=>s.n.trim().toLowerCase()==n.trim().toLowerCase());if(!sv)return alert('❌ Not found!');
-    sv.qty=Math.max(0,sv.qty-q);stkLog.unshift({dt:dt(),item:n,type:type=='spoil'?'Spoilage':'Transfer Out',qty:-q,by:user.name});save();renderStocks();renderStkLog();
+    const sv=stk.find(s=>s.n.trim().toLowerCase()==n.trim().toLowerCase());if(!sv)return alert('❌ Item not found!');
+    if(sv.qty<q)return alert('⚠️ Not enough stock!');
+    sv.qty-=q;sv.dt=dt();
+    stkLog.unshift({dt:dt(),item:n,type:type=='transfer'?'Transfer Out':'Spoilage',qty:q,by:user.name});save();renderStocks();renderStkLog();
 }
-function renderStkLog(){$('stkLog').innerHTML=stkLog.map(x=>`<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.type}</td><td>${x.qty}</td><td>${x.by}</td></tr>`).join('')||'<tr><td colspan=5 class="empty">No logs</td></tr>';}
+function renderStkLog(){$('stkLog').innerHTML=stkLog.length?stkLog.map(x=>`<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.type}</td><td>${x.qty}</td><td>${x.by}</td></tr>`).join(''):'<tr><td colspan=5 class="empty">No stock logs</td></tr>';}
 
-// ========== PRICE UPDATE ==========
-function showPrice(){const n=$('prodSel').value;$('curPrice').value=n?findProd(n).p:'';}
+// ========== PRICES ==========
+function showPrice(){const p=findProd($('prodSel').value);$('curPrice').value=p?p.p:'';}
 function savePrice(){
-    const n=$('prodSel').value,oldP=+$('curPrice').value||0,newP=+$('newPrice').value||0;
-    if(!n||newP<=0)return alert('⚠️ Invalid!');if(newP==oldP)return alert('⚠️ Same price!');
-    const p=findProd(n);if(!p)return alert('❌ Not found!');p.p=newP;
-    priceLogs.unshift({item:n,old:oldP,new:newP,dt:dt(),by:user.name});save();alert('✅ Price Updated!');$('newPrice').value='';renderPriceLog();
+    const n=$('prodSel').value,old=$('curPrice').value*1,newP=$('newPrice').value*1;
+    if(!n||!newP||newP<=0)return alert('⚠️ Fill all fields correctly!');
+    const prod = findProd(n);
+    if(prod){
+        prod.p = newP;
+        priceLogs.unshift({item:n,old,new:newP,dt:dt(),who:user.name});
+        save();
+        alert(`✅ Price updated!\n${n}: ₱${fmt(old)} → ₱${fmt(newP)}`);
+        $('newPrice').value='';
+        renderPriceLog();
+    }
 }
-function renderPriceLog(){$('priceLog').innerHTML=priceLogs.map(x=>`<tr><td>${x.item}</td><td>₱${fmt(x.old)}</td><td>₱${fmt(x.new)}</td><td>${x.dt}</td><td>${x.by}</td></tr>`).join('')||'<tr><td colspan=5 class="empty">No changes</td></tr>';}
+function renderPriceLog(){$('priceLog').innerHTML=priceLogs.length?priceLogs.map(x=>`<tr><td>${x.item}</td><td>₱${fmt(x.old)}</td><td>₱${fmt(x.new)}</td><td>${x.dt}</td><td>${x.who}</td></tr>`).join(''):'<tr><td colspan=5 class="empty">No price changes yet</td></tr>';}
 
 // ========== PAYMENT ACCOUNTS ==========
 function saveAcc(){
-    const t=$('accType').value,n=$('accName').value.trim(),num=$('accNum').value.trim();
-    if(!n||!num)return alert('⚠️ Fill all fields!');
-    accounts.push({type:t,name:n,number:num,by:user.name,dt:dt()});save();alert('✅ Saved!');
-    $('accName').value=$('accNum').value='';renderAccs();updPayBtns();
+    const type=$('accType').value,prov=$('providerSel').value,name=$('accName').value.trim(),num=$('accNum').value.trim();
+    if(!prov||!name||!num)return alert('⚠️ Fill all fields!');
+    accounts.push({type,provider:prov,name,number:num,dt:dt()});
+    save();alert('✅ Account saved!');
+    $('accName').value=$('accNum').value='';
+    renderAccs();updPayBtns();
 }
-function renderAccs(){$('accTbody').innerHTML=accounts.length?accounts.map((a,i)=>`<tr><td>${a.type}</td><td>${a.name}</td><td>${a.number}</td><td><button class="btn-red btn-sm" onclick="accounts.splice(${i},1);save();renderAccs();updPayBtns()">Delete</button></td></tr>`).join(''):'<tr><td colspan=4 class="empty">No accounts yet</td></tr>';}
+function renderAccs(){
+    $('accTbody').innerHTML=accounts.length?accounts.map((a,i)=>{
+        const dsp=a.number.length>8?'****'+a.number.slice(-4):a.number;
+        return `<tr><td>${a.type}</td><td>${a.provider}</td><td>${a.name}</td><td>${dsp}</td><td><button class="btn-sm btn-red" onclick="delAcc(${i})">Delete</button></td></tr>`;
+    }).join(''):'<tr><td colspan=5 class="empty">No accounts added yet</td></tr>';
+}
+function delAcc(i){if(confirm('Delete this account?')){accounts.splice(i,1);save();renderAccs();updPayBtns();}}
 
-// ========== ALERTS & CASH LOG ==========
-function renderAlerts(){$('errTbody').innerHTML=alerts.map(x=>`<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.soldQty}</td><td>${x.stock}</td><td>${x.who}</td><td>#${String(x.ticket).padStart(3,'0')}</td></tr>`).join('')||'<tr><td colspan=6 class="empty">✅ No alerts</td></tr>';}
-function cashOutModal(){const amt=+prompt('Amount to Cash Out:'),note=prompt('Remarks:');if(!amt||amt<=0)return;cashOuts.unshift({dt:dt(),date:D(),who:user.name,shift:user.sLabel,amt,note:note||''});save();alert('✅ Recorded!');renderCashLog();}
-function renderCashLog(){
-    $('cashTbody').innerHTML=cashOuts.map(x=>`<tr><td>${x.dt}</td><td>${x.who}</td><td>${x.shift}</td><td>₱${fmt(x.amt)}</td><td>${x.note}</td></tr>`).join('')||'<tr><td colspan=5 class="empty">No records</td></tr>';
-    $('epTbody').innerHTML=trans.filter(x=>x.pay?.method!=='Cash').map(x=>`<tr><td>${x.dt}</td><td>#${String(x.tic).padStart(3,'0')}</td><td>₱${fmt(x.total)}</td><td>${x.pay?.method}</td><td>${x.pay?.provider||'-'}</td><td>${x.pay?.reference||x.pay?.account?.name||'-'}</td><td>${x.who}</td></tr>`).join('')||'<tr><td colspan=7 class="empty">No e-payments</td></tr>';
+// ========== ALERTS ==========
+function renderAlerts(){
+    $('errTbody').innerHTML=alerts.length?alerts.map(x=>`<tr><td>${x.date}</td><td>${x.item}</td><td>${x.soldQty}</td><td>${x.stock}</td><td>${x.who}</td><td>#${x.ticket}</td></tr>`).join(''):'<tr><td colspan=6 class="empty">No alerts</td></tr>';
 }
+
+// ========== CASH OUT ==========
+function cashOutModal(){$('cashOutModal').classList.remove('hidden');$('cashOutAmt').value=$('cashOutNote').value='';}
+function closeCashOutModal(){$('cashOutModal').classList.add('hidden');}
+function saveCashOut(){
+    const amt=$('cashOutAmt').value*1,note=$('cashOutNote').value.trim();
+    if(!amt||amt<=0)return alert('⚠️ Enter valid amount!');
+    cashOuts.unshift({date:D(),dt:dt(),amount:amt,note:note||'Cash Out',who:user.name,shift:user.sLabel});
+    save();alert('✅ Cash Out Saved!');
+    closeCashOutModal();
+    renderCashLog();
+}
+function renderCashLog(){
+    $('cashTbody').innerHTML=cashOuts.length?cashOuts.map(x=>`<tr><td>${x.dt}</td><td>${x.who}</td><td>${x.shift}</td><td>₱${fmt(x.amount)}</td><td>${x.note}</td></tr>`).join(''):'<tr><td colspan=5 class="empty">No cash out records</td></tr>';
+    $('epTbody').innerHTML=trans.filter(t=>t.pay?.account).map(x=>{
+        const a=x.pay.account;
+        return `<tr><td>${x.date}</td><td>#${String(x.tic).padStart(3,'0')}</td><td>₱${fmt(x.total)}</td><td>${x.pay.method}</td><td>${a.provider}</td><td>${a.number.length>8?'****'+a.number.slice(-4):a.number}</td><td>${x.who}</td></tr>`;
+    }).join('')||'<tr><td colspan=7 class="empty">No e-payments yet</td></tr>';
+}
+
+// ========== INITIALIZE ==========
+window.onload=function(){
+    const sel=$('prodSel');
+    allProd().forEach(p=>sel.innerHTML+=`<option value="${p.n}">${p.n} — ₱${p.p}</option>`);
+    updNet();
+};
 </script>
 </body>
 </html>
