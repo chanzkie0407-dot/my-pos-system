@@ -67,7 +67,7 @@ th{background:#f9f9f9}
 <div id="login" class="modal">
 <div class="mbody">
 <h2 style="text-align:center;color:#008000;margin-bottom:20px">🍔 MINUTE BURGER POS</h2>
-<select onchange="showForm(this.value)">
+<select id="loginType" onchange="showForm(this.value)">
   <option value="">-- Select Login Type --</option>
   <option value="cashier">Cashier</option>
   <option value="admin">Admin</option>
@@ -91,16 +91,16 @@ th{background:#f9f9f9}
 <div class="topbar">
 <div><h1>🍔 Minute Burger POS <span id="netStatus" class="online-indicator"></span></h1><small id="user"></small></div>
 <div class="nav">
-  <button id="nsales" class="active" onclick="showView('pos')">🛒 Sales</button>
-  <button id="nreceipts" onclick="showView('mytrans')">📋 Receipts</button>
-  <button id="nshift" onclick="showView('shift')">⏱️ Shift</button>
-  <button id="nasales" class="hidden" onclick="showView('allsales')">📊 Sales Report</button>
-  <button id="nproductsales" class="hidden" onclick="showView('productsales')">📈 Product Sales</button>
-  <button id="nstocks" class="hidden" onclick="showView('stocks')">📦 Stocks</button>
-  <button id="nprices" class="hidden" onclick="showView('prices')">💰 Update Price</button>
-  <button id="npaymentsettings" class="hidden" onclick="showView('payments')">🏦 Payment Setup</button>
-  <button id="nalerts" class="hidden" onclick="showView('errors')">⚠️ Stock Alerts</button>
-  <button id="nreports" class="hidden" onclick="showView('cashlog')">💰 Cash Log</button>
+  <button id="nsales" class="active" onclick="showView('pos', this)">🛒 Sales</button>
+  <button id="nreceipts" onclick="showView('mytrans', this)">📋 Receipts</button>
+  <button id="nshift" onclick="showView('shift', this)">⏱️ Shift</button>
+  <button id="nasales" class="hidden" onclick="showView('allsales', this)">📊 Sales Report</button>
+  <button id="nproductsales" class="hidden" onclick="showView('productsales', this)">📈 Product Sales</button>
+  <button id="nstocks" class="hidden" onclick="showView('stocks', this)">📦 Stocks</button>
+  <button id="nprices" class="hidden" onclick="showView('prices', this)">💰 Update Price</button>
+  <button id="npaymentsettings" class="hidden" onclick="showView('payments', this)">🏦 Payment Setup</button>
+  <button id="nalerts" class="hidden" onclick="showView('errors', this)">⚠️ Stock Alerts</button>
+  <button id="nreports" class="hidden" onclick="showView('cashlog', this)">💰 Cash Log</button>
   <button onclick="logout()">🚪 Logout</button>
 </div>
 </div>
@@ -109,11 +109,11 @@ th{background:#f9f9f9}
 <div id="vpos" class="panels hidden">
 <div class="prod">
 <div class="cat">
-  <button class="active" onclick="setCat('burgers',this)">🍔 Burgers</button>
-  <button onclick="setCat('premium',this)">⭐ Premium</button>
-  <button onclick="setCat('hotdogs',this)">🌭 Hotdogs</button>
-  <button onclick="setCat('drinks',this)">🥤 Drinks</button>
-  <button onclick="setCat('extras',this)">🧂 Extras</button>
+  <button class="active" onclick="setCat('burgers', this)">🍔 Burgers</button>
+  <button onclick="setCat('premium', this)">⭐ Premium</button>
+  <button onclick="setCat('hotdogs', this)">🌭 Hotdogs</button>
+  <button onclick="setCat('drinks', this)">🥤 Drinks</button>
+  <button onclick="setCat('extras', this)">🧂 Extras</button>
 </div>
 <div class="grid" id="pgrid"></div>
 </div>
@@ -132,12 +132,12 @@ th{background:#f9f9f9}
   <strong>TOTAL: ₱<span id="gtotal">0.00</span></strong>
 </div>
 <div class="pay">
-  <button class="selected" onclick="setPay('Cash',this)">💵 Cash</button>
-  <button onclick="setPay('GCash',this)">📱 GCash</button>
-  <button id="bankBtn" class="hidden" onclick="setPay('Bank',this)">🏦 Bank</button>
-  <button id="ewalletBtn" class="hidden" onclick="setPay('EWallet',this)">💳 E-Wallet</button>
-  <button onclick="setPay('Grab',this)">🛵 Grab</button>
-  <button onclick="setPay('FoodPanda',this)">🐼 FoodPanda</button>
+  <button class="selected" onclick="setPay('Cash', this)">💵 Cash</button>
+  <button onclick="setPay('GCash', this)">📱 GCash</button>
+  <button id="bankBtn" class="hidden" onclick="setPay('Bank', this)">🏦 Bank</button>
+  <button id="ewalletBtn" class="hidden" onclick="setPay('EWallet', this)">💳 E-Wallet</button>
+  <button onclick="setPay('Grab', this)">🛵 Grab</button>
+  <button onclick="setPay('FoodPanda', this)">🐼 FoodPanda</button>
 </div>
 <div style="background:#f5f5f5;padding:8px;border-radius:6px;margin:8px 0">
   <label style="font-size:13px;font-weight:bold">💱 Split Payment</label>
@@ -288,13 +288,39 @@ const getStock=n=>{const s=stk.find(x=>x.n.trim().toLowerCase()==n.trim().toLowe
 const updNet=()=>{$('netStatus').className='online-indicator'+(isOnline()?'':' offline');if(isOnline()&&pending.length){pending=[];save();alert('✅ Synced!')}};
 window.addEventListener('online',updNet);window.addEventListener('offline',updNet);
 
-// ========== LOGIN ==========
-function detectShift(p){$('shiftInfo').textContent=SHIFTS[p]?'✅ '+SHIFTS[p].label:''}
-function showForm(t){$('cform').classList.toggle('hidden',t!='cashier');$('aform').classList.toggle('hidden',t!='admin')}
-function loginCashier(){const n=$('name').value.trim(),p=$('pass').value.trim();if(!n||!p)return alert('⚠️ Fill all fields!');const s=SHIFTS[p];if(!s)return alert('❌ Wrong passcode!');user={logged:!0,type:'cashier',name:n,shift:s.id,sLabel:s.label,start:new Date()};go()}
-function loginAdmin(){if($('apass').value.trim()!=ADMIN_PASS)return alert('❌ Wrong password!');user={logged:!0,type:'admin',name:'ADMIN',shift:'',sLabel:'Admin',start:new Date()};go()}
-function go(){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('user').textContent=`${user.sLabel} | ${user.name}`;$('tic').textContent=String(tic).padStart(3,'0');updNet();updPayBtns();loadAccSel();const adm=user.type=='admin';['nsales','nreceipts','nshift'].forEach(id=>$(id).classList.toggle('hidden',adm));['nasales','nproductsales','nstocks','nprices','npaymentsettings','nalerts','nreports'].forEach(id=>$(id).classList.toggle('hidden',!adm));adm?showView('allsales'):showView('pos')}
-function logout(){confirm('🚪 Logout?')&&location.reload()}
+// ========== LOGIN — AYOS NA! ==========
+function detectShift(p){$('shiftInfo').textContent = SHIFTS[p] ? '✅ ' + SHIFTS[p].label : ''}
+function showForm(t){
+  $('cform').classList.toggle('hidden', t !== 'cashier');
+  $('aform').classList.toggle('hidden', t !== 'admin');
+}
+function loginCashier(){
+  const n=$('name').value.trim(), p=$('pass').value.trim();
+  if(!n || !p) return alert('⚠️ Fill all fields!');
+  const s = SHIFTS[p];
+  if(!s) return alert('❌ Wrong passcode!');
+  user = {logged:true, type:'cashier', name:n, shift:s.id, sLabel:s.label, start:new Date()};
+  go();
+}
+function loginAdmin(){
+  if($('apass').value.trim() !== ADMIN_PASS) return alert('❌ Wrong password!');
+  user = {logged:true, type:'admin', name:'ADMIN', shift:'', sLabel:'Admin', start:new Date()};
+  go();
+}
+function go(){
+  $('login').classList.add('hidden');
+  $('app').classList.remove('hidden');
+  $('user').textContent = `${user.sLabel} | ${user.name}`;
+  $('tic').textContent = String(tic).padStart(3,'0');
+  updNet();
+  updPayBtns();
+  loadAccSel();
+  const adm = user.type === 'admin';
+  ['nsales','nreceipts','nshift'].forEach(id => $(id).classList.toggle('hidden', adm));
+  ['nasales','nproductsales','nstocks','nprices','npaymentsettings','nalerts','nreports'].forEach(id => $(id).classList.toggle('hidden', !adm));
+  adm ? showView('allsales') : showView('pos');
+}
+function logout(){confirm('🚪 Logout?') && location.reload()}
 
 // ========== PRODUCTS & CART ==========
 function setCat(c,b){cat=c;document.querySelectorAll('.cat button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderProds()}
@@ -304,24 +330,39 @@ function subtotal(){return cart.reduce((s,x)=>s+x.p*x.q,0)}
 function applyDisc(amt){if(!discType)return{sub:amt,disc:0,total:amt};const d=amt*DISC_RATE;return{sub:amt,disc:d,total:amt-d}}
 function toggleDisc(t){discType=t=='none'?null:t;$('btnSr').classList.toggle('applied',discType=='sr');$('btnPwd').classList.toggle('applied',discType=='pwd');$('discNote').textContent=discType?discType=='sr'?'👴 Senior (12%)':'♿ PWD (12%)':'';updCart()}
 function updCart(){const s=subtotal(),{sub,disc,total}=applyDisc(s);$('clist').innerHTML=cart.map((x,i)=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #eee">${x.q}x ${x.n}<span>₱${fmt(x.p*x.q)} <button style="background:red;color:#fff;border-radius:50%;width:20px;height:20px" onclick="cart.splice(${i},1);updCart()">×</button></span></div>`).join('');$('subtotal').textContent=fmt(sub);$('gtotal').textContent=fmt(total);disc>0?$('discLine').classList.remove('hidden')||($('discAmt').textContent=fmt(disc)):$('discLine').classList.add('hidden');calcSplit()}
-function setPay(m,b){payM=m;document.querySelectorAll('.pay button').forEach(x=>x.classList.remove('selected'));b&&b.classList.add('selected');['Bank','EWallet','GCash'].includes(m)?$('accSel').classList.remove('hidden'):$('accSel').classList.add('hidden');$('change').innerHTML=''}
+function setPay(m,b){payM=m;document.querySelectorAll('.pay button').forEach(x=>x.classList.remove('selected'));if(b)b.classList.add('selected');['Bank','EWallet','GCash'].includes(m)?$('accSel').classList.remove('hidden'):$('accSel').classList.add('hidden');$('change').innerHTML=''}
 function calcChange(){const {total}=applyDisc(subtotal()),c=+$('cashIn').value||0;$('change').innerHTML=payM=='Cash'&&c>=total&&total>0?`💰 CHANGE: ₱${fmt(c-total)}`:''}
 function updPayBtns(){const hasB=accounts.some(a=>a.type=='Bank'),hasE=accounts.some(a=>a.type!='Bank'&&a.type!='GCash');$('bankBtn').classList.toggle('hidden',!hasB);$('ewalletBtn').classList.toggle('hidden',!hasE)}
 function loadAccSel(){$('acc').innerHTML='<option value="">-- Select --</option>'+accounts.map((a,i)=>`<option value="${i}">${a.type}: ${a.name} — ${a.number}</option>`).join('')}
 function calcSplit(){const t=applyDisc(subtotal()).total,a1=+$('amt1').value||0;$('amt2').textContent=fmt(Math.max(0,t-a1))}
 
 // ========== CHECKOUT & SAVE ==========
-function checkout(){const {total}=applyDisc(subtotal()),paid1=+$('amt1').value||0,accIdx=$('acc').value,acc=accIdx!=''?accounts[+accIdx]:null;if(!total)return alert('⚠️ Empty cart!');let payObj={method:payM,split:!!paid1&&paid1<total,amt1:paid1,method1:$('pay1').value,amt2:paid1&&paid1<total?total-paid1:0,method2:'E-Money',account:acc};if(payObj.split);else if(payM=='Cash'&&(+$('cashIn').value||0)<total)return alert('⚠️ Insufficient Cash! Use Split Payment!');const now=dt(),d=D();cart.forEach(x=>{const cur=getStock(x.n),saved=stk.find(s=>s.n.trim().toLowerCase()==x.n.trim().toLowerCase());if(cur<x.q)alerts.unshift({dt:now,date:d,item:x.n,soldQty:x.q,stock:cur,who:user.name,ticket:tic});if(!saved)stk.push({n:x.n,qty:0,dt:now});saved.qty=Math.max(0,saved.qty-x.q);saved.dt=now});trans.unshift({tic,dt:now,date:d,items:[...cart],subtotal:subtotal(),discount:applyDisc(subtotal()).disc,total,pay:payObj,who:user.name,shift:user.sLabel,voided:!1,disc:discType});tic++;save();alert(`✅ SAVED! Ticket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${fmt(total)}`);cart=[];discType=null;updCart();$('tic').textContent=String(tic).padStart(3,'0');$('cashIn').value=$('amt1').value='';renderMyTrans()}
+function checkout(){const {total}=applyDisc(subtotal()),paid1=+$('amt1').value||0,accIdx=$('acc').value,acc=accIdx!=''?accounts[+accIdx]:null;if(!total)return alert('⚠️ Empty cart!');let payObj={method:payM,split:!!paid1&&paid1<total,amt1:paid1,method1:$('pay1').value,amt2:paid1&&paid1<total?total-paid1:0,method2:'E-Money',account:acc};if(payObj.split);else if(payM=='Cash'&&(+$('cashIn').value||0)<total)return alert('⚠️ Insufficient Cash! Use Split Payment!');const now=dt(),d=D();cart.forEach(x=>{const cur=getStock(x.n),saved=stk.find(s=>s.n.trim().toLowerCase()==x.n.trim().toLowerCase());if(cur<x.q)alerts.unshift({dt:now,date:d,item:x.n,soldQty:x.q,stock:cur,who:user.name,ticket:tic});if(!saved)stk.push({n:x.n,qty:0,dt:now});saved.qty=Math.max(0,saved.qty-x.q);saved.dt=now});trans.unshift({tic,dt:now,date:d,items:[...cart],subtotal:subtotal(),discount:applyDisc(subtotal()).disc,total,pay:payObj,who:user.name,shift:user.sLabel,voided:false,disc:discType});tic++;save();alert(`✅ SAVED! Ticket #${String(tic-1).padStart(3,'0')}\nTotal: ₱${fmt(total)}`);cart=[];discType=null;updCart();$('tic').textContent=String(tic).padStart(3,'0');$('cashIn').value=$('amt1').value='';if(user.type==='cashier')renderMyTrans()}
 
-// ========== VIEW SWITCHING ==========
-function showView(v){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));event.target.classList.add('active');['vpos','vmytrans','vshift','vallsales','vproductsales','vstocks','vprices','vpayments','verrors','vcashlog'].forEach(id=>$(id).classList.add('hidden'));$(`v${v}`).classList.remove('hidden');if(v=='pos'){renderProds();updPayBtns();loadAccSel()}if(v=='mytrans')renderMyTrans();if(v=='shift')renderShift();if(v=='allsales')renderAllSales();if(v=='productsales')renderProdSales();if(v=='stocks'){renderStocks();renderStkLog()}if(v=='prices'){loadProdSel()}if(v=='payments')renderAccs();if(v=='errors')renderAlerts();if(v=='cashlog')renderCashLog()}
+// ========== VIEW SWITCHING — AYOS NA ANG ERROR ==========
+function showView(v, btn){
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  ['vpos','vmytrans','vshift','vallsales','vproductsales','vstocks','vprices','vpayments','verrors','vcashlog'].forEach(id => $(id).classList.add('hidden'));
+  $(`v${v}`).classList.remove('hidden');
+  if(v=='pos'){renderProds();updPayBtns();loadAccSel()}
+  if(v=='mytrans')renderMyTrans();
+  if(v=='shift')renderShift();
+  if(v=='allsales')renderAllSales();
+  if(v=='productsales')renderProdSales();
+  if(v=='stocks'){renderStocks();renderStkLog()}
+  if(v=='prices'){loadProdSel()}
+  if(v=='payments')renderAccs();
+  if(v=='errors')renderAlerts();
+  if(v=='cashlog')renderCashLog();
+}
 
 // ========== CASHIER VIEWS ==========
 function renderShift(){$('sName').textContent=user.name;$('sLabel').textContent=user.sLabel;$('sStart').textContent=user.start.toLocaleString('en-PH');$('sTic').textContent=String(tic).padStart(3,'0')}
 function renderMyTrans(){const mt=trans.filter(x=>x.who==user.name);let sum=0,vd=0;mt.forEach(x=>x.voided?vd++:sum+=x.total);$('myAmt').textContent=fmt(sum);$('myVoid').textContent=vd;$('myTbody').innerHTML=mt.length?mt.map(x=>{let pm=x.pay?.method||x.pay,cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';if(x.voided)cls='void';return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${pm}</span></td><td>${x.voided?'❌ VOIDED':'✅ COUNTED'}</td></tr>`}).join(''):'<tr><td colspan="6" class="empty">No transactions yet</td></tr>'}
 
 // ========== ADMIN — SALES ==========
-function voidTrans(t){confirm(`Void Ticket #${String(t).padStart(3,'0')}?`)&&(trans.find(x=>x.tic==t).voided=!0,save(),renderAllSales(),renderMyTrans())}
+function voidTrans(t){confirm(`Void Ticket #${String(t).padStart(3,'0')}?`)&&(trans.find(x=>x.tic==t).voided=true,save(),renderAllSales(),renderMyTrans())}
 function renderAllSales(){const today=D();let dsum=0,ssum=0,vsum=0;trans.forEach(x=>{if(x.voided)return vsum+=x.total;if(x.date==today)dsum+=x.total;ssum+=x.total});$('daySale').textContent=fmt(dsum);$('shiftSale').textContent=fmt(ssum);$('voidSum').textContent=fmt(vsum);$('allTbody').innerHTML=trans.length?trans.map(x=>{let pm=x.pay?.method||x.pay,cls={Cash:'cash',GCash:'gcash',Bank:'bank',EWallet:'ewallet',Grab:'grab',FoodPanda:'fp',Split:'split'}[pm]||'';if(x.voided)cls='void';return `<tr><td><b>#${String(x.tic).padStart(3,'0')}</b></td><td>${x.dt}</td><td>${x.items.length} item(s)</td><td>₱${fmt(x.total)}</td><td><span class="tag ${cls}">${pm}</span></td><td>${x.who}</td><td>${x.shift}</td><td>${x.voided?'<span class="tag void">VOIDED</span>':`<button class="btn-sm" onclick="voidTrans(${x.tic})">VOID</button>`}</td></tr>`}).join(''):'<tr><td colspan="8" class="empty">No sales</td></tr>'}
 
 // ========== ADMIN — PRODUCT SALES ==========
@@ -345,7 +386,7 @@ function renderAccs(){$('accTbody').innerHTML=accounts.length?accounts.map((a,i)
 
 // ========== ALERTS & CASH LOG ==========
 function renderAlerts(){$('errTbody').innerHTML=alerts.map(x=>`<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.soldQty}</td><td>${x.stock}</td><td>${x.who}</td><td>#${String(x.ticket).padStart(3,'0')}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">✅ No alerts</td></tr>'}
-function cashOutModal(){const amt=+prompt('Amount to Cash Out:'),note=prompt('Remarks:');if(!amt||amt<=0)return;cashOuts.unshift({dt:dt(),date:D(),who:user.name,shift:user.sLabel,amt,note:note||''});save();alert('✅ Recorded!');user.type=='admin'&&renderCashLog()}
+function cashOutModal(){const amt=+prompt('Amount to Cash Out:'),note=prompt('Remarks:');if(!amt||amt<=0)return;cashOuts.unshift({dt:dt(),date:D(),who:user.name,shift:user.sLabel,amt,note:note||''});save();alert('✅ Recorded!');if(user.type==='admin')renderCashLog()}
 function renderCashLog(){$('cashTbody').innerHTML=cashOuts.map(x=>`<tr><td>${x.dt}</td><td>${x.who}</td><td>${x.shift}</td><td>₱${fmt(x.amt)}</td><td>${x.note}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No records</td></tr>';const ep=trans.filter(x=>!['Cash','Split'].includes(x.pay?.method||x.pay));$('epTbody').innerHTML=ep.map(x=>`<tr><td>${x.dt}</td><td>#${String(x.tic).padStart(3,'0')}</td><td>₱${fmt(x.total)}</td><td>${x.pay?.method||x.pay}</td><td>${x.pay?.account?`${x.pay.account.name}`:'—'}</td><td>${x.who}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No e-payments</td></tr>'}
 </script>
 </body>
