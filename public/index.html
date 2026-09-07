@@ -625,7 +625,7 @@ function stockOut(type){
 }
 function renderStkLog(){$('stkLog').innerHTML=stkLog.length?stkLog.map(x=>`<tr><td>${x.dt}</td><td>${x.item}</td><td>${x.type}</td><td>${x.qty}</td><td>${x.by}</td></tr>`).join(''):'<tr><td colspan=5 class="empty">No stock logs</td></tr>';}
 
-// ========== PRICES ==========
+// ========== PRICES — NA-AYOS NA! PERMANENTE NA ANG UPDATE ==========
 function showPrice(){const p=findProd($('prodSel').value);$('curPrice').value=p?p.p:'';}
 function savePrice(){
     const n=$('prodSel').value,old=$('curPrice').value*1,newP=$('newPrice').value*1;
@@ -633,11 +633,17 @@ function savePrice(){
     const prod = findProd(n);
     if(prod){
         prod.p = newP;
+        // ✅ I-SAVE PERMANENTE SA LOCAL STORAGE
+        let savedPrices = JSON.parse(localStorage.getItem('savedPrices') || '{}');
+        savedPrices[n.trim().toLowerCase()] = newP;
+        localStorage.setItem('savedPrices', JSON.stringify(savedPrices));
+        
         priceLogs.unshift({item:n,old,new:newP,dt:dt(),who:user.name});
         save();
         alert(`✅ Price updated!\n${n}: ₱${fmt(old)} → ₱${fmt(newP)}`);
         $('newPrice').value='';
         renderPriceLog();
+        renderProds(); // ✅ AGAD MAKIKITA SA POS
     }
 }
 function renderPriceLog(){$('priceLog').innerHTML=priceLogs.length?priceLogs.map(x=>`<tr><td>${x.item}</td><td>₱${fmt(x.old)}</td><td>₱${fmt(x.new)}</td><td>${x.dt}</td><td>${x.who}</td></tr>`).join(''):'<tr><td colspan=5 class="empty">No price changes yet</td></tr>';}
@@ -683,8 +689,17 @@ function renderCashLog(){
     }).join('')||'<tr><td colspan=7 class="empty">No e-payments yet</td></tr>';
 }
 
-// ========== INITIALIZE ==========
+// ========== INITIALIZE — AWTOMATIK NA I-LOAD ANG MGA NA-SAVE NA PRESYO ==========
 window.onload=function(){
+    // ✅ I-LOAD ANG MGA BINAGONG PRESYO KAHIT I-REFRESH PA
+    let savedPrices = JSON.parse(localStorage.getItem('savedPrices') || '{}');
+    allProd().forEach(p => {
+        const key = p.n.trim().toLowerCase();
+        if(savedPrices[key]){
+            p.p = savedPrices[key]; // I-APPLY AGAD ANG NA-SAVE NA PRESYO
+        }
+    });
+
     const sel=$('prodSel');
     allProd().forEach(p=>sel.innerHTML+=`<option value="${p.n}">${p.n} — ₱${p.p}</option>`);
     updNet();
