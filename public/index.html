@@ -373,7 +373,9 @@ function renderStoreSelectOptions(selId, includeAll=true){
     STORES.forEach(s => sel.innerHTML += `<option value="${s.code}">${s.code} — ${s.name}</option>`);
 }
 function renderStoreList(){
-    $('storeTbody').innerHTML = STORES.length ? STORES.map((s,i)=>`<tr><td>${s.code}</td><td>${s.name}</td><td><button class="btn-sm btn-red" onclick="removeStore(${i})">❌ DELETE</button></td></tr>`).join(''):'<tr><td colspan=3 class="empty">Wala pang tindahan. Magdagdag sa itaas.</td></tr>';
+    const tbody = $('storeTbody');
+    if(!tbody) return;
+    tbody.innerHTML = STORES.length ? STORES.map((s,i)=>`<tr><td>${s.code}</td><td>${s.name}</td><td><button class="btn-sm btn-red" onclick="removeStore(${i})">❌ DELETE</button></td></tr>`).join(''):'<tr><td colspan=3 class="empty">Wala pang tindahan. Magdagdag sa itaas.</td></tr>';
     renderStoreSelectOptions('filterStore');
     renderStoreSelectOptions('prodFilterStore');
 }
@@ -544,8 +546,8 @@ function showView(viewName,btn){
     document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
     if(btn)btn.classList.add('active');
     const panelId = `v${viewName.charAt(0).toUpperCase()+viewName.slice(1)}`;
-    $(panelId).classList.remove('hidden');
-    // ✅ INAYOS: Siguradong lalabas ang laman ng bawat tab
+    const panel = $(panelId);
+    if(panel) panel.classList.remove('hidden');
     if(viewName==='mytrans')renderMyTrans();
     if(viewName==='stores')renderStoreList();
     if(viewName==='allsales')renderAllSales();
@@ -625,8 +627,9 @@ function savePrice(){
     showPrice();
 }
 // ========== ALERTS VIEW =========
-  function renderAlertView(){
-    $('errTbody').innerHTML=alerts.length?alerts.map(a=>`<tr><td>${a.dt}</td><td>${a.storeName}</td><td>${a.item}</td><td>${a.soldQty}</td><td>${a.stock}</td><td>${a.who}</td><td>#${String(a.ticket).padStart(3,'0')}</td></tr>`).join(''):`<tr><td colspan=7 class="empty">✅ Walang labag sa stock.</td></tr>`;
+function renderAlertView(){
+    $('errTbody').innerHTML=alerts.length?alerts.map(a=>`<tr><td>${a.dt}</td
+    a=>`<tr><td>${a.dt}</td><td>${a.storeName}</td><td>${a.item}</td><td>${a.soldQty}</td><td>${a.stock}</td><td>${a.who}</td><td>#${String(a.ticket).padStart(3,'0')}</td></tr>`).join(''):`<tr><td colspan=7 class="empty">✅ Walang labag sa stock.</td></tr>`;
 }
 // ========== CASH LOG VIEW ==========
 function renderCashLogView(){
@@ -650,10 +653,9 @@ function renderProdSales(){
         :`<div class="empty">Wala pang datos ng benta.</div>`;
 }
 // ========== INITIALIZE ON LOAD ==========
-// ========== INITIALIZE ON LOAD ==========
 window.onload=function(){
     updNet();
-    renderStoreList(); // ✅ ITO ANG ILALAGAY MO DITO
+    renderStoreList();
     renderStoreSelectOptions('filterStore');
     renderStoreSelectOptions('prodFilterStore');
 };
