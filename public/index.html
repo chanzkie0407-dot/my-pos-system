@@ -77,7 +77,7 @@ th{background:#f9f9f9}
       <option value="cashier">Cashier</option>
       <option value="admin">Admin</option>
     </select>
-    <!-- CASHIER FORM - Pipili muna ng tindahan -->
+    <!-- CASHIER FORM -->
     <div id="cform" class="hidden">
       <label class="lbl">🏪 Piliin ang Tindahan:</label>
       <div id="storeSelectList" style="margin:6px 0 12px 0;max-height:200px;overflow-y:auto"></div>
@@ -180,7 +180,7 @@ th{background:#f9f9f9}
     </div>
   </div>
   <!-- MANAGE STORES (ADMIN ONLY) -->
-  <div id="vstores" class="hidden" style="padding:10px">
+  <div id="vstores" class="panels hidden" style="padding:10px">
     <h3>🏪 MANAGE STORES (1-10 stores)</h3>
     <div class="stk-box">
       <label class="lbl">Store Code:</label>
@@ -194,7 +194,7 @@ th{background:#f9f9f9}
     <tbody id="storeTbody"></tbody></table>
   </div>
   <!-- CASHIER VIEWS -->
-  <div id="vmytrans" class="hidden" style="padding:10px">
+  <div id="vmytrans" class="panels hidden" style="padding:10px">
     <div class="summary">
       <div class="box"><div>Shift Sales</div><div style="font-size:18px;font-weight:bold">₱<span id="myAmt">0.00</span></div></div>
       <div class="box"><div>Voided</div><div style="font-size:18px;font-weight:bold" id="myVoid">0</div></div>
@@ -202,7 +202,7 @@ th{background:#f9f9f9}
     <table><thead><tr><th>Ticket #</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Status</th></tr></thead>
     <tbody id="myTbody"></tbody></table>
   </div>
-  <div id="vshift" class="hidden" style="padding:10px">
+  <div id="vshift" class="panels hidden" style="padding:10px">
     <div class="stk-box">
       <h3>⏱️ Shift Info</h3>
       <p><strong>Tindahan:</strong> <span id="sStore"></span></p>
@@ -213,7 +213,7 @@ th{background:#f9f9f9}
     </div>
   </div>
   <!-- ADMIN VIEWS -->
-  <div id="vallsales" class="hidden" style="padding:10px">
+  <div id="vallsales" class="panels hidden" style="padding:10px">
     <div style="margin-bottom:10px">
       <label class="lbl">Pumili ng Tindahan:</label>
       <select id="filterStore" onchange="renderAllSales()">
@@ -228,7 +228,7 @@ th{background:#f9f9f9}
     <table><thead><tr><th>Ticket #</th><th>Tindahan</th><th>Date & Time</th><th>Items</th><th>Amount</th><th>Payment</th><th>Cashier</th><th>Shift</th><th>Action</th></tr></thead>
     <tbody id="allTbody"></tbody></table>
   </div>
-  <div id="vproductsales" class="hidden" style="padding:10px">
+  <div id="vproductsales" class="panels hidden" style="padding:10px">
     <h3>📈 Product Sales by Shift</h3>
     <div style="margin-bottom:10px">
       <label class="lbl">Pumili ng Tindahan:</label>
@@ -238,7 +238,7 @@ th{background:#f9f9f9}
     </div>
     <div id="prodReport"></div>
   </div>
-  <div id="vstocks" class="hidden" style="padding:10px">
+  <div id="vstocks" class="panels hidden" style="padding:10px">
     <h3>📦 Stocks On Hand — <span id="stockStoreName"></span></h3>
     <div class="stk-box">
       <table><thead><tr><th>Product</th><th>Stock</th><th>Updated</th></tr></thead>
@@ -254,7 +254,7 @@ th{background:#f9f9f9}
     <table><thead><tr><th>Date</th><th>Item</th><th>Type</th><th>Qty</th><th>Store</th><th>By</th></tr></thead>
     <tbody id="stkLog"></tbody></table>
   </div>
-  <div id="vprices" class="hidden" style="padding:10px">
+  <div id="vprices" class="panels hidden" style="padding:10px">
     <h3>💰 Update Product Prices</h3>
     <select id="prodSel" onchange="showPrice()">
       <option value="">-- Select Product --</option>
@@ -267,14 +267,14 @@ th{background:#f9f9f9}
     <table style="margin-top:20px"><thead><tr><th>Product</th><th>Old</th><th>New</th><th>Date</th><th>By</th></tr></thead>
     <tbody id="priceLog"></tbody></table>
   </div>
-  <div id="verrors" class="hidden" style="padding:10px">
+  <div id="verrors" class="panels hidden" style="padding:10px">
     <div class="box" style="background:#fff3cd;border:1px solid #ffeeba">
       <h3 style="color:#856404">⚠️ SOLD WITHOUT SUFFICIENT STOCK</h3>
     </div>
     <table><thead><tr><th>Date</th><th>Store</th><th>Item</th><th>Sold</th><th>Stock</th><th>Cashier</th><th>Ticket</th></tr></thead>
     <tbody id="errTbody"></tbody></table>
   </div>
-  <div id="vcashlog" class="hidden" style="padding:10px">
+  <div id="vcashlog" class="panels hidden" style="padding:10px">
     <h4>💰 Cash Out Records</h4>
     <table><thead><tr><th>Date</th><th>Store</th><th>Cashier</th><th>Shift</th><th>Amount</th><th>Note</th></tr></thead>
     <tbody id="cashTbody"></tbody></table>
@@ -543,7 +543,9 @@ function showView(viewName,btn){
     document.querySelectorAll('.panels').forEach(p=>p.classList.add('hidden'));
     document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
     if(btn)btn.classList.add('active');
-    $(`v${viewName.charAt(0).toUpperCase()+viewName.slice(1)}`).classList.remove('hidden');
+    const panelId = `v${viewName.charAt(0).toUpperCase()+viewName.slice(1)}`;
+    $(panelId).classList.remove('hidden');
+    // ✅ INAYOS: Siguradong lalabas ang laman ng bawat tab
     if(viewName==='mytrans')renderMyTrans();
     if(viewName==='stores')renderStoreList();
     if(viewName==='allsales')renderAllSales();
@@ -551,6 +553,7 @@ function showView(viewName,btn){
     if(viewName==='prices')renderPriceView();
     if(viewName==='errors')renderAlertView();
     if(viewName==='cashlog')renderCashLogView();
+    if(viewName==='productsales')renderProdSales();
 }
 // ========== RENDER CASHIER'S TRANSACTIONS ==========
 function renderMyTrans(){
@@ -621,37 +624,37 @@ function savePrice(){
     renderPriceView();
     showPrice();
 }
-// ========== ALERTS VIEW ==========
-function renderAlertView(){
-    $('errTbody').innerHTML=alerts.length?alerts.map(a=>`<tr><td>${a.dt}</td><td>${a.storeName}</td><td>${a.item}</td><td>${a.soldQty}</td><td>${a.stock}</td><td>${a.who}</td><td>#${String(a
-                                                                                                                                                                                             .ticket).padStart(3,'0')}</td></tr>`).join(''):`<tr><td colspan=7 class="empty">✅ Wala pang babala.</td></tr>`;
+// ========== ALERTS VIEW =========
+  function renderAlertView(){
+    $('errTbody').innerHTML=alerts.length?alerts.map(a=>`<tr><td>${a.dt}</td><td>${a.storeName}</td><td>${a.item}</td><td>${a.soldQty}</td><td>${a.stock}</td><td>${a.who}</td><td>#${String(a.ticket).padStart(3,'0')}</td></tr>`).join(''):`<tr><td colspan=7 class="empty">✅ Walang labag sa stock.</td></tr>`;
 }
-// ========== CASH OUT LOG VIEW ==========
+// ========== CASH LOG VIEW ==========
 function renderCashLogView(){
-    const f=$('filterStore')?.value || 'ALL';
-    const cf=f==='ALL'?cashOuts:cashOuts.filter(c=>c.storeCode===f);
-    $('cashTbody').innerHTML=cf.length?cf.map(c=>`<tr><td>${c.dt}</td><td>${c.storeName}</td><td>${c.who}</td><td>${c.shift}</td><td>₱${fmt(c.amount)}</td><td>${c.note}</td></tr>`).join(''):`<tr><td colspan=6 class="empty">Wala pang tala.</td></tr>`;
+    $('cashTbody').innerHTML=cashOuts.length?cashOuts.map(c=>`<tr><td>${c.dt}</td><td>${c.storeName}</td><td>${c.who}</td><td>${c.shift}</td><td>₱${fmt(c.amount)}</td><td>${c.note}</td></tr>`).join(''):`<tr><td colspan=6 class="empty">Wala pang tala.</td></tr>`;
 }
 // ========== PRODUCT SALES REPORT ==========
 function renderProdSales(){
     const f=$('prodFilterStore').value;
     const ft=f==='ALL'?trans:trans.filter(t=>t.storeCode===f);
-    const prodSum={};
+    const sales={};
     ft.filter(t=>!t.voided).forEach(t=>{
-        t.items.forEach(it=>{
-            if(!prodSum[it.n]) prodSum[it.n]={qty:0,total:0};
-            prodSum[it.n].qty+=it.q;
-            prodSum[it.n].total+=it.p*it.q;
+        t.items.forEach(x=>{
+            if(!sales[x.n]) sales[x.n]={qty:0,total:0};
+            sales[x.n].qty+=x.q;
+            sales[x.n].total+=x.q*x.p;
         });
     });
-    const sorted=Object.entries(prodSum).sort((a,b)=>b[1].total-a[1].total);
-    $('prodReport').innerHTML=sorted.length?`
-    <table><thead><tr><th>Produkto</th><th>Dami Nabenta</th><th>Kabuoan</th></tr></thead>
-    <tbody>${sorted.map(([n,d])=>`<tr><td>${n}</td><td>${d.qty}</td><td>₱${fmt(d.total)}</td></tr>`).join('')}</tbody>
-    </table>`:`<div class="empty">Wala pang datos ng benta.</div>`;
+    const rows=Object.entries(sales).sort((a,b)=>b[1].total-a[1].total);
+    $('prodReport').innerHTML=rows.length?`<table><thead><tr><th>Produkto</th><th>Dami Nabenta</th><th>Kabuoan</th></tr></thead>`+
+        rows.map(([n,v])=>`<tr><td>${n}</td><td>${v.qty}</td><td>₱${fmt(v.total)}</td></tr>`).join('')+`</table>`
+        :`<div class="empty">Wala pang datos ng benta.</div>`;
 }
-// ========== AUTO-INIT ==========
-updNet();
+// ========== INITIALIZE ON LOAD ==========
+window.onload=function(){
+    updNet();
+    renderStoreSelectOptions('filterStore');
+    renderStoreSelectOptions('prodFilterStore');
+};
 </script>
 </body>
 </html>
