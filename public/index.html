@@ -256,7 +256,7 @@ tr:nth-child(even){background:#fafafa}
         </div>
       </div>
     </div>
-    <!-- ═══════════════════ CASHIER: SHIFT SALES (RENAMED FROM TODAY'S SALES) ═══════════════════ -->
+    <!-- ═══════════════════ CASHIER: SHIFT SALES ═══════════════════ -->
     <div id="vShiftSales" class="tab-page hidden">
       <div class="card">
         <h3>📊 Shift Sales — <span id="shiftSalesSubtitle"></span></h3>
@@ -267,7 +267,7 @@ tr:nth-child(even){background:#fafafa}
         </table>
       </div>
     </div>
-    <!-- ═══════════════════ CASHIER: TRANSACTION LOG ═══════════════════ -->
+    <!-- ═══════════════════ TRANSACTION LOG ═══════════════════ -->
     <div id="vLog" class="tab-page hidden">
       <div class="card">
         <h3>📋 Transaction Log</h3>
@@ -292,7 +292,7 @@ tr:nth-child(even){background:#fafafa}
         <table><thead><tr><th>Rank</th><th>Code</th><th>Product</th><th>Qty Sold</th><th>Total</th></tr></thead><tbody id="dashTopSales"></tbody></table>
       </div>
     </div>
-    <!-- ═══════════════════ ADMIN: REPORTS ═══════════════════ -->
+    <!-- ═══════════════════ ADMIN: SALES REPORT ═══════════════════ -->
     <div id="vReports" class="tab-page hidden">
       <div class="card">
         <h3>📊 Sales Reports & Analytics</h3>
@@ -435,7 +435,6 @@ const saveAll = () => {
 // Load saved admin pass
 const savedAdmin = localStorage.getItem('mb_adminpass');
 if(savedAdmin) ADMIN_PASS = JSON.parse(savedAdmin).pass;
-
 // ═══════════════════ STOCK HELPERS ═══════════════════
 function getStock(code, storeCode){
   const key = `${storeCode}||${code}`;
@@ -616,7 +615,7 @@ function saveCashIo(){
   const amt = parseFloat($('ioAmt').value)||0;
   const note = $('ioNote').value.trim() || (type==='in'?'Cash-In':'Cash-Out');
   if(amt<=0) return alert('⚠️ Enter valid amount!');
-  CASH_IO.unshift({key:user.shiftKey,type,amount:amt,note,time:new Date().toLocaleTimeString('en-PH')});
+  CASH_IO.unshift({key:user.shiftKey,type,amount,note,time:new Date().toLocaleTimeString('en-PH')});
   saveAll();
   alert(`✅ SAVED: ${type==='in'?'+':'-'}₱${fmt(amt)}`);
   closeIoModal();
@@ -640,11 +639,9 @@ function renderShiftView(){
   $('soldListBody').innerHTML = entries.length
     ? entries.map(([code,d])=>`<tr><td><strong>${code}</strong></td><td>${d.name}</td><td><strong>${d.qty}</strong></td><td>₱${fmt(d.sub)}</td></tr>`).join('')
     : '<tr><td colspan="4" class="empty">No sales yet for this shift.</td></tr>';
-
   // Totals
   const totalSales = shiftSales.reduce((s,x)=>s+x.total,0);
   $('shiftTotalSales').textContent = fmt(totalSales);
-
   // GCash
   const shiftGCash = user.type==='cashier' ? GCASH_LOG.filter(x=>x.key===user.shiftKey) : GCASH_LOG;
   $('gcashLogList').innerHTML = shiftGCash.length
@@ -653,7 +650,6 @@ function renderShiftView(){
   const totalGCash = shiftGCash.reduce((s,x)=>s+x.amount,0);
   $('shiftTotalGCash').textContent = fmt(totalGCash);
   $('gcashTotal').textContent = fmt(totalGCash);
-
   // Cash-In/Out
   const shiftIo = user.type==='cashier' ? CASH_IO.filter(x=>x.key===user.shiftKey) : CASH_IO;
   $('cashIoList').innerHTML = shiftIo.length
@@ -663,10 +659,7 @@ function renderShiftView(){
   const totalOut = shiftIo.filter(x=>x.type==='out').reduce((s,x)=>s+x.amount,0);
   $('totalCashIn').textContent = fmt(totalIn);
   $('totalCashOut').textContent = fmt(totalOut);
-
   const cashSales = totalSales - totalGCash;
-  $('shiftTotalCash').textContent = fmt(cashSales);
-    const cashSales = totalSales - totalGCash;
   $('shiftTotalCash').textContent = fmt(cashSales);
   const toRemit = Math.max(0, cashSales + totalIn - totalOut);
   $('cashToRemit').textContent = fmt(toRemit);
@@ -687,238 +680,328 @@ function delIo(i){
     if(idx > -1){ CASH_IO.splice(idx,1); saveAll(); renderShiftView(); }
   }
 }
-// ═══════════════════ DENOMINATION ═══════════════════
+//
+  // ═══════════════════ ACTUAL CASH & VARIANCE CALC ═══════════════════
 function calcActualCash(){
-  const d1000 = (+$('d1000').value||0)*1000;
-  const d500 = (+$('d500').value||0)*500;
-  const d200 = (+$('d200').value||0)*200;
-  const d100 = (+$('d100').value||0)*100;
-  const d50 = (+$('d50').value||0)*50;
-  const d20 = (+$('d20').value||0)*20;
-  const dcoins = +$('dcoins').value||0;
-  const dcheck = +$('dcheck').value||0;
-  const actual = d1000+d500+d200+d100+d50+d20+dcoins+dcheck;
+  const d1000 = parseInt($('d1000').value) || 0;
+  const d500  = parseInt($('d500').value)  || 0;
+  const d200  = parseInt($('d200').value)  || 0;
+  const d100  = parseInt($('d100').value)  || 0;
+  const d50   = parseInt($('d50').value)   || 0;
+  const d20   = parseInt($('d20').value)   || 0;
+  const dcoins= parseFloat($('dcoins').value) || 0;
+  const dcheck= parseFloat($('dcheck').value) || 0;
+
+  const actual = (d1000 * 1000) + (d500 * 500) + (d200 * 200) +
+                 (d100 * 100) + (d50 * 50) + (d20 * 20) + dcoins + dcheck;
   $('actualCashTotal').textContent = fmt(actual);
 
-  const shiftSales = getShiftSales();
-  const totalSales = shiftSales.reduce((s,x)=>s+x.total,0);
-  const shiftGCash = GCASH_LOG.filter(x=>x.key === user.shiftKey);
-  const totalGCash = shiftGCash.reduce((s,x)=>s+x.amount,0);
-  const shiftIo = CASH_IO.filter(x=>x.key === user.shiftKey);
-  const totalIn = shiftIo.filter(x=>x.type==='in').reduce((s,x)=>s+x.amount,0);
-  const totalOut = shiftIo.filter(x=>x.type==='out').reduce((s,x)=>s+x.amount,0);
-  const expected = Math.max(0, (totalSales - totalGCash) + totalIn - totalOut);
-  const diff = actual - expected;
-  $('cashDiff').innerHTML = diff===0
-    ? `<span style="color:green">✅ BALANCED — ₱0.00</span>`
-    : diff>0
-      ? `<span style="color:blue">+₱${fmt(diff)} (Sobra)</span>`
-      : `<span style="color:red">-₱${fmt(-diff)} (Kulang)</span>`;
-}
-// ═══════════════════ TABS ═══════════════════
-function showTab(name){
-  document.querySelectorAll('.tab-page').forEach(p=>p.classList.add('hidden'));
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-  const tabBtn = $(`tab${name.charAt(0).toUpperCase()+name.slice(1)}`);
-  const tabPage = $(`v${name.charAt(0).toUpperCase()+name.slice(1)}`);
-  if(tabBtn) tabBtn.classList.add('active');
-  if(tabPage) tabPage.classList.remove('hidden');
+  // Recalc expected & variance
+  const cashSales   = parseFloat($('shiftTotalCash').textContent);
+  const totalIn     = parseFloat($('totalCashIn').textContent);
+  const totalOut    = parseFloat($('totalCashOut').textContent);
+  const expected    = Math.max(0, cashSales + totalIn - totalOut);
+  const variance    = actual - expected;
 
-  if(name==='entry') renderShiftView();
-  if(name==='shiftSales') renderShiftSalesTab();
-  if(name==='log') renderTransactionLog();
-  if(name==='dashboard' && user.type==='admin') renderDashboard();
-  if(name==='reports' && user.type==='admin') { $('rptFrom').value=today(); $('rptTo').value=today(); runReport(); }
-  if(name==='stock' && user.type==='admin') renderStockView();
-  if(name==='cashiers' && user.type==='admin') renderCashierReport();
-  if(name==='stores' && user.type==='admin') renderStoreManage();
-  if(name==='settings' && user.type==='admin') renderSettings();
+  $('cashToRemit').textContent  = fmt(expected);
+  $('expectedRemit').textContent= fmt(expected);
+
+  const diffEl = $('cashDiff');
+  if(Math.abs(variance) < 0.01){
+    diffEl.textContent = '✅ Balanced — ₱0.00';
+    diffEl.style.color  = '#2e7d32';
+  } else if(variance > 0){
+    diffEl.textContent = `➕ OVER: ₱${fmt(variance)}`;
+    diffEl.style.color  = '#2e7d32';
+  } else {
+    diffEl.textContent = `➖ SHORT: ₱${fmt(Math.abs(variance))}`;
+    diffEl.style.color  = '#c62828';
+  }
 }
 
-// ═══════════════════ CASHIER: SHIFT SALES TAB ═══════════════════
+// ═══════════════════ TAB SWITCHING ═══════════════════
+function showTab(tabId){
+  // Hide all pages
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.add('hidden'));
+  // Deactivate all tabs
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  // Show target page
+  $(`v${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).classList.remove('hidden');
+  // Activate tab button
+  $(`tab${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).classList.add('active');
+
+  // Load data on tab enter
+  if(tabId === 'shiftSales') renderShiftSalesTab();
+  if(tabId === 'log')        renderTransactionLog();
+  if(tabId === 'dashboard')  renderDashboard();
+  if(tabId === 'reports')    runReport();
+  if(tabId === 'stock')      renderStockView();
+  if(tabId === 'cashiers')   renderCashierSummary();
+  if(tabId === 'stores')     renderStoreTable();
+  if(tabId === 'settings')   renderShiftPassEditors();
+}
+
+// ═══════════════════ TAB: SHIFT SALES ═══════════════════
 function renderShiftSalesTab(){
-  $('shiftSalesSubtitle').textContent = `${user.sLabel} | ${D()} | ${user.name}`;
-  const list = SALES.filter(s=>s.shiftKey === user.shiftKey);
-  $('shiftSalesBody').innerHTML = list.length ? list.map(s=>`<tr>
-    <td>${s.time}</td><td>${s.shift}</td><td>${s.code}</td><td>${s.name}</td><td>${s.qty}</td>
-    <td>₱${fmt(s.total)}</td><td>${s.who}</td>
-  </tr>`).join('') : '<tr><td colspan="7" class="empty">No sales yet for this shift.</td></tr>';
-}
-
-// ═══════════════════ TRANSACTION LOG ═══════════════════
-function renderTransactionLog(){
-  const list = user.type==='cashier'
-    ? SALES.filter(s=>s.shiftKey === user.shiftKey)
-    : SALES.filter(s=>user.storeCode==='ALL' || s.storeCode===user.storeCode);
-  $('logBody').innerHTML = list.length ? list.map(s=>`<tr>
-    <td>${s.dt}</td><td>${s.storeName}</td><td>${s.shift}</td><td><strong>${s.code}</strong></td><td>${s.name}</td>
-    <td>${s.qty}</td><td>₱${fmt(s.total)}</td><td>${s.who}</td>
-  </tr>`).join('') : '<tr><td colspan="8" class="empty">No transactions yet.</td></tr>';
-}
-
-// ═══════════════════ ADMIN: DASHBOARD ═══════════════════
-function renderDashboard(){
-  const todaySales = SALES.filter(s=>s.isoDate===today());
-  const totalSales = todaySales.reduce((sum,x)=>sum+x.total,0);
-  $('dashTodaySales').textContent = fmt(totalSales);
-  const cashTotal = todaySales.reduce((sum,x)=>sum+x.total,0) - GCASH_LOG.filter(g=>g.time.includes(today().replace(/-/g,'/'))).reduce((sum,g)=>sum+g.amount,0);
-  const gcashTotal = GCASH_LOG.filter(g=>{
-    const d = new Date().toLocaleDateString('en-PH');
-    return true;
-  }).reduce((sum,g)=>sum+g.amount,0);
-  $('dashCash').textContent = fmt(cashTotal>0?cashTotal:0);
-  $('dashGCash').textContent = fmt(gcashTotal);
-  $('dashStoresCount').textContent = STORES.length;
-
-  const grouped = {};
-  todaySales.forEach(s=>{
-    if(!grouped[s.code]) grouped[s.code]={name:s.name,qty:0,total:0};
-    grouped[s.code].qty += s.qty; grouped[s.code].total += s.total;
-  });
-  const sorted = Object.entries(grouped).sort((a,b)=>b[1].total-a[1].total).slice(0,5);
-  $('dashTopSales').innerHTML = sorted.length ? sorted.map(([c,d],i)=>`<tr>
-    <td><strong>#${i+1}</strong></td><td>${c}</td><td>${d.name}</td><td>${d.qty}</td><td>₱${fmt(d.total)}</td>
-  </tr>`).join('') : '<tr><td colspan="5" class="empty">No sales today.</td></tr>';
-}
-
-// ═══════════════════ ADMIN: SALES REPORT ═══════════════════
-function runReport(){
-  let from = $('rptFrom').value;
-  let to = $('rptTo').value;
-  let storeFilter = $('rptStore').value;
-  let shiftFilter = $('rptShift').value;
-
-  let list = SALES.filter(s=>{
-    if(s.isoDate < from || s.isoDate > to) return false;
-    if(storeFilter!=='ALL' && s.storeCode!==storeFilter) return false;
-    if(shiftFilter!=='ALL' && s.shiftId!==shiftFilter) return false;
-    return true;
-  });
-
-  const totalAmt = list.reduce((s,x)=>s+x.total,0);
-  const totalQty = list.reduce((s,x)=>s+x.qty,0);
-  $('rptTotal').textContent = fmt(totalAmt);
-  $('rptQty').textContent = totalQty;
-  $('rptCount').textContent = list.length;
-
-  $('rptBody').innerHTML = list.length ? list.map(s=>`<tr>
-    <td>${s.date}</td><td>${s.time}</td><td>${s.storeCode}</td><td>${s.shift}</td><td>${s.who}</td>
-    <td>${s.code}</td><td>${s.qty}</td><td>₱${fmt(s.total)}</td>
-  </tr>`).join('') : '<tr><td colspan="8" class="empty">No records found.</td></tr>';
-}
-
-// ═══════════════════ ADMIN: STOCK VIEW ═══════════════════
-function renderStockView(){
-  const sel = $('stockStoreSel').value;
-  const codes = sel==='ALL' ? STORES.map(s=>s.code) : [sel];
-  $('stockBody').innerHTML = PRODUCTS.map(p=>{
-    let qty = 0;
-    codes.forEach(c=> qty += getStock(p.code, c));
-    const low = qty <= LOW_STOCK_LIMIT;
-    return `<tr class="${low?'low-stock':''}">
-      <td><strong>${p.code}</strong></td><td>${p.name}</td><td><strong>${qty}</strong></td>
-      <td>${low?'<span class="tag low">⚠️ LOW</span>':'✅ OK'}</td>
-      <td>
-        <button class="btn-sm" onclick="adjStock('${p.code}',${qty},-5)">−5</button>
-        <button class="btn-sm" onclick="adjStock('${p.code}',${qty},-1)">−1</button>
-        <button class="btn-sm" onclick="adjStock('${p.code}',${qty},1)">+1</button>
-        <button class="btn-sm" onclick="adjStock('${p.code}',${qty},5)">+5</button>
-      </td>
-    </tr>`;
-  }).join('');
-}
-function adjStock(code, current, delta){
-  const sel = $('stockStoreSel').value;
-  if(sel==='ALL') return alert('⚠️ Select specific store first!');
-  setStock(code, sel, Math.max(0, getStock(code, sel)+delta));
-  renderStockView();
-}
-
-// ═══════════════════ ADMIN: CASHIER PERFORMANCE ═══════════════════
-function renderCashierReport(){
-  const grouped = {};
-  SALES.forEach(s=>{
-    const key = `${s.who}||${s.storeName}`;
-    if(!grouped[key]) grouped[key]={name:s.who,store:s.storeName,sales:0,qty:0,last:s.dt};
-    grouped[key].sales += s.total;
-    grouped[key].qty += s.qty;
-    grouped[key].last = s.dt;
-  });
-  const arr = Object.values(grouped).sort((a,b)=>b.sales-a.sales);
-  $('cashierBody').innerHTML = arr.length ? arr.map(x=>`<tr>
-    <td><strong>${x.name}</strong></td><td>${x.store}</td><td>₱${fmt(x.sales)}</td><td>${x.qty}</td><td>${x.last}</td>
-  </tr>`).join('') : '<tr><td colspan="5" class="empty">No data yet.</td></tr>';
-}
-
-// ═══════════════════ ADMIN: STORE MANAGEMENT ═══════════════════
-function renderStoreManage(){
-  $('storeBody').innerHTML = STORES.length
-    ? STORES.map((s,i)=>`<tr>
-        <td><strong>${s.code}</strong></td><td>${s.name}</td>
-        <td><button class="btn-sm btn-red" onclick="delStore(${i})">❌ Delete</button></td>
+  const sales = getShiftSales();
+  $('shiftSalesSubtitle').textContent = `${user.sLabel} — ${D()}`;
+  $('shiftSalesBody').innerHTML = sales.length
+    ? sales.map(s => `<tr>
+        <td>${s.time}</td>
+        <td>${s.shift}</td>
+        <td>${s.code}</td>
+        <td>${s.name}</td>
+        <td>${s.qty}</td>
+        <td>₱${fmt(s.total)}</td>
+        <td>${s.who}</td>
       </tr>`).join('')
-    : '<tr><td colspan="3" class="empty">No stores added yet.</td></tr>';
+    : `<tr><td colspan="7" class="empty">No sales yet for this shift.</td></tr>`;
 }
+
+// ═══════════════════ TAB: TRANSACTION LOG ═══════════════════
+function renderTransactionLog(){
+  const allSales = user.type === 'cashier'
+    ? SALES.filter(s => s.storeCode === user.storeCode)
+    : SALES;
+
+  $('logBody').innerHTML = allSales.length
+    ? allSales.map(s => `<tr>
+        <td>${s.dt}</td>
+        <td>${s.storeCode}</td>
+        <td>${s.shift}</td>
+        <td>${s.code}</td>
+        <td>${s.name}</td>
+        <td>${s.qty}</td>
+        <td>₱${fmt(s.total)}</td>
+        <td>${s.who}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="8" class="empty">No transactions yet.</td></tr>`;
+}
+
+// ═══════════════════ TAB: DASHBOARD ═══════════════════
+function renderDashboard(){
+  const todaySales = SALES.filter(s => s.isoDate === today());
+  const totalAmt  = todaySales.reduce((s, x) => s + x.total, 0);
+  const totalGCash= GCASH_LOG.filter(g => g.key.includes(today())).reduce((s, x) => s + x.amount, 0);
+  const totalCash = totalAmt - totalGCash;
+
+  $('dashTodaySales').textContent = fmt(totalAmt);
+  $('dashCash').textContent       = fmt(Math.max(0, totalCash));
+  $('dashGCash').textContent      = fmt(totalGCash);
+  $('dashStoresCount').textContent= STORES.length;
+
+  // Top items
+  const ranking = {};
+  todaySales.forEach(s => {
+    if(!ranking[s.code]) ranking[s.code] = {name:s.name, qty:0, total:0};
+    ranking[s.code].qty  += s.qty;
+    ranking[s.code].total+= s.total;
+  });
+  const sorted = Object.entries(ranking).sort((a,b) => b[1].total - a[1].total).slice(0,10);
+  $('dashTopSales').innerHTML = sorted.length
+    ? sorted.map(([code, d], i) => `<tr>
+        <td>${i+1}</td>
+        <td><strong>${code}</strong></td>
+        <td>${d.name}</td>
+        <td>${d.qty}</td>
+        <td>₱${fmt(d.total)}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="5" class="empty">No sales today.</td></tr>`;
+}
+
+// ═══════════════════ TAB: SALES REPORTS ═══════════════════
+function runReport(){
+  const from   = $('rptFrom').value;
+  const to     = $('rptTo').value;
+  const store  = $('rptStore').value;
+  const shift  = $('rptShift').value;
+
+  let filtered = SALES.filter(s => {
+    const inRange = s.isoDate >= from && s.isoDate <= to;
+    const matchStore = store === 'ALL' || s.storeCode === store;
+    const matchShift = shift === 'ALL' || s.shiftId === shift;
+    return inRange && matchStore && matchShift;
+  });
+
+  const totalAmt = filtered.reduce((s, x) => s + x.total, 0);
+  const totalQty = filtered.reduce((s, x) => s + x.qty, 0);
+
+  $('rptTotal').textContent = fmt(totalAmt);
+  $('rptQty').textContent   = totalQty;
+  $('rptCount').textContent = filtered.length;
+
+  $('rptBody').innerHTML = filtered.length
+    ? filtered.map(s => `<tr>
+        <td>${s.date}</td>
+        <td>${s.time}</td>
+        <td>${s.storeCode}</td>
+        <td>${s.shift}</td>
+        <td>${s.who}</td>
+        <td>${s.code}</td>
+        <td>${s.qty}</td>
+        <td>₱${fmt(s.total)}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="8" class="empty">No records found for selected filters.</td></tr>`;
+}
+
+// ═══════════════════ TAB: STOCK MANAGEMENT ═══════════════════
+function renderStockView(){
+  const selStore = $('stockStoreSel').value;
+  let html = '';
+
+  PRODUCTS.forEach(p => {
+    if(selStore === 'ALL'){
+      // Show per-store stock when ALL
+      STORES.forEach(st => {
+        const qty = getStock(p.code, st.code);
+        const cls = qty <= LOW_STOCK_LIMIT ? 'low-stock' : '';
+        html += `<tr class="${cls}">
+          <td><strong>${p.code}</strong></td>
+          <td>${p.name}</td>
+          <td>${qty}</td>
+          <td>${qty <= LOW_STOCK_LIMIT ? '<span class="tag low">LOW</span>' : 'OK'}</td>
+          <td>
+            <input type="number" style="width:70px;padding:4px" placeholder="Qty"
+              id="stk-${st.code}-${p.code}" value="${qty}"
+              onchange="setStock('${p.code}','${st.code}',parseInt(this.value)||0);renderStockView()">
+          </td>
+        </tr>`;
+      });
+    } else {
+      const qty = getStock(p.code, selStore);
+      const cls = qty <= LOW_STOCK_LIMIT ? 'low-stock' : '';
+      html += `<tr class="${cls}">
+        <td><strong>${p.code}</strong></td>
+        <td>${p.name}</td>
+        <td>${qty}</td>
+        <td>${qty <= LOW_STOCK_LIMIT ? '<span class="tag low">LOW</span>' : 'OK'}</td>
+        <td>
+          <input type="number" style="width:70px;padding:4px" placeholder="Qty"
+            value="${qty}"
+            onchange="setStock('${p.code}','${selStore}',parseInt(this.value)||0);renderStockView()">
+        </td>
+      </tr>`;
+    }
+  });
+
+  $('stockBody').innerHTML = html || `<tr><td colspan="5" class="empty">No products available.</td></tr>`;
+}
+
+// ═══════════════════ TAB: CASHIER PERFORMANCE ═══════════════════
+function renderCashierSummary(){
+  const perf = {};
+  SALES.forEach(s => {
+    const key = `${s.storeCode}||${s.who}`;
+    if(!perf[key]) perf[key] = {store:s.storeCode, cashier:s.who, total:0, qty:0, lastDt:s.dt};
+    perf[key].total += s.total;
+    perf[key].qty   += s.qty;
+    perf[key].lastDt = s.dt;
+  });
+
+  const rows = Object.values(perf).sort((a,b) => b.total - a.total);
+  $('cashierBody').innerHTML = rows.length
+    ? rows.map(r => `<tr>
+        <td><strong>${r.cashier}</strong></td>
+        <td>${r.store}</td>
+        <td>₱${fmt(r.total)}</td>
+        <td>${r.qty}</td>
+        <td>${r.lastDt}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="5" class="empty">No performance data yet.</td></tr>`;
+}
+
+// ═══════════════════ TAB: STORE MANAGEMENT ═══════════════════
+function renderStoreTable(){
+  $('storeBody').innerHTML = STORES.length
+    ? STORES.map((s, i) => `<tr>
+        <td><strong>${s.code}</strong></td>
+        <td>${s.name}</td>
+        <td><button class="btn-red btn-sm" onclick="removeStore(${i})">🗑️ Remove</button></td>
+      </tr>`).join('')
+    : `<tr><td colspan="3" class="empty">No stores added yet.</td></tr>`;
+}
+
 function addStore(){
-  const code = $('newStoreCode').value.trim().toUpperCase();
+  const code = $('newStoreCode').value.trim();
   const name = $('newStoreName').value.trim();
-  if(!code || !name) return alert('⚠️ Enter both Store Code and Store Name!');
-  if(STORES.some(s=>s.code===code)) return alert('⚠️ Store Code already exists!');
+  if(!code || !name) return alert('⚠️ Fill up both fields!');
+  if(STORES.some(s => s.code === code)) return alert('⚠️ Store code already exists!');
   STORES.push({code, name});
   saveAll();
-  alert(`✅ Store Added: ${code} — ${name}`);
-  $('newStoreCode').value='';
-  $('newStoreName').value='';
-  renderStoreManage();
-}
-function delStore(i){
-  if(!confirm('❌ Delete this store? This cannot be undone!')) return;
-  STORES.splice(i,1);
-  saveAll();
-  renderStoreManage();
+  $('newStoreCode').value = '';
+  $('newStoreName').value  = '';
+  renderStoreTable();
+  alert('✅ Store added!');
 }
 
-// ═══════════════════ ADMIN: SETTINGS ═══════════════════
-function renderSettings(){
-  $('shiftPassEditors').innerHTML = Object.entries(SHIFTS).map(([code,info])=>`
-    <div style="display:flex;gap:8px;align-items:center;margin:4px 0">
-      <span style="width:120px">${info.label}:</span>
-      <input type="password" value="${code}" maxlength="4" oninput="updateShiftPass('${info.id}',this.value)" style="max-width:100px">
-      <span style="font-size:12px;color:#666">${info.hours}</span>
+function removeStore(idx){
+  if(!confirm('⚠️ Remove this store? This does NOT delete existing sales data.')) return;
+  STORES.splice(idx, 1);
+  saveAll();
+  renderStoreTable();
+}
+
+// ═══════════════════ TAB: SETTINGS ═══════════════════
+function renderShiftPassEditors(){
+  $('shiftPassEditors').innerHTML = Object.entries(SHIFTS).map(([pass, info]) => `
+    <div style="display:flex;gap:8px;align-items:center;margin:6px 0">
+      <label style="width:120px">${info.label}:</label>
+      <input type="text" maxlength="4" style="width:100px" value="${pass}"
+        id="pass-${info.id}" oninput="updateShiftPass('${info.id}', this.value)">
+      <small>${info.hours}</small>
     </div>
   `).join('');
 }
-function updateShiftPass(id,newCode){
-  if(newCode.length===4 && /^\d+$/.test(newCode)){
-    const oldKey = Object.keys(SHIFTS).find(k=>SHIFTS[k].id===id);
-    if(oldKey && oldKey!==newCode){
-      SHIFTS[newCode] = SHIFTS[oldKey];
-      delete SHIFTS[oldKey];
+
+function updateShiftPass(shiftId, newPass){
+  if(newPass.length === 4 && /^\d+$/.test(newPass)){
+    // Find & update
+    const entry = Object.entries(SHIFTS).find(([k,v]) => v.id === shiftId);
+    if(entry && entry[0] !== newPass){
+      delete SHIFTS[entry[0]];
+      SHIFTS[newPass] = entry[1];
       saveAll();
     }
   }
 }
+
 function changeAdminPass(){
   const cur = $('curAdminPass').value.trim();
   const newP = $('newAdminPass').value.trim();
-  if(cur!==ADMIN_PASS) return alert('⚠️ Current password wrong!');
-  if(newP.length<4) return alert('⚠️ Min 4 characters!');
+  if(cur !== ADMIN_PASS) return alert('⚠️ Current password is wrong!');
+  if(newP.length < 4) return alert('⚠️ New password must be at least 4 characters!');
   ADMIN_PASS = newP;
   saveAll();
+  $('curAdminPass').value = '';
+  $('newAdminPass').value   = '';
   alert('✅ Admin password changed!');
-  $('curAdminPass').value=''; $('newAdminPass').value='';
-}
-function exportAllData(){
-  const data = {STORES,SALES,STOCKS,GCASH_LOG,CASH_IO,PRODUCTS,SHIFTS,exported:new Date().toLocaleString('en-PH')};
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download = `MB_POS_Backup_${today()}.json`;
-  a.click();
 }
 
-// AUTO-SET DATE
-$('selDate') && ($('selDate').value = today());
+function exportAllData(){
+  const payload = {
+    exported: new Date().toLocaleString('en-PH'),
+    stores: STORES,
+    sales: SALES,
+    stocks: STOCKS,
+    gcash: GCASH_LOG,
+    cashIo: CASH_IO,
+    shiftPass: SHIFTS
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `mb-backup-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ═══════════════════ INITIALIZE ON LOAD ═══════════════════
+window.onload = function(){
+  // Pre-fill date filters
+  $('rptFrom').value = today();
+  $('rptTo').value   = today();
+};
+
 </script>
 </body>
 </html>
