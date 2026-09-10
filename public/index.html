@@ -81,12 +81,28 @@ tr:nth-child(even){background:#fafafa}
 
     <!-- CASHIER LOGIN -->
     <div id="cashierForm" class="hidden">
+      <label>👤 Cashier Name:</label>
+      <select id="cashierName">
+        <option value="">-- Select Your Name --</option>
+        <option>Angene</option>
+        <option>Christelle</option>
+        <option>Abby</option>
+        <option>Arbi</option>
+        <option>Deah</option>
+        <option>Jahara</option>
+        <option>Mary Jane</option>
+        <option>Michelle</option>
+        <option>Jay</option>
+        <option>Christian D</option>
+      </select>
+
       <label>🏪 Select Store:</label>
       <div id="storeListSel" style="margin:6px 0 12px 0;max-height:180px;overflow-y:auto"></div>
-      <input type="text" id="cashierName" placeholder="Your Name">
-      <input type="password" id="shiftPass" placeholder="Shift Passcode (4 digits)" maxlength="4" oninput="detectShift(this.value)">
-      <div class="hint">ⓘ 1111=Morning | 2222=Swing | 3333=Graveyard</div>
+
+      <label>🔑 Shift Passcode:</label>
+      <input type="password" id="shiftPass" placeholder="Enter 4-digit code" maxlength="4" oninput="detectShift(this.value)">
       <div style="font-weight:bold;margin:6px 0;color:#008000" id="shiftLabel"></div>
+
       <button class="btn-green" onclick="loginCashier()">✅ Login & Start Shift</button>
     </div>
 
@@ -118,8 +134,8 @@ tr:nth-child(even){background:#fafafa}
   <div class="mbody">
     <h3 id="ioTitle">💰 Cash-In / Cash-Out</h3>
     <select id="ioType" onchange="document.getElementById('ioNote').placeholder = this.value==='in'?'e.g. Pera galing hulog':'e.g. Pambili yelo / Gastos'">
-      <option value="in">➕ CASH-IN (dagdag sa pera)</option>
-      <option value="out">➖ CASH-OUT (bawas sa pera)</option>
+      <option value="in">➕ CASH-IN (DAGDAG sa Remit)</option>
+      <option value="out">➖ CASH-OUT (BAWAS sa Remit)</option>
     </select>
     <label>Amount:</label>
     <input type="number" id="ioAmt" placeholder="Enter amount" step="0.01" min="0">
@@ -173,7 +189,7 @@ tr:nth-child(even){background:#fafafa}
 
       <!-- 📋 SOLD LIST -->
       <div class="card">
-        <h3>📋 Items Sold Today — <span id="todayDate"></span></h3>
+        <h3>📋 Items Sold — <span id="shiftLabelHeader"></span> | <span id="todayDate"></span></h3>
         <table>
           <thead><tr><th>Code</th><th>Product Name</th><th>Qty Sold</th><th>Subtotal</th></tr></thead>
           <tbody id="soldListBody"><tr><td colspan="4" class="empty">No sales yet.</td></tr></tbody>
@@ -264,7 +280,7 @@ tr:nth-child(even){background:#fafafa}
         <div class="total-box-purple" style="font-size:20px">
           💵 <strong>CASH TO REMIT:</strong> ₱<span id="cashToRemit">0.00</span>
           <div style="font-size:13px;font-weight:normal;margin-top:4px">
-            (Cash Sales + Cash-In − Cash-Out)
+            (Cash Sales ➕ Cash-In ➖ Cash-Out)
           </div>
         </div>
         <div style="font-size:14px;margin-top:8px">
@@ -282,8 +298,8 @@ tr:nth-child(even){background:#fafafa}
         <label>Select Date:</label>
         <input type="date" id="selDate" onchange="renderSalesByDate(this.value)">
         <table style="margin-top:10px">
-          <thead><tr><th>Time</th><th>Code</th><th>Product</th><th>Qty</th><th>Amount</th><th>Cashier</th></tr></thead>
-          <tbody id="dateSalesBody"><tr><td colspan="6" class="empty">Select date to view.</td></tr></tbody>
+          <thead><tr><th>Time</th><th>Shift</th><th>Code</th><th>Product</th><th>Qty</th><th>Amount</th><th>Cashier</th></tr></thead>
+          <tbody id="dateSalesBody"><tr><td colspan="7" class="empty">Select date to view.</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -293,8 +309,8 @@ tr:nth-child(even){background:#fafafa}
       <div class="card">
         <h3>📋 Transaction Log</h3>
         <table>
-          <thead><tr><th>Date & Time</th><th>Store</th><th>Code</th><th>Product</th><th>Qty</th><th>Amount</th><th>Cashier</th></tr></thead>
-          <tbody id="logBody"><tr><td colspan="7" class="empty">No transactions yet.</td></tr>
+          <thead><tr><th>Date & Time</th><th>Store</th><th>Shift</th><th>Code</th><th>Product</th><th>Qty</th><th>Amount</th><th>Cashier</th></tr></thead>
+          <tbody id="logBody"><tr><td colspan="8" class="empty">No transactions yet.</td></tr>
         </table>
       </div>
     </div>
@@ -343,7 +359,11 @@ tr:nth-child(even){background:#fafafa}
 
 <script>
 // ═══════════════════ SETTINGS ═══════════════════
-const SHIFTS = {'1111':{id:'morning',label:'Morning (6AM–2PM)'},'2222':{id:'swing',label:'Swing (2PM–10PM)'},'3333':{id:'graveyard',label:'Graveyard (10PM–6AM)'}};
+const SHIFTS = {
+  '1111':{id:'morning',label:'Morning',hours:'(6AM–2PM)'},
+  '2222':{id:'swing',label:'Swing',hours:'(2PM–10PM)'},
+  '3333':{id:'graveyard',label:'Graveyard',hours:'(10PM–6AM)'}
+};
 const ADMIN_PASS = 'admin123';
 const LOW_STOCK_LIMIT = 10;
 
@@ -391,9 +411,12 @@ let SALES = JSON.parse(localStorage.getItem('mb_sales') || '[]');
 let STOCKS = JSON.parse(localStorage.getItem('mb_stocks') || '{}');
 let GCASH_LOG = JSON.parse(localStorage.getItem('mb_gcash') || '[]');
 let CASH_IO = JSON.parse(localStorage.getItem('mb_cashio') || '[]');
-let DENOM = JSON.parse(localStorage.getItem('mb_denom') || '{}');
+let DENOM = {}; // PER SHIFT — resets each shift
 
-let user = {logged:false, type:'', name:'', shift:'', sLabel:'', storeCode:'', storeName:'', shiftDate:'', canEntry:true};
+let user = {
+  logged:false, type:'', name:'', shift:'', sLabel:'', storeCode:'', storeName:'',
+  shiftDate:'', shiftKey:'', canEntry:true
+};
 let selectedProduct = null;
 let selectedStoreIndex = null;
 
@@ -403,7 +426,6 @@ const saveAll = () => {
   localStorage.setItem('mb_stocks', JSON.stringify(STOCKS));
   localStorage.setItem('mb_gcash', JSON.stringify(GCASH_LOG));
   localStorage.setItem('mb_cashio', JSON.stringify(CASH_IO));
-  localStorage.setItem('mb_denom', JSON.stringify(DENOM));
 };
 
 // ═══════════════════ STOCK HELPERS ═══════════════════
@@ -425,6 +447,7 @@ function showLoginForm(t){
   $('cashierForm').classList.add('hidden');
   $('adminForm').classList.add('hidden');
   selectedStoreIndex = null;
+  $('shiftLabel').textContent = '';
   if(t==='cashier'){
     $('cashierForm').classList.remove('hidden');
     renderStoreListForLogin();
@@ -451,32 +474,28 @@ function pickStore(i){
 function loginCashier(){
   const name = $('cashierName').value.trim();
   const pass = $('shiftPass').value.trim();
-  if(!name) return alert('⚠️ Enter your name!');
+  if(!name) return alert('⚠️ Select your name!');
   if(selectedStoreIndex===null) return alert('⚠️ Select a store!');
   const shift = SHIFTS[pass];
   if(!shift) return alert('⚠️ Wrong passcode!');
   const store = STORES[selectedStoreIndex];
+
+  // UNIQUE SHIFT KEY — SALES ARE ISOLATED PER STORE + DATE + SHIFT
+  const shiftKey = `${store.code}||${today()}||${shift.id}`;
+
   user = {
     logged:true, type:'cashier', name, shift:shift.id, sLabel:shift.label,
-    storeCode:store.code, storeName:store.name, shiftDate:today(), canEntry:true
+    storeCode:store.code, storeName:store.name, shiftDate:today(), shiftKey, canEntry:true
   };
-  clearShiftData();
   startApp();
 }
 function loginAdmin(){
   if($('adminPass').value.trim()!==ADMIN_PASS) return alert('⚠️ Wrong admin password!');
   user = {
     logged:true, type:'admin', name:'ADMIN', shift:'', sLabel:'Admin',
-    storeCode:'ALL', storeName:'All Stores', shiftDate:today(), canEntry:false
+    storeCode:'ALL', storeName:'All Stores', shiftDate:today(), shiftKey:'', canEntry:false
   };
   startApp();
-}
-function clearShiftData(){
-  const keyPrefix = `${user.storeCode}||${user.shiftDate}||${user.shift}`;
-  GCASH_LOG = GCASH_LOG.filter(x => !x.key.startsWith(keyPrefix));
-  CASH_IO = CASH_IO.filter(x => !x.key.startsWith(keyPrefix));
-  DENOM = {};
-  saveAll();
 }
 function startApp(){
   $('loginModal').classList.add('hidden');
@@ -484,20 +503,21 @@ function startApp(){
   $('userInfoLine').textContent = `${user.storeName} | ${user.sLabel} | ${user.name}`;
   $('todayDate').textContent = D();
   $('shiftDate').textContent = D();
+  $('shiftLabelHeader').textContent = user.sLabel;
 
-  // Admin = VIEW ONLY — hide entry form
+  // Admin = VIEW ONLY
   if(user.type==='admin'){
     $('entryCard').style.opacity = '0.6';
     $('entryCard').style.pointerEvents = 'none';
     $('entryCard').querySelectorAll('button,input').forEach(el=>el.disabled=true);
-    $('entryCard').innerHTML = '<div style="padding:20px;text-align:center;color:#666"><strong>🔐 ADMIN VIEW ONLY</strong><br>Admin cannot record sales. Please login as Cashier.</div>' + $('entryCard').innerHTML;
+    $('entryCard').innerHTML = '<div style="padding:20px;text-align:center;color:#666"><strong>🔐 ADMIN VIEW ONLY</strong><br>Admin cannot record sales. Login as Cashier.</div>' + $('entryCard').innerHTML;
     ['tabStock','tabReport','tabStores'].forEach(id=>$(id).classList.remove('hidden'));
   }
 
   showTab('entry');
 }
 function logout(){
-  if(confirm('🚪 Make sure you have noted all totals before logging out!\n\nLogout?')) location.reload();
+  if(confirm('🚪 Make sure all totals are noted before logging out!\n\nLogout?')) location.reload();
 }
 
 // ═══════════════════ SEARCH & ADD SALE ═══════════════════
@@ -537,7 +557,7 @@ function addSale(){
   if(!selectedProduct) return alert('⚠️ Select product first!');
   const qty = parseInt($('qtyInput').value) || 0;
   if(qty<1) return alert('⚠️ Enter quantity!');
-  if(user.storeCode==='ALL') return alert('⚠️ Select a specific store first!');
+  if(user.storeCode==='ALL') return alert('⚠️ Select specific store first!');
 
   const amount = selectedProduct.price * qty;
   const stock = getStock(selectedProduct.code, user.storeCode);
@@ -549,8 +569,8 @@ function addSale(){
     dt:dt(), storeCode:user.storeCode, storeName:user.storeName,
     code:selectedProduct.code, name:selectedProduct.name,
     price:selectedProduct.price, qty, total:amount,
-    who:user.name, shift:user.sLabel,
-    shiftKey:`${user.storeCode}||${user.shiftDate}||${user.shift}`
+    who:user.name, shift:user.sLabel, shiftId:user.shift,
+    shiftKey:user.shiftKey
   };
   SALES.unshift(sale);
   saveAll();
@@ -580,7 +600,7 @@ function saveGCash(){
   if(amt<=0) return alert('⚠️ Enter valid amount!');
 
   GCASH_LOG.unshift({
-    key:`${user.storeCode}||${user.shiftDate}||${user.shift}`,
+    key:user.shiftKey,
     time:new Date().toLocaleTimeString('en-PH'),
     amount:amt, note
   });
@@ -609,7 +629,7 @@ function saveCashIo(){
   if(amt<=0) return alert('⚠️ Enter valid amount!');
 
   CASH_IO.unshift({
-    key:`${user.storeCode}||${user.shiftDate}||${user.shift}`,
+    key:user.shiftKey,
     type, amount:amt, note,
     time:new Date().toLocaleTimeString('en-PH')
   });
@@ -619,15 +639,19 @@ function saveCashIo(){
   renderShiftView();
 }
 
-// ═══════════════════ RENDER EVERYTHING ═══════════════════
+// ═══════════════════ RENDER SHIFT VIEW — ISOLATED PER SHIFT ═══════════════════
 function getShiftSales(){
-  const sk = `${user.storeCode}||${user.shiftDate}||${user.shift}`;
-  return SALES.filter(s=>s.shiftKey === sk);
+  // CASHIER: Makikita LANG yung benta NG SHIFT NA ITO — walang ibang shift!
+  if(user.type==='cashier'){
+    return SALES.filter(s=>s.shiftKey === user.shiftKey);
+  }
+  // ADMIN: Makikita LAHAT
+  return SALES.filter(s=>user.storeCode==='ALL' || s.storeCode===user.storeCode);
 }
 function renderShiftView(){
   const shiftSales = getShiftSales();
 
-  // 1. Sold List
+  // 1. Sold List — GROUPED
   const grouped = {};
   shiftSales.forEach(s=>{
     if(!grouped[s.code]) grouped[s.code]={name:s.name,qty:0,sub:0};
@@ -636,7 +660,7 @@ function renderShiftView(){
   });
   const entries = Object.entries(grouped);
   if(!entries.length){
-    $('soldListBody').innerHTML = '<tr><td colspan="4" class="empty">No sales yet.</td></tr>';
+    $('soldListBody').innerHTML = '<tr><td colspan="4" class="empty">No sales yet for this shift.</td></tr>';
   } else {
     $('soldListBody').innerHTML = entries.map(([code,d])=>`<tr>
       <td><strong>${code}</strong></td><td>${d.name}</td><td><strong>${d.qty}</strong></td><td>₱${fmt(d.sub)}</td>
@@ -647,9 +671,10 @@ function renderShiftView(){
   const totalSales = shiftSales.reduce((s,x)=>s+x.total,0);
   $('shiftTotalSales').textContent = fmt(totalSales);
 
-  // 3. GCash Log & Total
-  const sk = `${user.storeCode}||${user.shiftDate}||${user.shift}`;
-  const shiftGCash = GCASH_LOG.filter(x=>x.key === sk);
+  // 3. GCash Log — SHIFT-SPECIFIC ONLY
+  const shiftGCash = user.type==='cashier'
+    ? GCASH_LOG.filter(x=>x.key === user.shiftKey)
+    : GCASH_LOG;
   if(!shiftGCash.length){
     $('gcashLogList').innerHTML = '<div class="empty">Click "Add GCash Payment" to enter amount from receipt/screenshot.</div>';
   } else {
@@ -664,8 +689,10 @@ function renderShiftView(){
   $('shiftTotalGCash').textContent = fmt(totalGCash);
   $('gcashTotal').textContent = fmt(totalGCash);
 
-  // 4. Cash-In / Cash-Out
-  const shiftIo = CASH_IO.filter(x=>x.key === sk);
+  // 4. Cash-In / Cash-Out — SHIFT-SPECIFIC ONLY
+  const shiftIo = user.type==='cashier'
+    ? CASH_IO.filter(x=>x.key === user.shiftKey)
+    : CASH_IO;
   if(!shiftIo.length){
     $('cashIoList').innerHTML = '<div class="empty">No Cash-In / Cash-Out recorded yet.</div>';
   } else {
@@ -681,29 +708,26 @@ function renderShiftView(){
   $('totalCashIn').textContent = fmt(totalIn);
   $('totalCashOut').textContent = fmt(totalOut);
 
-  // 5. CASH TO REMIT = Cash Sales + Cash-In − Cash-Out
+  // ✅ FORMULA: Cash Sales + Cash-In − Cash-Out = CASH TO REMIT
   const cashSales = totalSales - totalGCash;
   $('shiftTotalCash').textContent = fmt(cashSales);
   const toRemit = Math.max(0, cashSales + totalIn - totalOut);
   $('cashToRemit').textContent = fmt(toRemit);
   $('expectedRemit').textContent = fmt(toRemit);
 
-  // Recalc denomination & variance
   calcActualCash();
 }
 
 function delGCash(i){
   if(confirm('❌ Delete this GCash entry?')){
-    const sk = `${user.storeCode}||${user.shiftDate}||${user.shift}`;
-    const list = GCASH_LOG.filter(x=>x.key === sk);
+    const list = GCASH_LOG.filter(x=>x.key === user.shiftKey);
     const idx = GCASH_LOG.indexOf(list[i]);
     if(idx>-1){ GCASH_LOG.splice(idx,1); saveAll(); renderShiftView(); }
   }
 }
 function delIo(i){
   if(confirm('❌ Delete this entry?')){
-    const sk = `${user.storeCode}||${user.shiftDate}||${user.shift}`;
-    const list = CASH_IO.filter(x=>x.key === sk);
+    const list = CASH_IO.filter(x=>x.key === user.shiftKey);
     const idx = CASH_IO.indexOf(list[i]);
     if(idx>-1){ CASH_IO.splice(idx,1); saveAll(); renderShiftView(); }
   }
@@ -723,16 +747,14 @@ function calcActualCash(){
   const actual = d1000+d500+d200+d100+d50+d20+dcoins+dcheck;
   $('actualCashTotal').textContent = fmt(actual);
 
-  DENOM = {d1000:$('d1000').value,d500:$('d500').value,d200:$('d200').value,
-           d100:$('d100').value,d50:$('d50').value,d20:$('d20').value,
-           dcoins:$('dcoins').value,dcheck:$('dcheck').value};
-  saveAll();
-
-  const sk = `${user.storeCode}||${user.shiftDate}||${user.shift}`;
-  const totalSales = getShiftSales().reduce((s,x)=>s+x.total,0);
-  const totalGCash = GCASH_LOG.filter(x=>x.key === sk).reduce((s,x)=>s+x.amount,0);
-  const totalIn = CASH_IO.filter(x=>x.key === sk && x.type==='in').reduce((s,x)=>s+x.amount,0);
-  const totalOut = CASH_IO.filter(x=>x.key === sk && x.type==='out').reduce((s,x)=>s+x.amount,0);
+  // Recalc expected
+  const shiftSales = getShiftSales();
+  const totalSales = shiftSales.reduce((s,x)=>s+x.total,0);
+  const shiftGCash = GCASH_LOG.filter(x=>x.key === user.shiftKey);
+  const totalGCash = shiftGCash.reduce((s,x)=>s+x.amount,0);
+  const shiftIo = CASH_IO.filter(x=>x.key === user.shiftKey);
+  const totalIn = shiftIo.filter(x=>x.type==='in').reduce((s,x)=>s+x.amount,0);
+  const totalOut = shiftIo.filter(x=>x.type==='out').reduce((s,x)=>s+x.amount,0);
   const expected = Math.max(0, (totalSales - totalGCash) + totalIn - totalOut);
 
   const diff = actual - expected;
@@ -761,61 +783,69 @@ function showTab(name){
 }
 
 function renderTransactionLog(){
-  const list = SALES.filter(s=>user.storeCode==='ALL' || s.storeCode===user.storeCode);
+  const list = SALES.filter(s=>user.type==='admin'
+    ? (user.storeCode==='ALL' || s.storeCode===user.storeCode)
+    : s.shiftKey === user.shiftKey);
   $('logBody').innerHTML = list.length ? list.map(s=>`<tr>
-    <td>${s.dt}</td><td>${s.storeName}</td><td><strong>${s.code}</strong></td><td>${s.name}</td>
+    <td>${s.dt}</td><td>${s.storeName}</td><td>${s.shift}</td><td><strong>${s.code}</strong></td><td>${s.name}</td>
     <td>${s.qty}</td><td>₱${fmt(s.total)}</td><td>${s.who}</td>
-  </tr>`).join('') : '<tr><td colspan="7" class="empty">No transactions yet.</td></tr>';
+  </tr>`).join('') : '<tr><td colspan="8" class="empty">No transactions yet.</td></tr>';
 }
 
 function renderSalesByDate(date){
-  const list = SALES.filter(s=>s.isoDate===date && (user.storeCode==='ALL' || s.storeCode===user.storeCode));
+  const list = SALES.filter(s=>s.isoDate===date && (user.type==='admin'
+    ? (user.storeCode==='ALL' || s.storeCode===user.storeCode)
+    : s.shiftKey.startsWith(`${user.storeCode}||${date}`)));
   $('dateSalesBody').innerHTML = list.length ? list.map(s=>`<tr>
-    <td>${s.time}</td><td>${s.code}</td><td>${s.name}</td><td>${s.qty}</td>
+    <td>${s.time}</td><td>${s.shift}</td><td>${s.code}</td><td>${s.name}</td><td>${s.qty}</td>
     <td>₱${fmt(s.total)}</td><td>${s.who}</td>
-  </tr>`).join('') : '<tr><td colspan="6" class="empty">No sales on this date.</td></tr>';
+  </tr>`).join('') : '<tr><td colspan="7" class="empty">No sales on this date.</td></tr>';
 }
 
-function
-  renderStockView(){
-  const tbody = $('stockBody');
-  const storeCode = user.storeCode === 'ALL' ? STORES[0]?.code || '0000' : user.storeCode;
-  tbody.innerHTML = PRODUCTS.map(p=>{
+function renderStockView(){
+  const storeCode = user.storeCode ===
+    'ALL' ? STORES[0]?.code : user.storeCode;
+  if(!storeCode) return;
+  $('stockBody').innerHTML = PRODUCTS.map(p=>{
     const qty = getStock(p.code, storeCode);
     const low = qty <= LOW_STOCK_LIMIT;
     return `<tr class="${low?'low-stock':''}">
       <td><strong>${p.code}</strong></td>
       <td>${p.name}</td>
-      <td>${qty}</td>
+      <td><strong>${qty}</strong></td>
       <td>${low?'<span class="tag low">⚠️ LOW</span>':'✅ OK'}</td>
       <td>
-        <button class="btn-sm btn-green" onclick="adjStock('${p.code}',1)">+1</button>
-        <button class="btn-sm btn-red" onclick="adjStock('${p.code}',-1)">-1</button>
+        <button class="btn-sm" onclick="adjStock('${p.code}',${qty},-5)">−5</button>
+        <button class="btn-sm" onclick="adjStock('${p.code}',${qty},-1)">−1</button>
+        <button class="btn-sm" onclick="adjStock('${p.code}',${qty},1)">+1</button>
+        <button class="btn-sm" onclick="adjStock('${p.code}',${qty},5)">+5</button>
       </td>
     </tr>`;
   }).join('');
 }
-function adjStock(code, delta){
-  const storeCode = user.storeCode === 'ALL' ? STORES[0]?.code || '0000' : user.storeCode;
-  const current = getStock(code, storeCode);
+function adjStock(code, current, delta){
+  const storeCode = user.storeCode === 'ALL' ? STORES[0]?.code : user.storeCode;
+  if(!storeCode) return;
   setStock(code, storeCode, Math.max(0, current + delta));
   renderStockView();
 }
 
 function renderReports(){
-  const storeCode = user.storeCode;
-  const sales = storeCode==='ALL' ? SALES : SALES.filter(s=>s.storeCode===storeCode);
-  const agg = {};
-  sales.forEach(s=>{
-    if(!agg[s.code]) agg[s.code] = {name:s.name, qty:0, total:0};
-    agg[s.code].qty += s.qty;
-    agg[s.code].total += s.total;
+  const allSales = SALES.filter(s=>user.storeCode==='ALL' || s.storeCode===user.storeCode);
+  const grouped = {};
+  allSales.forEach(s=>{
+    if(!grouped[s.code]) grouped[s.code] = {name:s.name, qty:0, total:0};
+    grouped[s.code].qty += s.qty;
+    grouped[s.code].total += s.total;
   });
-  const rows = Object.entries(agg).sort((a,b)=>b[1].qty - a[1].qty);
-  $('topSalesBody').innerHTML = rows.length
-    ? rows.map(([code,d],i)=>`<tr>
-        <td>${i+1}</td><td><strong>${code}</strong></td><td>${d.name}</td>
-        <td>${d.qty}</td><td>₱${fmt(d.total)}</td>
+  const sorted = Object.entries(grouped).sort((a,b)=>b[1].total - a[1].total);
+  $('topSalesBody').innerHTML = sorted.length
+    ? sorted.map(([code,d],i)=>`<tr>
+        <td><strong>#${i+1}</strong></td>
+        <td>${code}</td>
+        <td>${d.name}</td>
+        <td>${d.qty}</td>
+        <td>₱${fmt(d.total)}</td>
       </tr>`).join('')
     : '<tr><td colspan="5" class="empty">No sales yet.</td></tr>';
 }
@@ -827,41 +857,31 @@ function renderStoreManage(){
         <td>${s.name}</td>
         <td><button class="btn-sm btn-red" onclick="delStore(${i})">❌ Delete</button></td>
       </tr>`).join('')
-    : '<tr><td colspan="3" class="empty">No stores added.</td></tr>';
+    : '<tr><td colspan="3" class="empty">No stores added yet.</td></tr>';
 }
+
 function addStore(){
-  const code = $('newStoreCode').value.trim();
+  const code = $('newStoreCode').value.trim().toUpperCase();
   const name = $('newStoreName').value.trim();
-  if(!code || !name) return alert('⚠️ Fill up both fields!');
-  if(STORES.some(s=>s.code===code)) return alert('⚠️ Store code already exists!');
-  STORES.push({code,name});
+  if(!code || !name) return alert('⚠️ Enter both Store Code and Store Name!');
+  if(STORES.some(s=>s.code===code)) return alert('⚠️ Store Code already exists!');
+  STORES.push({code, name});
+  saveAll();
+  alert(`✅ Store Added: ${code} — ${name}`);
   $('newStoreCode').value='';
   $('newStoreName').value='';
+  renderStoreManage();
+}
+
+function delStore(i){
+  if(!confirm('❌ Delete this store? This cannot be undone!')) return;
+  STORES.splice(i,1);
   saveAll();
   renderStoreManage();
 }
-function delStore(i){
-  if(confirm('❌ Delete this store?')){
-    STORES.splice(i,1);
-    saveAll();
-    renderStoreManage();
-  }
-}
 
-// Load saved denomination on shift start
-window.onload = function(){
-  if(user.logged && user.canEntry){
-    $('d1000').value = DENOM.d1000||'';
-    $('d500').value = DENOM.d500||'';
-    $('d200').value = DENOM.d200||'';
-    $('d100').value = DENOM.d100||'';
-    $('d50').value = DENOM.d50||'';
-    $('d20').value = DENOM.d20||'';
-    $('dcoins').value = DENOM.dcoins||'';
-    $('dcheck').value = DENOM.dcheck||'';
-    calcActualCash();
-  }
-};
+// AUTO-SET TODAY'S DATE
+$('selDate').value = today();
 </script>
 </body>
 </html>
