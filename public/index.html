@@ -9,50 +9,58 @@
 body{background:#f5f5f5;padding-bottom:40px}
 .hidden{display:none !important}
 button{border:none;border-radius:6px;padding:10px 14px;cursor:pointer;font-size:14px;font-weight:500}
-input{border:2px solid #ddd;border-radius:6px;padding:10px 12px;width:100%;margin:4px 0 8px;font-size:15px}
+input,select{border:2px solid #ddd;border-radius:6px;padding:10px 12px;width:100%;margin:4px 0 8px;font-size:15px}
 label{font-size:13px;color:#444;font-weight:bold}
-h2,h3{color:#2d2d2d;margin-bottom:12px}
+h2,h3,h4{color:#2d2d2d;margin-bottom:10px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;padding:15px;z-index:999}
-.mbody{background:#fff;border-radius:10px;padding:24px;max-width:420px;width:100%;max-height:90vh;overflow-y-auto}
+.mbody{background:#fff;border-radius:10px;padding:24px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto}
 .topbar{background:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 3px #0001;position:sticky;top:0;z-index:10}
 .topbar h1{font-size:18px;color:#008000}
 .topbar small{display:block;color:#666;font-size:12px;margin-top:2px}
 .nav{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.nav button{padding:6px 10px;font-size:13px;background:#f0f0f0}
+.nav button{padding:8px 12px;font-size:13px;background:#f0f0f0}
 .nav button.active{background:#008000;color:#fff}
-.container{max-width:1100px;margin:16px auto;padding:0 12px}
+.container{max-width:1000px;margin:16px auto;padding:0 12px}
 .card{background:#fff;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px #0001}
 .search-box{position:relative}
-.search-results{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-top:none;max-height:280px;overflow-y:auto;z-index:100;border-radius:0 0 8px 8px;box-shadow:0 4px 8px #0002}
+.search-results{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-top:none;max-height:260px;overflow-y:auto;z-index:100;border-radius:0 0 8px 8px;box-shadow:0 4px 8px #0002}
 .search-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5}
 .search-item:hover{background:#e8f5e9}
 .search-item:last-child{border-bottom:none}
 .search-item .code{font-weight:bold;color:#008000;margin-right:8px}
-.search-item .price{float:right;color:#666;font-size:13px}
 .selected-product{background:#e8f5e9;padding:10px 14px;border-radius:6px;margin:10px 0;border-left:4px solid #008000}
 .qty-row{display:flex;gap:10px;align-items:center;margin-top:10px}
 .qty-row input{flex:1;margin:0}
 .btn-green{background:#008000;color:#fff;font-weight:bold}
 .btn-green:hover{background:#006600}
 .btn-red{background:#d32f2f;color:#fff}
+.btn-blue{background:#2196f3;color:#fff}
 .btn-orange{background:#ff9800;color:#fff}
-table{width:100%;border-collapse:collapse;margin-top:10px}
-th,td{padding:8px 10px;text-align:left;border-bottom:1px solid #eee;font-size:14px}
+.btn-sm{padding:5px 8px;font-size:12px;width:auto;margin:2px}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid #eee;font-size:14px}
 th{background:#f9f9f9;font-weight:bold;color:#333}
 tr.low-stock td{color:#c62828;background:#fff3f3}
+tr:nth-child(even){background:#fafafa}
 .total-box{background:#e8f5e9;padding:12px;border-radius:6px;text-align:right;font-size:18px;font-weight:bold;color:#006400;margin-top:10px}
+.total-box-blue{background:#e3f2fd;padding:12px;border-radius:6px;text-align:right;font-size:18px;font-weight:bold;color:#1565c0;margin-top:10px}
 .empty{text-align:center;color:#888;padding:24px}
 .tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:bold}
-.tag.cashier{background:#e3f2fd;color:#1565c0}
-.tag.admin{background:#ede7f6;color:#512da8}
+.tag.cash{background:#e8f5e9;color:#2e7d32}
+.tag.gcash{background:#e3f2fd;color:#1565c0}
 .tag.low{background:#ffebee;color:#c62828}
-.tag.ok{background:#e8f5e9;color:#2e7d32}
 .hint{font-size:12px;color:#888;margin:4px 0 10px}
 .store-item{padding:10px;border:2px solid #eee;border-radius:6px;margin:6px 0;cursor:pointer}
 .store-item:hover,.store-item.selected{border-color:#008000;background:#f1f8f1}
-.summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px}
-.summary-box{background:#fff;padding:12px;border-radius:6px;text-align:center;box-shadow:0 1px 2px #0001}
-.summary-box .num{font-size:20px;font-weight:bold;color:#008000}
+.pay-row{display:flex;gap:8px;align-items:center;margin:6px 0;padding:8px;background:#f9f9f9;border-radius:6px}
+.pay-row input{margin:0;flex:1}
+.denom-row{display:grid;grid-template-columns:80px 1fr 80px 1fr;gap:6px;align-items:center;margin:4px 0}
+.denom-row input{margin:0}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
+.summary-card{padding:12px;border-radius:6px;text-align:center}
+.summary-card.cash{background:#e8f5e9}
+.summary-card.gcash{background:#e3f2fd}
+.summary-card.total{background:#ede7f6}
 </style>
 </head>
 <body>
@@ -63,8 +71,8 @@ tr.low-stock td{color:#c62828;background:#fff3f3}
     <h2 style="text-align:center;color:#008000;margin-bottom:20px">🍔 Minute Burger — Sales Entry System</h2>
     <select id="loginType" onchange="showLoginForm(this.value)">
       <option value="">-- Select User Type --</option>
-      <option value="cashier">Cashier — Enter Sales Only</option>
-      <option value="admin">Admin — Full Access & Reports</option>
+      <option value="cashier">Cashier — Sales Entry & Shift Summary</option>
+      <option value="admin">Admin — Full Access</option>
     </select>
 
     <!-- CASHIER LOGIN -->
@@ -75,7 +83,7 @@ tr.low-stock td{color:#c62828;background:#fff3f3}
       <input type="password" id="shiftPass" placeholder="Shift Passcode (4 digits)" maxlength="4" oninput="detectShift(this.value)">
       <div class="hint">ⓘ 1111=Morning | 2222=Swing | 3333=Graveyard</div>
       <div style="font-weight:bold;margin:6px 0;color:#008000" id="shiftLabel"></div>
-      <button class="btn-green" onclick="loginCashier()">✅ Login & Start</button>
+      <button class="btn-green" onclick="loginCashier()">✅ Login & Start Shift</button>
     </div>
 
     <!-- ADMIN LOGIN -->
@@ -105,11 +113,12 @@ tr.low-stock td{color:#c62828;background:#fff3f3}
   </div>
 
   <div class="container">
-    <!-- SALES ENTRY TAB -->
+    <!-- ═══════════════════ SALES ENTRY TAB ═══════════════════ -->
     <div id="vEntry" class="tab-page">
+      <!-- 🔍 PRODUCT SEARCH -->
       <div class="card">
-        <h3>🔍 Search & Add Sold Item</h3>
-        <label>Type Code or Name (e.g. mb, minute, bp, black pepper):</label>
+        <h3>🔍 Add Sold Item</h3>
+        <label>Type Code or Name (e.g. mb, bp, black pepper):</label>
         <div class="search-box">
           <input type="text" id="searchInput" placeholder="Type here..." oninput="searchProduct(this.value)" autocomplete="off">
           <div id="searchResults" class="search-results hidden"></div>
@@ -118,83 +127,133 @@ tr.low-stock td{color:#c62828;background:#fff3f3}
         <div id="selectedItemBox" class="selected-product hidden">
           <strong id="selName"></strong> — ₱<span id="selPrice"></span>
           <div class="qty-row">
-            <input type="number" id="qtyInput" placeholder="Quantity Sold" min="1" onkeydown="if(event.key==='Enter')addSale()">
-            <button class="btn-green" onclick="addSale()">✅ ADD TO SALES</button>
+            <input type="number" id="qtyInput" placeholder="Quantity Sold" min="1" onkeydown="if(event.key==='Enter')openPayModal()">
+            <select id="payMethod" style="max-width:140px">
+              <option value="Cash">💵 Cash</option>
+              <option value="GCash">📱 GCash</option>
+            </select>
+            <button class="btn-green" onclick="openPayModal()">✅ ADD</button>
           </div>
         </div>
       </div>
 
+      <!-- 📋 SIMPLE LIST: CODE — PRODUCT — QTY SOLD -->
       <div class="card">
-        <h3>📊 Today's Summary — <span id="todayDate"></span></h3>
-        <div class="summary-row">
-          <div class="summary-box">
-            <div>Items Sold</div>
-            <div class="num" id="totalItems">0</div>
+        <h3>📋 Items Sold Today — <span id="todayDate"></span></h3>
+        <table>
+          <thead><tr><th>Code</th><th>Product Name</th><th>Qty Sold</th><th>Subtotal</th></tr></thead>
+          <tbody id="soldListBody"><tr><td colspan="4" class="empty">No sales yet.</td></tr></tbody>
+        </table>
+      </div>
+
+      <!-- 💰 CASHIER SHIFT SUMMARY PANEL -->
+      <div class="card">
+        <h3>💰 Shift Summary — <span id="shiftDate"></span></h3>
+
+        <div class="summary-grid">
+          <div class="summary-card total">
+            <div>📊 Total Sales Amount</div>
+            <div style="font-size:22px;font-weight:bold">₱<span id="shiftTotalSales">0.00</span></div>
           </div>
-          <div class="summary-box">
-            <div>Total Amount</div>
-            <div class="num">₱<span id="totalAmount">0.00</span></div>
+          <div class="summary-card cash">
+            <div>💵 Total Cash Sales</div>
+            <div style="font-size:22px;font-weight:bold">₱<span id="shiftTotalCash">0.00</span></div>
           </div>
-          <div class="summary-box">
-            <div>Unique Products</div>
-            <div class="num" id="uniqueCount">0</div>
+          <div class="summary-card gcash">
+            <div>📱 Total GCash Sales</div>
+            <div style="font-size:22px;font-weight:bold">₱<span id="shiftTotalGCash">0.00</span></div>
           </div>
         </div>
-        <table id="todayTable">
-          <thead><tr><th>Product</th><th>Code</th><th>Qty Sold</th><th>Price</th><th>Subtotal</th><th>Stock Left</th><th>Action</th></tr></thead>
-          <tbody id="todayBody"><tr><td colspan="7" class="empty">No sales recorded yet.</td></tr></tbody>
-        </table>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #eee">
+
+        <!-- 💵 ACTUAL CASH ON HAND / DENOMINATION -->
+        <h4>💵 Actual Cash On Hand — Ilagay ang totoong pera</h4>
+        <div class="denom-row">
+          <label>₱1000</label><input type="number" id="d1000" placeholder="Bilang" oninput="calcActualCash()">
+          <label>₱500</label><input type="number" id="d500" placeholder="Bilang" oninput="calcActualCash()">
+        </div>
+        <div class="denom-row">
+          <label>₱200</label><input type="number" id="d200" placeholder="Bilang" oninput="calcActualCash()">
+          <label>₱100</label><input type="number" id="d100" placeholder="Bilang" oninput="calcActualCash()">
+        </div>
+        <div class="denom-row">
+          <label>₱50</label><input type="number" id="d50" placeholder="Bilang" oninput="calcActualCash()">
+          <label>₱20</label><input type="number" id="d20" placeholder="Bilang" oninput="calcActualCash()">
+        </div>
+        <div class="denom-row">
+          <label>Coins</label><input type="number" id="dcoins" placeholder="Halaga" oninput="calcActualCash()">
+          <label>Check/Card</label><input type="number" id="dcheck" placeholder="Halaga" oninput="calcActualCash()">
+        </div>
+        <div class="total-box">
+          ACTUAL CASH IN BOX: ₱<span id="actualCashTotal">0.00</span>
+        </div>
+        <div style="font-size:14px;margin-top:6px">
+          <strong>💵 Expected Cash:</strong> ₱<span id="expectedCash">0.00</span>
+          &nbsp;&nbsp;|&nbsp;&nbsp;
+          <strong>⚠️ Difference:</strong> <span id="cashDiff">—</span>
+        </div>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #eee">
+
+        <!-- 📱 GCASH TRANSACTION LOG — HIWALAY BAWAT BENTA -->
+        <h4>📱 GCash Payments Log (per Transaction)</h4>
+        <div id="gcashLogList">
+          <div class="empty">Wala pang GCash transaction.</div>
+        </div>
+        <div class="total-box-blue">
+          TOTAL GCASH PAYMENTS: ₱<span id="gcashTotal">0.00</span>
+        </div>
       </div>
     </div>
 
-    <!-- TODAY'S SALES TAB -->
+    <!-- ═══════════════════ TODAY'S SALES TAB ═══════════════════ -->
     <div id="vToday" class="tab-page hidden">
       <div class="card">
-        <h3>📊 Detailed Sales by Date</h3>
+        <h3>📊 Sales by Date</h3>
         <label>Select Date:</label>
         <input type="date" id="selDate" onchange="renderSalesByDate(this.value)">
-        <div id="dateSummary" class="summary-row" style="margin-top:10px"></div>
-        <table id="dateSalesTable">
-          <thead><tr><th>Time</th><th>Product</th><th>Qty</th><th>Amount</th><th>Cashier</th></tr></thead>
-          <tbody id="dateSalesBody"><tr><td colspan="5" class="empty">Select date to view sales.</td></tr></tbody>
+        <table style="margin-top:10px">
+          <thead><tr><th>Time</th><th>Code</th><th>Product</th><th>Qty</th><th>Amount</th><th>Payment</th><th>Cashier</th></tr></thead>
+          <tbody id="dateSalesBody"><tr><td colspan="7" class="empty">Select date to view.</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- TRANSACTION LOG TAB -->
+    <!-- ═══════════════════ TRANSACTION LOG TAB ═══════════════════ -->
     <div id="vLog" class="tab-page hidden">
       <div class="card">
-        <h3>📋 All Transaction Log</h3>
+        <h3>📋 Transaction Log</h3>
         <table>
-          <thead><tr><th>Date & Time</th><th>Store</th><th>Product</th><th>Qty</th><th>Amount</th><th>Cashier</th><th>Shift</th></tr></thead>
-          <tbody id="logBody"><tr><td colspan="7" class="empty">No transactions yet.</td></tr></tbody>
+          <thead><tr><th>Date & Time</th><th>Store</th><th>Code</th><th>Product</th><th>Qty</th><th>Amount</th><th>Payment</th><th>Cashier</th></tr></thead>
+          <tbody id="logBody"><tr><td colspan="8" class="empty">No transactions yet.</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- STOCK TAB (ADMIN) -->
+    <!-- ═══════════════════ STOCK TAB (ADMIN) ═══════════════════ -->
     <div id="vStock" class="tab-page hidden">
       <div class="card">
-        <h3>📦 Stock Management — <span id="stockStoreName"></span></h3>
+        <h3>📦 Stock Management</h3>
         <table>
-          <thead><tr><th>Code</th><th>Product</th><th>Stock</th><th>Status</th><th>Updated</th><th>Adjust</th></tr></thead>
+          <thead><tr><th>Code</th><th>Product</th><th>Stock</th><th>Status</th><th>Adjust</th></tr></thead>
           <tbody id="stockBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- REPORTS TAB (ADMIN) -->
+    <!-- ═══════════════════ REPORTS TAB (ADMIN) ═══════════════════ -->
     <div id="vReport" class="tab-page hidden">
       <div class="card">
         <h3>📈 Top Selling Products</h3>
         <table id="topSalesTable">
-          <thead><tr><th>Rank</th><th>Product</th><th>Total Qty Sold</th><th>Total Sales</th></tr></thead>
+          <thead><tr><th>Rank</th><th>Code</th><th>Product</th><th>Total Qty Sold</th><th>Total Sales</th></tr></thead>
           <tbody id="topSalesBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- STORE MANAGEMENT TAB (ADMIN) -->
+    <!-- ═══════════════════ STORE MANAGEMENT TAB (ADMIN) ═══════════════════ -->
     <div id="vStores" class="tab-page hidden">
       <div class="card">
         <h3>🏪 Manage Stores</h3>
@@ -220,7 +279,7 @@ const SHIFTS = {'1111':{id:'morning',label:'Morning (6AM–2PM)'},'2222':{id:'sw
 const ADMIN_PASS = 'admin123';
 const LOW_STOCK_LIMIT = 10;
 
-// ═══════════════════ PRODUCT LIST (EXACTLY YOURS) ═══════════════════
+// ═══════════════════ PRODUCT LIST ═══════════════════
 const PRODUCTS = [
   {code:'MB', name:'Minute Burger', price:43, stock:50},
   {code:'DMB', name:'Double Minute Burger', price:66, stock:40},
@@ -257,21 +316,27 @@ const fmt = n => n.toFixed(2);
 const dt = () => new Date().toLocaleString('en-PH');
 const D = () => new Date().toLocaleDateString('en-PH');
 const today = () => new Date().toISOString().split('T')[0];
+
+// ═══════════════════ DATA STORE ═══════════════════
 let STORES = JSON.parse(localStorage.getItem('mb_stores') || '[]');
 let SALES = JSON.parse(localStorage.getItem('mb_sales') || '[]');
 let STOCKS = JSON.parse(localStorage.getItem('mb_stocks') || '{}');
-let user = {logged:false, type:'', name:'', shift:'', sLabel:'', storeCode:'', storeName:''};
+let GCASH_LOG = JSON.parse(localStorage.getItem('mb_gcash') || '[]'); // per shift store
+let DENOM = JSON.parse(localStorage.getItem('mb_denom') || '{}');
+
+let user = {logged:false, type:'', name:'', shift:'', sLabel:'', storeCode:'', storeName:'', shiftDate:''};
 let selectedProduct = null;
 let selectedStoreIndex = null;
 
-// ═══════════════════ SAVE ALL ═══════════════════
 const saveAll = () => {
   localStorage.setItem('mb_stores', JSON.stringify(STORES));
   localStorage.setItem('mb_sales', JSON.stringify(SALES));
   localStorage.setItem('mb_stocks', JSON.stringify(STOCKS));
+  localStorage.setItem('mb_gcash', JSON.stringify(GCASH_LOG));
+  localStorage.setItem('mb_denom', JSON.stringify(DENOM));
 };
 
-// ═══════════════════ INIT STOCK ═══════════════════
+// ═══════════════════ STOCK HELPERS ═══════════════════
 function getStock(code, storeCode){
   const key = `${storeCode}||${code}`;
   if(STOCKS[key]===undefined){
@@ -321,26 +386,38 @@ function loginCashier(){
   const shift = SHIFTS[pass];
   if(!shift) return alert('⚠️ Wrong passcode!');
   const store = STORES[selectedStoreIndex];
-  user = {logged:true, type:'cashier', name, shift:shift.id, sLabel:shift.label, storeCode:store.code, storeName:store.name};
+  user = {
+    logged:true, type:'cashier', name, shift:shift.id, sLabel:shift.label,
+    storeCode:store.code, storeName:store.name, shiftDate:today()
+  };
+  clearShiftData(); // clear previous shift's GCash & denom
   startApp();
 }
 function loginAdmin(){
   if($('adminPass').value.trim()!==ADMIN_PASS) return alert('⚠️ Wrong admin password!');
-  user = {logged:true, type:'admin', name:'ADMIN', shift:'', sLabel:'Admin', storeCode:'ALL', storeName:'All Stores'};
+  user = {logged:true, type:'admin', name:'ADMIN', shift:'', sLabel:'Admin', storeCode:'ALL', storeName:'All Stores', shiftDate:today()};
   startApp();
+}
+function clearShiftData(){
+  // Clear only THIS shift's GCash log & denom
+  const keyPrefix = `${user.storeCode}||${user.shiftDate}||${user.shift}`;
+  GCASH_LOG = GCASH_LOG.filter(x => !x.key.startsWith(keyPrefix));
+  DENOM = {};
+  saveAll();
 }
 function startApp(){
   $('loginModal').classList.add('hidden');
   $('app').classList.remove('hidden');
   $('userInfoLine').textContent = `${user.storeName} | ${user.sLabel} | ${user.name}`;
   $('todayDate').textContent = D();
+  $('shiftDate').textContent = D();
   if(user.type==='admin'){
     ['tabStock','tabReport','tabStores'].forEach(id=>$(id).classList.remove('hidden'));
   }
   showTab('entry');
 }
 function logout(){
-  if(confirm('🚪 Logout?')) location.reload();
+  if(confirm('🚪 Make sure you have noted your Cash & GCash totals before logging out!\n\nLogout?')) location.reload();
 }
 
 // ═══════════════════ SEARCH PRODUCT ═══════════════════
@@ -375,101 +452,144 @@ function selectProduct(code){
   $('qtyInput').focus();
 }
 
-// ═══════════════════ ADD SALE ═══════════════════
-function addSale(){
-  if(!selectedProduct) return alert('⚠️ Select a product first!');
+// ═══════════════════ ADD SALE WITH PAYMENT ═══════════════════
+function openPayModal(){
+  if(!selectedProduct) return alert('⚠️ Select product first!');
   const qty = parseInt($('qtyInput').value) || 0;
+  const payMethod = $('payMethod').value;
   if(qty<1) return alert('⚠️ Enter quantity!');
   if(user.storeCode==='ALL') return alert('⚠️ Select a specific store first!');
 
+  const amount = selectedProduct.price * qty;
   const stock = getStock(selectedProduct.code, user.storeCode);
-  if(stock < qty) alert(`⚠️ Low stock! Only ${stock} left. Proceeding anyway...`);
+  if(stock < qty) alert(`⚠️ Low stock! Only ${stock} left. Proceeding...`);
 
   // Deduct stock
   setStock(selectedProduct.code, user.storeCode, stock - qty);
 
   // Record sale
   const sale = {
-    date:D(),
-    isoDate:today(),
-    time:new Date().toLocaleTimeString('en-PH'),
-    dt:dt(),
-    storeCode:user.storeCode,
-    storeName:user.storeName,
-    code:selectedProduct.code,
-    name:selectedProduct.name,
-    price:selectedProduct.price,
-    qty,
-    total:selectedProduct.price * qty,
-    who:user.name,
-    shift:user.sLabel
+    date:D(), isoDate:today(), time:new Date().toLocaleTimeString('en-PH'),
+    dt:dt(), storeCode:user.storeCode, storeName:user.storeName,
+    code:selectedProduct.code, name:selectedProduct.name,
+    price:selectedProduct.price, qty, total:amount,
+    payment:payMethod, who:user.name, shift:user.sLabel,
+    shiftKey:`${user.storeCode}||${user.shiftDate}||${user.shift}`
   };
   SALES.unshift(sale);
-  saveAll();
 
-  alert(`✅ RECORDED!\n${qty}x ${selectedProduct.name}\nTotal: ₱${fmt(sale.total)}`);
+  // If GCash — add to GCash Log
+  if(payMethod==='GCash'){
+    GCASH_LOG.unshift({
+      key:sale.shiftKey, time:sale.time,
+      items:`${qty}x ${selectedProduct.code} ${selectedProduct.name}`,
+      amount:amount
+    });
+  }
+
+  saveAll();
+  alert(`✅ RECORDED!\n${qty}x ${selectedProduct.name}\n₱${fmt(amount)} — ${payMethod}`);
 
   // Reset
   selectedProduct = null;
   $('searchInput').value='';
   $('qtyInput').value='';
   $('selectedItemBox').classList.add('hidden');
-  renderTodaySales();
+
+  renderShiftView();
 }
 
-// ═══════════════════ RENDER TODAY'S SALES ═══════════════════
-function renderTodaySales(){
-  const todaySales = SALES.filter(s=>s.isoDate===today() && (user.storeCode==='ALL' || s.storeCode===user.storeCode));
+// ═══════════════════ RENDER SHIFT VIEW — ALL NUMBERS ═══════════════════
+function getShiftSales(){
+  const sk = `${user.storeCode}||${user.shiftDate}||${user.shift}`;
+  return SALES.filter(s=>s.shiftKey === sk);
+}
+function renderShiftView(){
+  const shiftSales = getShiftSales();
+
+  // 1. Simple Sold List: Code — Product — Qty Sold
   const grouped = {};
-  todaySales.forEach(s=>{
-    if(!grouped[s.code]) grouped[s.code] = {name:s.name, qty:0, total:0, price:s.price};
+  shiftSales.forEach(s=>{
+    if(!grouped[s.code]) grouped[s.code]={name:s.name,qty:0,sub:0};
     grouped[s.code].qty += s.qty;
-    grouped[s.code].total += s.total;
+    grouped[s.code].sub += s.total;
   });
-
   const entries = Object.entries(grouped);
-  $('totalItems').textContent = todaySales.reduce((s,x)=>s+x.qty,0);
-  $('totalAmount').textContent = fmt(todaySales.reduce((s,x)=>s+x.total,0));
-  $('uniqueCount').textContent = entries.length;
-
   if(!entries.length){
-    $('todayBody').innerHTML = '<tr><td colspan="7" class="empty">No sales recorded yet.</td></tr>';
-    return;
+    $('soldListBody').innerHTML = '<tr><td colspan="4" class="empty">No sales yet.</td></tr>';
+  } else {
+    $('soldListBody').innerHTML = entries.map(([code,d])=>`<tr>
+      <td><strong>${code}</strong></td><td>${d.name}</td><td><strong>${d.qty}</strong></td><td>₱${fmt(d.sub)}</td>
+    </tr>`).join('');
   }
-  $('todayBody').innerHTML = entries.map(([code,data])=>{
-    const stockLeft = getStock(code, user.storeCode);
-    const lowClass = stockLeft <= LOW_STOCK_LIMIT ? 'low-stock' : '';
-    return `<tr class="${lowClass}">
-      <td>${data.name}</td>
-      <td>${code}</td>
-      <td><strong>${data.qty}</strong></td>
-      <td>₱${fmt(data.price)}</td>
-      <td>₱${fmt(data.total)}</td>
-      <td>${stockLeft} ${stockLeft<=LOW_STOCK_LIMIT?' ⚠️':''}</td>
-      <td><button class="btn-sm btn-red" onclick="voidSale('${code}')">❌ Void</button></td>
-    </tr>`;
-  }).join('');
+
+  // 2. Totals
+  const totalSales = shiftSales.reduce((s,x)=>s+x.total,0);
+  const totalCash = shiftSales.filter(x=>x.payment==='Cash').reduce((s,x)=>s+x.total,0);
+  const totalGCash = shiftSales.filter(x=>x.payment==='GCash').reduce((s,x)=>s+x.total,0);
+  $('shiftTotalSales').textContent = fmt(totalSales);
+  $('shiftTotalCash').textContent = fmt(totalCash);
+  $('shiftTotalGCash').textContent = fmt(totalGCash);
+  $('expectedCash').textContent = fmt(totalCash);
+
+  // 3. GCash Log — THIS SHIFT ONLY
+  const sk = `${user.storeCode}||${user.shiftDate}||${user.shift}`;
+  const shiftGCash = GCASH_LOG.filter(x=>x.key === sk);
+  if(!shiftGCash.length){
+    $('gcashLogList').innerHTML = '<div class="empty">Wala pang GCash transaction.</div>';
+  } else {
+    $('gcashLogList').innerHTML = shiftGCash.map((g,i)=>`<div class="pay-row">
+      <span style="font-weight:bold;color:#1565c0">GCash #${i+1}</span>
+      <span style="flex:1">${g.time} — ${g.items}</span>
+      <span style="font-weight:bold">₱${fmt(g.amount)}</span>
+    </div>`).join('');
+  }
+  $('gcashTotal').textContent = fmt(totalGCash);
+
+  // Recalc actual cash & diff
+  calcActualCash();
 }
 
-function voidSale(code){
-  if(!confirm('❌ Remove last entry for this product?')) return;
-  const idx = SALES.findIndex(s=>s.code===code && s.isoDate===today() && (user.storeCode==='ALL' || s.storeCode===user.storeCode));
-  if(idx===-1) return alert('Not found');
-  const s = SALES[idx];
-  setStock(s.code, s.storeCode, getStock(s.code, s.storeCode) + s.qty);
-  SALES.splice(idx,1);
+// ═══════════════════ DENOMINATION & ACTUAL CASH ═══════════════════
+function calcActualCash(){
+  const d1000 = (+$('d1000').value||0)*1000;
+  const d500 = (+$('d500').value||0)*500;
+  const d200 = (+$('d200').value||0)*200;
+  const d100 = (+$('d100').value||0)*100;
+  const d50 = (+$('d50').value||0)*50;
+  const d20 = (+$('d20').value||0)*20;
+  const dcoins = +$('dcoins').value||0;
+  const dcheck = +$('dcheck').value||0;
+
+  const actual = d1000+d500+d200+d100+d50+d20+dcoins+dcheck;
+  $('actualCashTotal').textContent = fmt(actual);
+
+  // Save denomination
+  DENOM = {d1000:$('d1000').value,d500:$('d500').value,d200:$('d200').value,
+           d100:$('d1000').value,d50:$('d50').value,d20:$('d20').value,
+           dcoins:$('dcoins').value,dcheck:$('dcheck').value};
   saveAll();
-  renderTodaySales();
+
+  // Difference
+  const expected = getShiftSales().filter(x=>x.payment==='Cash').reduce((s,x)=>s+x.total,0);
+  const diff = actual - expected;
+  $('cashDiff').innerHTML = diff===0
+    ? `<span style="color:green">✅ BALANCED — ₱0.00</span>`
+    : diff>0
+      ? `<span style="color:blue">+₱${fmt(diff)} (Sobra)</span>`
+      : `<span style="color:red">-₱${fmt(-diff)} (Kulang)</span>`;
 }
 
 // ═══════════════════ TABS ═══════════════════
 function showTab(name){
   document.querySelectorAll('.tab-page').forEach(p=>p.classList.add('hidden'));
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
-  $(`tab${name.charAt(0).toUpperCase()+name.slice(1)}`)?.classList.add('active');
-  $(`v${name.charAt(0).toUpperCase()+name.slice(1)}`).classList.remove('hidden');
+  const tabBtn = $(`tab${name.charAt(0).toUpperCase()+name.slice(1)}`);
+  const tabPage = $(`v${name.charAt(0).toUpperCase()+name.slice(1)}`);
+  if(tabBtn) tabBtn.classList.add('active');
+  if(tabPage) tabPage.classList.remove('hidden');
 
-  if(name==='entry') renderTodaySales();
+  if(name==='entry') renderShiftView();
   if(name==='log') renderTransactionLog();
   if(name==='stock') renderStockView();
   if(name==='report') renderReports();
@@ -480,32 +600,26 @@ function showTab(name){
 function renderTransactionLog(){
   const list = SALES.filter(s=>user.storeCode==='ALL' || s.storeCode===user.storeCode);
   $('logBody').innerHTML = list.length ? list.map(s=>`<tr>
-    <td>${s.dt}</td><td>${s.storeName}</td><td>${s.name}</td><td>${s.qty}</td><td>₱${fmt(s.total)}</td><td>${s.who}</td><td>${s.shift}</td>
-  </tr>`).join('') : '<tr><td colspan="7" class="empty">No transactions yet.</td></tr>';
+    <td>${s.dt}</td><td>${s.storeName}</td><td><strong>${s.code}</strong></td><td>${s.name}</td>
+    <td>${s.qty}</td><td>₱${fmt(s.total)}</td>
+    <td>${s.payment==='GCash'?'📱 GCash':'💵 Cash'}</td><td>${s.who}</td>
+  </tr>`).join('') : '<tr><td colspan="8" class="empty">No transactions yet.</td></tr>';
 }
 
 function renderSalesByDate(date){
   const list = SALES.filter(s=>s.isoDate===date && (user.storeCode==='ALL' || s.storeCode===user.storeCode));
-  const totalQty = list.reduce((s,x)=>s+x.qty,0);
-  const totalAmt = list.reduce((s,x)=>s+x.total,0);
-  $('dateSummary').innerHTML = `
-    <div class="summary-box"><div>Items Sold</div><div class="num">${totalQty}</div></div>
-    <div class="summary-box"><div>Total Sales</div><div class="num">₱${fmt(totalAmt)}</div></div>
-    <div class="summary-box"><div>Transactions</div><div class="num">${list.length}</div></div>
-  `;
   $('dateSalesBody').innerHTML = list.length ? list.map(s=>`<tr>
-    <td>${s.time}</td><td>${s.name}</td><td>${s.qty}</td><td>₱${fmt(s.total)}</td><td>${s.who}</td>
-  </tr>`).join('') : '<tr><td colspan="5" class="empty">No sales on this date.</td></tr>';
+    <td>${s.time}</td><td>${s.code}</td><td>${s.name}</td><td>${s.qty}</td>
+    <td>₱${fmt(s.total)}</td><td>${s.payment==='GCash'?'📱 GCash':'💵 Cash'}</td><td>${s.who}</td>
+  </tr>`).join('') : '<tr><td colspan="7" class="empty">No sales on this date.</td></tr>';
 }
 
 function renderStockView(){
-  $('stockStoreName').textContent = user.storeName;
   $('stockBody').innerHTML = PRODUCTS.map(p=>{
     const stock = getStock(p.code, user.storeCode);
-    const status = stock<=LOW_STOCK_LIMIT ? '<span class="tag low">LOW</span>' : '<span class="tag ok">OK</span>';
+    const status = stock<=LOW_STOCK_LIMIT ? '<span class="tag low">LOW</span>' : '<span class="tag cash">OK</span>';
     return `<tr>
       <td><strong>${p.code}</strong></td><td>${p.name}</td><td>${stock}</td><td>${status}</td>
-      <td>${new Date().toLocaleDateString('en-PH')}</td>
       <td>
         <button class="btn-sm btn-green" onclick="adjStock('${p.code}',10)">+10</button>
         <button class="btn-sm btn-orange" onclick="adjStock('${p.code}',-5)">-5</button>
@@ -530,11 +644,10 @@ function renderReports(){
   });
   const rows = Object.values(rank).sort((a,b)=>b.total-a.total);
   $('topSalesBody').innerHTML = rows.length ? rows.map((r,i)=>`<tr>
-    <td>#${i+1}</td><td>${r.name}</td><td>${r.qty}</td><td>₱${fmt(r.total)}</td>
-  </tr>`).join('') : '<tr><td colspan="4" class="empty">No sales data yet.</td></tr>';
+    <td>#${i+1}</td><td>${r.code}</td><td>${r.name}</td><td>${r.qty}</td><td>₱${fmt(r.total)}</td>
+  </tr>`).join('') : '<tr><td colspan="5" class="empty">No sales data yet.</td></tr>';
 }
 
-// ═══════════════════ STORE MANAGEMENT ═══════════════════
 function renderStoreManage(){
   $('storeBody').innerHTML = STORES.length ? STORES.map((s,i)=>`<tr>
     <td>${s.code}</td><td>${s.name}</td>
@@ -556,7 +669,6 @@ function addStore(){
 
 // ═══════════════════ INITIALIZE ═══════════════════
 window.onload = function(){
-  // Pre-init stock for all products
   STORES.forEach(s=>{
     PRODUCTS.forEach(p=>getStock(p.code, s.code));
   });
