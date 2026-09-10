@@ -51,6 +51,7 @@ tr:nth-child(even){background:#fafafa}
 .tag.cash{background:#e8f5e9;color:#2e7d32}
 .tag.gcash{background:#e3f2fd;color:#1565c0}
 .tag.low{background:#ffebee;color:#c62828}
+.tag.info{background:#e0f7fa;color:#00838f}
 .hint{font-size:12px;color:#888;margin:4px 0 10px}
 .store-item{padding:10px;border:2px solid #eee;border-radius:6px;margin:6px 0;cursor:pointer}
 .store-item:hover,.store-item.selected{border-color:#008000;background:#f1f8f1}
@@ -64,11 +65,13 @@ tr:nth-child(even){background:#fafafa}
 .summary-card.gcash{background:#e3f2fd}
 .summary-card.total{background:#ede7f6}
 .summary-card.remit{background:#fff3e0}
+.summary-card.dash{background:#e8f5e9;border-left:4px solid #008000}
 .sep{border:none;border-top:1px dashed #ddd;margin:16px 0}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.filter-row input,.filter-row select{width:auto;flex:minmax(140px,1)}
 </style>
 </head>
 <body>
-
 <!-- LOGIN MODAL -->
 <div id="loginModal" class="modal">
   <div class="mbody">
@@ -76,9 +79,8 @@ tr:nth-child(even){background:#fafafa}
     <select id="loginType" onchange="showLoginForm(this.value)">
       <option value="">-- Select User Type --</option>
       <option value="cashier">💵 Cashier — Record Sales & Payments</option>
-      <option value="admin">🔐 Admin — Monitor & Reports Only</option>
+      <option value="admin">🔐 Admin — Full Reports & Management</option>
     </select>
-
     <!-- CASHIER LOGIN -->
     <div id="cashierForm" class="hidden">
       <label>👤 Cashier Name:</label>
@@ -95,25 +97,20 @@ tr:nth-child(even){background:#fafafa}
         <option>Jay</option>
         <option>Christian D</option>
       </select>
-
       <label>🏪 Select Store:</label>
       <div id="storeListSel" style="margin:6px 0 12px 0;max-height:180px;overflow-y:auto"></div>
-
       <label>🔑 Shift Passcode:</label>
       <input type="password" id="shiftPass" placeholder="Enter 4-digit code" maxlength="4" oninput="detectShift(this.value)">
       <div style="font-weight:bold;margin:6px 0;color:#008000" id="shiftLabel"></div>
-
       <button class="btn-green" onclick="loginCashier()">✅ Login & Start Shift</button>
     </div>
-
     <!-- ADMIN LOGIN -->
     <div id="adminForm" class="hidden">
       <input type="password" id="adminPass" placeholder="Admin Password">
-      <button class="btn-green" onclick="loginAdmin()">🔐 Login as Admin (View Only)</button>
+      <button class="btn-green" onclick="loginAdmin()">🔐 Login as Admin</button>
     </div>
   </div>
 </div>
-
 <!-- GCASH ENTRY MODAL -->
 <div id="gcashModal" class="modal hidden">
   <div class="mbody">
@@ -128,7 +125,6 @@ tr:nth-child(even){background:#fafafa}
     </div>
   </div>
 </div>
-
 <!-- CASH IN/OUT MODAL -->
 <div id="cashIoModal" class="modal hidden">
   <div class="mbody">
@@ -147,7 +143,6 @@ tr:nth-child(even){background:#fafafa}
     </div>
   </div>
 </div>
-
 <!-- MAIN APP -->
 <div id="app" class="hidden">
   <div class="topbar">
@@ -156,20 +151,23 @@ tr:nth-child(even){background:#fafafa}
       <small id="userInfoLine"></small>
     </div>
     <div class="nav">
+      <!-- CASHIER TABS -->
       <button id="tabEntry" class="active" onclick="showTab('entry')">✍️ Sales Entry</button>
-      <button id="tabToday" onclick="showTab('today')">📊 Today's Sales</button>
+      <button id="tabShiftSales" onclick="showTab('shiftSales')">📊 Shift Sales</button>
       <button id="tabLog" onclick="showTab('log')">📋 Transaction Log</button>
+      <!-- ADMIN TABS ONLY -->
+      <button id="tabDashboard" class="hidden" onclick="showTab('dashboard')">📈 Dashboard</button>
+      <button id="tabReports" class="hidden" onclick="showTab('reports')">📊 Reports</button>
       <button id="tabStock" class="hidden" onclick="showTab('stock')">📦 Stocks</button>
-      <button id="tabReport" class="hidden" onclick="showTab('report')">📈 Reports</button>
+      <button id="tabCashiers" class="hidden" onclick="showTab('cashiers')">👤 Cashiers</button>
       <button id="tabStores" class="hidden" onclick="showTab('stores')">🏪 Stores</button>
+      <button id="tabSettings" class="hidden" onclick="showTab('settings')">⚙️ Settings</button>
       <button onclick="logout()">🚪 Logout</button>
     </div>
   </div>
-
   <div class="container">
-    <!-- ═══════════════════ SALES ENTRY TAB ═══════════════════ -->
+    <!-- ═══════════════════ CASHIER: SALES ENTRY ═══════════════════ -->
     <div id="vEntry" class="tab-page">
-      <!-- 🔍 PRODUCT SEARCH & ENTRY -->
       <div class="card" id="entryCard">
         <h3>🔍 Record Sold Item</h3>
         <label>Type Code or Name (e.g. mb, bp, black pepper):</label>
@@ -177,7 +175,6 @@ tr:nth-child(even){background:#fafafa}
           <input type="text" id="searchInput" placeholder="Type here..." oninput="searchProduct(this.value)" autocomplete="off">
           <div id="searchResults" class="search-results hidden"></div>
         </div>
-
         <div id="selectedItemBox" class="selected-product hidden">
           <strong id="selName"></strong> — ₱<span id="selPrice"></span>
           <div class="qty-row">
@@ -186,8 +183,6 @@ tr:nth-child(even){background:#fafafa}
           </div>
         </div>
       </div>
-
-      <!-- 📋 SOLD LIST -->
       <div class="card">
         <h3>📋 Items Sold — <span id="shiftLabelHeader"></span> | <span id="todayDate"></span></h3>
         <table>
@@ -195,65 +190,43 @@ tr:nth-child(even){background:#fafafa}
           <tbody id="soldListBody"><tr><td colspan="4" class="empty">No sales yet.</td></tr></tbody>
         </table>
       </div>
-
-      <!-- 💰 SHIFT SUMMARY & PAYMENTS -->
       <div class="card">
         <h3>💰 Shift Summary — <span id="shiftDate"></span></h3>
-
         <div class="summary-grid">
           <div class="summary-card total">
             <div>📊 Total Sales Amount</div>
             <div style="font-size:22px;font-weight:bold">₱<span id="shiftTotalSales">0.00</span></div>
           </div>
           <div class="summary-card cash">
-            <div>💵 Cash Sales (To Collect)</div>
+            <div>💵 Cash Sales</div>
             <div style="font-size:22px;font-weight:bold">₱<span id="shiftTotalCash">0.00</span></div>
           </div>
           <div class="summary-card gcash">
-            <div>📱 Total GCash Payments</div>
+            <div>📱 GCash Payments</div>
             <div style="font-size:22px;font-weight:bold">₱<span id="shiftTotalGCash">0.00</span></div>
           </div>
         </div>
-
         <hr class="sep">
-
-        <!-- 📱 GCASH BUTTON & LIST -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <h4>📱 GCash Payments Log</h4>
           <button class="btn-blue" onclick="openGCashModal()">➕ ADD GCash PAYMENT</button>
         </div>
         <div id="gcashLogList">
-          <div class="empty">Click "Add GCash Payment" to enter amount from receipt/screenshot.</div>
+          <div class="empty">Click "Add GCash Payment" to enter amount from receipt.</div>
         </div>
-        <div class="total-box-blue">
-          TOTAL GCASH: ₱<span id="gcashTotal">0.00</span>
-        </div>
-
+        <div class="total-box-blue">TOTAL GCASH: ₱<span id="gcashTotal">0.00</span></div>
         <hr class="sep">
-
-        <!-- 💰 CASH-IN / CASH-OUT -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <h4>💰 Cash-In / Cash-Out</h4>
           <button class="btn-purple" onclick="openIoModal()">➕ ADD CASH IN/OUT</button>
         </div>
-        <div id="cashIoList">
-          <div class="empty">No Cash-In / Cash-Out recorded yet.</div>
-        </div>
+        <div id="cashIoList"><div class="empty">No Cash-In / Cash-Out recorded yet.</div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
-          <div class="summary-card cash">
-            <div>➕ Total Cash-In</div>
-            <div style="font-weight:bold">₱<span id="totalCashIn">0.00</span></div>
-          </div>
-          <div class="summary-card remit">
-            <div>➖ Total Cash-Out</div>
-            <div style="font-weight:bold">₱<span id="totalCashOut">0.00</span></div>
-          </div>
+          <div class="summary-card cash"><div>➕ Total Cash-In</div><div style="font-weight:bold">₱<span id="totalCashIn">0.00</span></div></div>
+          <div class="summary-card remit"><div>➖ Total Cash-Out</div><div style="font-weight:bold">₱<span id="totalCashOut">0.00</span></div></div>
         </div>
-
         <hr class="sep">
-
-        <!-- 💵 DENOMINATION / ACTUAL CASH -->
-        <h4>💵 Actual Cash On Hand (Ilagay ang totoong pera)</h4>
+        <h4>💵 Actual Cash On Hand</h4>
         <div class="denom-row">
           <label>₱1000</label><input type="number" id="d1000" placeholder="Bilang" oninput="calcActualCash()">
           <label>₱500</label><input type="number" id="d500" placeholder="Bilang" oninput="calcActualCash()">
@@ -270,18 +243,11 @@ tr:nth-child(even){background:#fafafa}
           <label>Coins</label><input type="number" id="dcoins" placeholder="Halaga" oninput="calcActualCash()">
           <label>Check/Card</label><input type="number" id="dcheck" placeholder="Halaga" oninput="calcActualCash()">
         </div>
-        <div class="total-box">
-          ACTUAL CASH IN BOX: ₱<span id="actualCashTotal">0.00</span>
-        </div>
-
+        <div class="total-box">ACTUAL CASH IN BOX: ₱<span id="actualCashTotal">0.00</span></div>
         <hr class="sep">
-
-        <!-- 🏅 FINAL: CASH TO REMIT -->
         <div class="total-box-purple" style="font-size:20px">
           💵 <strong>CASH TO REMIT:</strong> ₱<span id="cashToRemit">0.00</span>
-          <div style="font-size:13px;font-weight:normal;margin-top:4px">
-            (Cash Sales ➕ Cash-In ➖ Cash-Out)
-          </div>
+          <div style="font-size:13px;font-weight:normal;margin-top:4px">(Cash Sales ➕ Cash-In ➖ Cash-Out)</div>
         </div>
         <div style="font-size:14px;margin-top:8px">
           <strong>Expected:</strong> ₱<span id="expectedRemit">0.00</span>
@@ -290,21 +256,18 @@ tr:nth-child(even){background:#fafafa}
         </div>
       </div>
     </div>
-
-    <!-- ═══════════════════ TODAY'S SALES TAB ═══════════════════ -->
-    <div id="vToday" class="tab-page hidden">
+    <!-- ═══════════════════ CASHIER: SHIFT SALES (RENAMED FROM TODAY'S SALES) ═══════════════════ -->
+    <div id="vShiftSales" class="tab-page hidden">
       <div class="card">
-        <h3>📊 Sales by Date</h3>
-        <label>Select Date:</label>
-        <input type="date" id="selDate" onchange="renderSalesByDate(this.value)">
+        <h3>📊 Shift Sales — <span id="shiftSalesSubtitle"></span></h3>
+        <p class="hint">Shows ONLY your current shift transactions</p>
         <table style="margin-top:10px">
           <thead><tr><th>Time</th><th>Shift</th><th>Code</th><th>Product</th><th>Qty</th><th>Amount</th><th>Cashier</th></tr></thead>
-          <tbody id="dateSalesBody"><tr><td colspan="7" class="empty">Select date to view.</td></tr></tbody>
+          <tbody id="shiftSalesBody"><tr><td colspan="7" class="empty">No sales yet for this shift.</td></tr></tbody>
         </table>
       </div>
     </div>
-
-    <!-- ═══════════════════ TRANSACTION LOG TAB ═══════════════════ -->
+    <!-- ═══════════════════ CASHIER: TRANSACTION LOG ═══════════════════ -->
     <div id="vLog" class="tab-page hidden">
       <div class="card">
         <h3>📋 Transaction Log</h3>
@@ -314,30 +277,58 @@ tr:nth-child(even){background:#fafafa}
         </table>
       </div>
     </div>
-
-    <!-- ═══════════════════ STOCK TAB (ADMIN ONLY) ═══════════════════ -->
+    <!-- ═══════════════════ ADMIN: DASHBOARD ═══════════════════ -->
+    <div id="vDashboard" class="tab-page hidden">
+      <div class="card">
+        <h3>📈 Admin Dashboard — Overview</h3>
+        <div class="summary-grid">
+          <div class="summary-card dash"><div>💰 Total Sales Today</div><div style="font-size:22px;font-weight:bold">₱<span id="dashTodaySales">0.00</span></div></div>
+          <div class="summary-card cash"><div>💵 Cash</div><div style="font-size:22px;font-weight:bold">₱<span id="dashCash">0.00</span></div></div>
+          <div class="summary-card gcash"><div>📱 GCash</div><div style="font-size:22px;font-weight:bold">₱<span id="dashGCash">0.00</span></div></div>
+          <div class="summary-card remit"><div>🏪 Stores</div><div style="font-size:22px;font-weight:bold"><span id="dashStoresCount">0</span></div></div>
+        </div>
+        <hr class="sep">
+        <h4>🏆 Top Selling Items</h4>
+        <table><thead><tr><th>Rank</th><th>Code</th><th>Product</th><th>Qty Sold</th><th>Total</th></tr></thead><tbody id="dashTopSales"></tbody></table>
+      </div>
+    </div>
+    <!-- ═══════════════════ ADMIN: REPORTS ═══════════════════ -->
+    <div id="vReports" class="tab-page hidden">
+      <div class="card">
+        <h3>📊 Sales Reports & Analytics</h3>
+        <div class="filter-row">
+          <label>From:</label><input type="date" id="rptFrom">
+          <label>To:</label><input type="date" id="rptTo">
+          <label>Store:</label><select id="rptStore"><option value="ALL">All Stores</option></select>
+          <label>Shift:</label><select id="rptShift"><option value="ALL">All Shifts</option><option value="morning">Morning</option><option value="swing">Swing</option><option value="graveyard">Graveyard</option></select>
+          <button class="btn-green" onclick="runReport()">🔍 Generate Report</button>
+        </div>
+        <div class="summary-grid" style="margin:10px 0">
+          <div class="summary-card total"><div>Total Sales</div><div style="font-weight:bold">₱<span id="rptTotal">0.00</span></div></div>
+          <div class="summary-card cash"><div>Total Items Sold</div><div style="font-weight:bold"><span id="rptQty">0</span></div></div>
+          <div class="summary-card gcash"><div>Transactions</div><div style="font-weight:bold"><span id="rptCount">0</span></div></div>
+        </div>
+        <table><thead><tr><th>Date</th><th>Time</th><th>Store</th><th>Shift</th><th>Cashier</th><th>Code</th><th>Qty</th><th>Amount</th></tr></thead><tbody id="rptBody"></tbody></table>
+      </div>
+    </div>
+    <!-- ═══════════════════ ADMIN: STOCK MANAGEMENT ═══════════════════ -->
     <div id="vStock" class="tab-page hidden">
       <div class="card">
         <h3>📦 Stock Management</h3>
-        <table>
-          <thead><tr><th>Code</th><th>Product</th><th>Stock</th><th>Status</th><th>Adjust</th></tr></thead>
-          <tbody id="stockBody"></tbody>
-        </table>
+        <label>Select Store:</label>
+        <select id="stockStoreSel" onchange="renderStockView()"><option value="ALL">All Stores</option></select>
+        <table><thead><tr><th>Code</th><th>Product</th><th>Stock</th><th>Status</th><th>Adjust</th></tr></thead><tbody id="stockBody"></tbody></table>
       </div>
     </div>
-
-    <!-- ═══════════════════ REPORTS TAB (ADMIN ONLY) ═══════════════════ -->
-    <div id="vReport" class="tab-page hidden">
+    <!-- ═══════════════════ ADMIN: CASHIER PERFORMANCE ═══════════════════ -->
+    <div id="vCashiers" class="tab-page hidden">
       <div class="card">
-        <h3>📈 Top Selling Products</h3>
-        <table id="topSalesTable">
-          <thead><tr><th>Rank</th><th>Code</th><th>Product</th><th>Total Qty Sold</th><th>Total Sales</th></tr></thead>
-          <tbody id="topSalesBody"></tbody>
-        </table>
+        <h3>👤 Cashier Performance Summary</h3>
+        <p class="hint">Totals grouped by Cashier</p>
+        <table><thead><tr><th>Cashier</th><th>Store</th><th>Total Sales</th><th>Items Sold</th><th>Last Active</th></tr></thead><tbody id="cashierBody"></tbody></table>
       </div>
     </div>
-
-    <!-- ═══════════════════ STORE MANAGEMENT TAB (ADMIN ONLY) ═══════════════════ -->
+    <!-- ═══════════════════ ADMIN: STORE MANAGEMENT ═══════════════════ -->
     <div id="vStores" class="tab-page hidden">
       <div class="card">
         <h3>🏪 Manage Stores</h3>
@@ -348,25 +339,40 @@ tr:nth-child(even){background:#fafafa}
           <input type="text" id="newStoreName" placeholder="e.g. MB Davao">
           <button class="btn-green" onclick="addStore()">✅ Add Store</button>
         </div>
-        <table>
-          <thead><tr><th>Code</th><th>Store Name</th><th>Action</th></tr></thead>
-          <tbody id="storeBody"></tbody>
-        </table>
+        <table><thead><tr><th>Code</th><th>Store Name</th><th>Action</th></tr></thead><tbody id="storeBody"></tbody></table>
+      </div>
+    </div>
+    <!-- ═══════════════════ ADMIN: SETTINGS ═══════════════════ -->
+    <div id="vSettings" class="tab-page hidden">
+      <div class="card">
+        <h3>⚙️ Admin Settings</h3>
+        <h4>🔐 Security</h4>
+        <label>Current Admin Password:</label>
+        <input type="password" id="curAdminPass" placeholder="Enter current password">
+        <label>New Admin Password:</label>
+        <input type="password" id="newAdminPass" placeholder="New password">
+        <button class="btn-green" onclick="changeAdminPass()">✅ Change Admin Password</button>
+        <hr class="sep">
+        <h4>🔑 Shift Passcodes</h4>
+        <div class="hint">Edit 4-digit passcodes per shift</div>
+        <div id="shiftPassEditors"></div>
+        <hr class="sep">
+        <h4>🛠️ System Tools</h4>
+        <button class="btn-orange" onclick="exportAllData()">📤 Export All Data (JSON)</button>
+        <button class="btn-red" onclick="if(confirm('Clear ALL sales data?')){localStorage.clear();location.reload()}">⚠️ Reset All Data</button>
       </div>
     </div>
   </div>
 </div>
-
 <script>
 // ═══════════════════ SETTINGS ═══════════════════
-const SHIFTS = {
+let SHIFTS = {
   '1111':{id:'morning',label:'Morning',hours:'(6AM–2PM)'},
   '2222':{id:'swing',label:'Swing',hours:'(2PM–10PM)'},
   '3333':{id:'graveyard',label:'Graveyard',hours:'(10PM–6AM)'}
 };
-const ADMIN_PASS = 'admin123';
+let ADMIN_PASS = 'admin123';
 const LOW_STOCK_LIMIT = 10;
-
 // ═══════════════════ PRODUCT LIST ═══════════════════
 const PRODUCTS = [
   {code:'MB', name:'Minute Burger', price:43, stock:50},
@@ -397,36 +403,38 @@ const PRODUCTS = [
   {code:'HCOF', name:'Hot Coffee', price:15, stock:60},
   {code:'HCM', name:'Hot Choco', price:26, stock:60}
 ];
-
 // ═══════════════════ HELPERS ═══════════════════
 const $ = id => document.getElementById(id);
 const fmt = n => n.toFixed(2);
 const dt = () => new Date().toLocaleString('en-PH');
 const D = () => new Date().toLocaleDateString('en-PH');
 const today = () => new Date().toISOString().split('T')[0];
-
 // ═══════════════════ DATA STORE ═══════════════════
 let STORES = JSON.parse(localStorage.getItem('mb_stores') || '[]');
 let SALES = JSON.parse(localStorage.getItem('mb_sales') || '[]');
 let STOCKS = JSON.parse(localStorage.getItem('mb_stocks') || '{}');
 let GCASH_LOG = JSON.parse(localStorage.getItem('mb_gcash') || '[]');
 let CASH_IO = JSON.parse(localStorage.getItem('mb_cashio') || '[]');
-let DENOM = {}; // PER SHIFT — resets each shift
-
+let SHIFT_PASSES = JSON.parse(localStorage.getItem('mb_shiftpass') || JSON.stringify(SHIFTS));
+if(Object.keys(SHIFT_PASSES).length) SHIFTS = SHIFT_PASSES;
 let user = {
   logged:false, type:'', name:'', shift:'', sLabel:'', storeCode:'', storeName:'',
   shiftDate:'', shiftKey:'', canEntry:true
 };
 let selectedProduct = null;
 let selectedStoreIndex = null;
-
 const saveAll = () => {
   localStorage.setItem('mb_stores', JSON.stringify(STORES));
   localStorage.setItem('mb_sales', JSON.stringify(SALES));
   localStorage.setItem('mb_stocks', JSON.stringify(STOCKS));
   localStorage.setItem('mb_gcash', JSON.stringify(GCASH_LOG));
   localStorage.setItem('mb_cashio', JSON.stringify(CASH_IO));
+  localStorage.setItem('mb_shiftpass', JSON.stringify(SHIFTS));
+  localStorage.setItem('mb_adminpass', JSON.stringify({pass:ADMIN_PASS}));
 };
+// Load saved admin pass
+const savedAdmin = localStorage.getItem('mb_adminpass');
+if(savedAdmin) ADMIN_PASS = JSON.parse(savedAdmin).pass;
 
 // ═══════════════════ STOCK HELPERS ═══════════════════
 function getStock(code, storeCode){
@@ -441,7 +449,6 @@ function setStock(code, storeCode, qty){
   STOCKS[`${storeCode}||${code}`] = Math.max(0, qty);
   saveAll();
 }
-
 // ═══════════════════ LOGIN ═══════════════════
 function showLoginForm(t){
   $('cashierForm').classList.add('hidden');
@@ -479,10 +486,7 @@ function loginCashier(){
   const shift = SHIFTS[pass];
   if(!shift) return alert('⚠️ Wrong passcode!');
   const store = STORES[selectedStoreIndex];
-
-  // UNIQUE SHIFT KEY — SALES ARE ISOLATED PER STORE + DATE + SHIFT
   const shiftKey = `${store.code}||${today()}||${shift.id}`;
-
   user = {
     logged:true, type:'cashier', name, shift:shift.id, sLabel:shift.label,
     storeCode:store.code, storeName:store.name, shiftDate:today(), shiftKey, canEntry:true
@@ -504,22 +508,25 @@ function startApp(){
   $('todayDate').textContent = D();
   $('shiftDate').textContent = D();
   $('shiftLabelHeader').textContent = user.sLabel;
-
-  // Admin = VIEW ONLY
+  // Admin Tabs Show
   if(user.type==='admin'){
     $('entryCard').style.opacity = '0.6';
     $('entryCard').style.pointerEvents = 'none';
     $('entryCard').querySelectorAll('button,input').forEach(el=>el.disabled=true);
     $('entryCard').innerHTML = '<div style="padding:20px;text-align:center;color:#666"><strong>🔐 ADMIN VIEW ONLY</strong><br>Admin cannot record sales. Login as Cashier.</div>' + $('entryCard').innerHTML;
-    ['tabStock','tabReport','tabStores'].forEach(id=>$(id).classList.remove('hidden'));
+    ['tabDashboard','tabReports','tabStock','tabCashiers','tabStores','tabSettings'].forEach(id=>$(id).classList.remove('hidden'));
+    ['tabShiftSales','tabEntry','tabLog'].forEach(id=>$(id).style.display='none');
+    // Populate report dropdowns
+    $('rptFrom').value = today();
+    $('rptTo').value = today();
+    $('rptStore').innerHTML = '<option value="ALL">All Stores</option>' + STORES.map(s=>`<option value="${s.code}">${s.code} — ${s.name}</option>`).join('');
+    $('stockStoreSel').innerHTML = '<option value="ALL">All Stores</option>' + STORES.map(s=>`<option value="${s.code}">${s.code} — ${s.name}</option>`).join('');
   }
-
-  showTab('entry');
+  showTab(user.type==='admin'?'dashboard':'entry');
 }
 function logout(){
   if(confirm('🚪 Make sure all totals are noted before logging out!\n\nLogout?')) location.reload();
 }
-
 // ═══════════════════ SEARCH & ADD SALE ═══════════════════
 function searchProduct(term){
   if(!user.canEntry) return;
@@ -558,12 +565,10 @@ function addSale(){
   const qty = parseInt($('qtyInput').value) || 0;
   if(qty<1) return alert('⚠️ Enter quantity!');
   if(user.storeCode==='ALL') return alert('⚠️ Select specific store first!');
-
   const amount = selectedProduct.price * qty;
   const stock = getStock(selectedProduct.code, user.storeCode);
   if(stock < qty) alert(`⚠️ Low stock! Only ${stock} left. Proceeding...`);
   setStock(selectedProduct.code, user.storeCode, stock - qty);
-
   const sale = {
     date:D(), isoDate:today(), time:new Date().toLocaleTimeString('en-PH'),
     dt:dt(), storeCode:user.storeCode, storeName:user.storeName,
@@ -575,164 +580,113 @@ function addSale(){
   SALES.unshift(sale);
   saveAll();
   alert(`✅ RECORDED!\n${qty}x ${selectedProduct.name}\nTotal: ₱${fmt(amount)}`);
-
   selectedProduct = null;
   $('searchInput').value='';
   $('qtyInput').value='';
   $('selectedItemBox').classList.add('hidden');
   renderShiftView();
 }
-
-// ═══════════════════ GCASH MODAL ═══════════════════
+// ═══════════════════ GCash MODAL ═══════════════════
 function openGCashModal(){
   if(!user.canEntry) return alert('⚠️ Admin cannot add payments!');
   $('gcashModal').classList.remove('hidden');
   $('gcashAmt').value='';
   $('gcashNote').value='';
-  $('gcashAmt').focus();
 }
-function closeGCashModal(){
-  $('gcashModal').classList.add('hidden');
-}
+function closeGCashModal(){ $('gcashModal').classList.add('hidden'); }
 function saveGCash(){
   const amt = parseFloat($('gcashAmt').value)||0;
   const note = $('gcashNote').value.trim() || 'GCash Payment';
   if(amt<=0) return alert('⚠️ Enter valid amount!');
-
-  GCASH_LOG.unshift({
-    key:user.shiftKey,
-    time:new Date().toLocaleTimeString('en-PH'),
-    amount:amt, note
-  });
+  GCASH_LOG.unshift({key:user.shiftKey,time:new Date().toLocaleTimeString('en-PH'),amount:amt,note});
   saveAll();
   alert(`✅ GCash Saved: ₱${fmt(amt)}`);
   closeGCashModal();
   renderShiftView();
 }
-
 // ═══════════════════ CASH IN/OUT MODAL ═══════════════════
 function openIoModal(){
   if(!user.canEntry) return alert('⚠️ Admin cannot add cash in/out!');
   $('cashIoModal').classList.remove('hidden');
-  $('ioType').value='in';
-  $('ioAmt').value='';
-  $('ioNote').value='';
-  $('ioAmt').focus();
+  $('ioType').value='in'; $('ioAmt').value=''; $('ioNote').value='';
 }
-function closeIoModal(){
-  $('cashIoModal').classList.add('hidden');
-}
+function closeIoModal(){ $('cashIoModal').classList.add('hidden'); }
 function saveCashIo(){
   const type = $('ioType').value;
   const amt = parseFloat($('ioAmt').value)||0;
   const note = $('ioNote').value.trim() || (type==='in'?'Cash-In':'Cash-Out');
   if(amt<=0) return alert('⚠️ Enter valid amount!');
-
-  CASH_IO.unshift({
-    key:user.shiftKey,
-    type, amount:amt, note,
-    time:new Date().toLocaleTimeString('en-PH')
-  });
+  CASH_IO.unshift({key:user.shiftKey,type,amount:amt,note,time:new Date().toLocaleTimeString('en-PH')});
   saveAll();
   alert(`✅ SAVED: ${type==='in'?'+':'-'}₱${fmt(amt)}`);
   closeIoModal();
   renderShiftView();
 }
-
-// ═══════════════════ RENDER SHIFT VIEW — ISOLATED PER SHIFT ═══════════════════
-function getShiftSales(){
-  // CASHIER: Makikita LANG yung benta NG SHIFT NA ITO — walang ibang shift!
-  if(user.type==='cashier'){
-    return SALES.filter(s=>s.shiftKey === user.shiftKey);
-  }
-  // ADMIN: Makikita LAHAT
+// ═══════════════════ SHIFT DATA HELPER ═══════════════════
+function getShiftSales(shiftKeyFilter=null){
+  if(user.type==='cashier') return SALES.filter(s=>s.shiftKey === (shiftKeyFilter||user.shiftKey));
   return SALES.filter(s=>user.storeCode==='ALL' || s.storeCode===user.storeCode);
 }
+// ═══════════════════ RENDER CASHIER SHIFT VIEW ═══════════════════
 function renderShiftView(){
   const shiftSales = getShiftSales();
-
-  // 1. Sold List — GROUPED
+  // Grouped summary
   const grouped = {};
   shiftSales.forEach(s=>{
     if(!grouped[s.code]) grouped[s.code]={name:s.name,qty:0,sub:0};
-    grouped[s.code].qty += s.qty;
-    grouped[s.code].sub += s.total;
+    grouped[s.code].qty += s.qty; grouped[s.code].sub += s.total;
   });
   const entries = Object.entries(grouped);
-  if(!entries.length){
-    $('soldListBody').innerHTML = '<tr><td colspan="4" class="empty">No sales yet for this shift.</td></tr>';
-  } else {
-    $('soldListBody').innerHTML = entries.map(([code,d])=>`<tr>
-      <td><strong>${code}</strong></td><td>${d.name}</td><td><strong>${d.qty}</strong></td><td>₱${fmt(d.sub)}</td>
-    </tr>`).join('');
-  }
+  $('soldListBody').innerHTML = entries.length
+    ? entries.map(([code,d])=>`<tr><td><strong>${code}</strong></td><td>${d.name}</td><td><strong>${d.qty}</strong></td><td>₱${fmt(d.sub)}</td></tr>`).join('')
+    : '<tr><td colspan="4" class="empty">No sales yet for this shift.</td></tr>';
 
-  // 2. Totals
+  // Totals
   const totalSales = shiftSales.reduce((s,x)=>s+x.total,0);
   $('shiftTotalSales').textContent = fmt(totalSales);
 
-  // 3. GCash Log — SHIFT-SPECIFIC ONLY
-  const shiftGCash = user.type==='cashier'
-    ? GCASH_LOG.filter(x=>x.key === user.shiftKey)
-    : GCASH_LOG;
-  if(!shiftGCash.length){
-    $('gcashLogList').innerHTML = '<div class="empty">Click "Add GCash Payment" to enter amount from receipt/screenshot.</div>';
-  } else {
-    $('gcashLogList').innerHTML = shiftGCash.map((g,i)=>`<div class="pay-row">
-      <span style="font-weight:bold;color:#1565c0">#${i+1}</span>
-      <span style="flex:1">${g.time} — ${g.note}</span>
-      <span style="font-weight:bold">₱${fmt(g.amount)}</span>
-      ${user.canEntry?`<button class="btn-sm btn-red" onclick="delGCash(${i})">❌</button>`:''}
-    </div>`).join('');
-  }
+  // GCash
+  const shiftGCash = user.type==='cashier' ? GCASH_LOG.filter(x=>x.key===user.shiftKey) : GCASH_LOG;
+  $('gcashLogList').innerHTML = shiftGCash.length
+    ? shiftGCash.map((g,i)=>`<div class="pay-row"><span style="font-weight:bold;color:#1565c0">#${i+1}</span><span style="flex:1">${g.time} — ${g.note}</span><span style="font-weight:bold">₱${fmt(g.amount)}</span>${user.canEntry?`<button class="btn-sm btn-red" onclick="delGCash(${i})">❌</button>`:''}</div>`).join('')
+    : '<div class="empty">Click "Add GCash Payment" to enter amount from receipt.</div>';
   const totalGCash = shiftGCash.reduce((s,x)=>s+x.amount,0);
   $('shiftTotalGCash').textContent = fmt(totalGCash);
   $('gcashTotal').textContent = fmt(totalGCash);
 
-  // 4. Cash-In / Cash-Out — SHIFT-SPECIFIC ONLY
-  const shiftIo = user.type==='cashier'
-    ? CASH_IO.filter(x=>x.key === user.shiftKey)
-    : CASH_IO;
-  if(!shiftIo.length){
-    $('cashIoList').innerHTML = '<div class="empty">No Cash-In / Cash-Out recorded yet.</div>';
-  } else {
-    $('cashIoList').innerHTML = shiftIo.map((x,i)=>`<div class="pay-row">
-      <span style="font-weight:bold;color:${x.type==='in'?'#2e7d32':'#c62828'}">${x.type==='in'?'➕ IN':'➖ OUT'}</span>
-      <span style="flex:1">${x.time} — ${x.note}</span>
-      <span style="font-weight:bold">₱${fmt(x.amount)}</span>
-      ${user.canEntry?`<button class="btn-sm btn-red" onclick="delIo(${i})">❌</button>`:''}
-    </div>`).join('');
-  }
+  // Cash-In/Out
+  const shiftIo = user.type==='cashier' ? CASH_IO.filter(x=>x.key===user.shiftKey) : CASH_IO;
+  $('cashIoList').innerHTML = shiftIo.length
+    ? shiftIo.map((x,i)=>`<div class="pay-row"><span style="font-weight:bold;color:${x.type==='in'?'#2e7d32':'#c62828'}">${x.type==='in'?'➕ IN':'➖ OUT'}</span><span style="flex:1">${x.time} — ${x.note}</span><span style="font-weight:bold">₱${fmt(x.amount)}</span>${user.canEntry?`<button class="btn-sm btn-red" onclick="delIo(${i})">❌</button>`:''}</div>`).join('')
+    : '<div class="empty">No Cash-In / Cash-Out recorded yet.</div>';
   const totalIn = shiftIo.filter(x=>x.type==='in').reduce((s,x)=>s+x.amount,0);
   const totalOut = shiftIo.filter(x=>x.type==='out').reduce((s,x)=>s+x.amount,0);
   $('totalCashIn').textContent = fmt(totalIn);
   $('totalCashOut').textContent = fmt(totalOut);
 
-  // ✅ FORMULA: Cash Sales + Cash-In − Cash-Out = CASH TO REMIT
   const cashSales = totalSales - totalGCash;
+  $('shiftTotalCash').textContent = fmt(cashSales);
+    const cashSales = totalSales - totalGCash;
   $('shiftTotalCash').textContent = fmt(cashSales);
   const toRemit = Math.max(0, cashSales + totalIn - totalOut);
   $('cashToRemit').textContent = fmt(toRemit);
   $('expectedRemit').textContent = fmt(toRemit);
-
   calcActualCash();
 }
-
 function delGCash(i){
   if(confirm('❌ Delete this GCash entry?')){
     const list = GCASH_LOG.filter(x=>x.key === user.shiftKey);
     const idx = GCASH_LOG.indexOf(list[i]);
-    if(idx>-1){ GCASH_LOG.splice(idx,1); saveAll(); renderShiftView(); }
+    if(idx > -1){ GCASH_LOG.splice(idx,1); saveAll(); renderShiftView(); }
   }
 }
 function delIo(i){
   if(confirm('❌ Delete this entry?')){
     const list = CASH_IO.filter(x=>x.key === user.shiftKey);
     const idx = CASH_IO.indexOf(list[i]);
-    if(idx>-1){ CASH_IO.splice(idx,1); saveAll(); renderShiftView(); }
+    if(idx > -1){ CASH_IO.splice(idx,1); saveAll(); renderShiftView(); }
   }
 }
-
 // ═══════════════════ DENOMINATION ═══════════════════
 function calcActualCash(){
   const d1000 = (+$('d1000').value||0)*1000;
@@ -743,11 +697,9 @@ function calcActualCash(){
   const d20 = (+$('d20').value||0)*20;
   const dcoins = +$('dcoins').value||0;
   const dcheck = +$('dcheck').value||0;
-
   const actual = d1000+d500+d200+d100+d50+d20+dcoins+dcheck;
   $('actualCashTotal').textContent = fmt(actual);
 
-  // Recalc expected
   const shiftSales = getShiftSales();
   const totalSales = shiftSales.reduce((s,x)=>s+x.total,0);
   const shiftGCash = GCASH_LOG.filter(x=>x.key === user.shiftKey);
@@ -756,7 +708,6 @@ function calcActualCash(){
   const totalIn = shiftIo.filter(x=>x.type==='in').reduce((s,x)=>s+x.amount,0);
   const totalOut = shiftIo.filter(x=>x.type==='out').reduce((s,x)=>s+x.amount,0);
   const expected = Math.max(0, (totalSales - totalGCash) + totalIn - totalOut);
-
   const diff = actual - expected;
   $('cashDiff').innerHTML = diff===0
     ? `<span style="color:green">✅ BALANCED — ₱0.00</span>`
@@ -764,7 +715,6 @@ function calcActualCash(){
       ? `<span style="color:blue">+₱${fmt(diff)} (Sobra)</span>`
       : `<span style="color:red">-₱${fmt(-diff)} (Kulang)</span>`;
 }
-
 // ═══════════════════ TABS ═══════════════════
 function showTab(name){
   document.querySelectorAll('.tab-page').forEach(p=>p.classList.add('hidden'));
@@ -775,44 +725,98 @@ function showTab(name){
   if(tabPage) tabPage.classList.remove('hidden');
 
   if(name==='entry') renderShiftView();
+  if(name==='shiftSales') renderShiftSalesTab();
   if(name==='log') renderTransactionLog();
+  if(name==='dashboard' && user.type==='admin') renderDashboard();
+  if(name==='reports' && user.type==='admin') { $('rptFrom').value=today(); $('rptTo').value=today(); runReport(); }
   if(name==='stock' && user.type==='admin') renderStockView();
-  if(name==='report' && user.type==='admin') renderReports();
+  if(name==='cashiers' && user.type==='admin') renderCashierReport();
   if(name==='stores' && user.type==='admin') renderStoreManage();
-  if(name==='today') { $('selDate').value=today(); renderSalesByDate(today()); }
+  if(name==='settings' && user.type==='admin') renderSettings();
 }
 
+// ═══════════════════ CASHIER: SHIFT SALES TAB ═══════════════════
+function renderShiftSalesTab(){
+  $('shiftSalesSubtitle').textContent = `${user.sLabel} | ${D()} | ${user.name}`;
+  const list = SALES.filter(s=>s.shiftKey === user.shiftKey);
+  $('shiftSalesBody').innerHTML = list.length ? list.map(s=>`<tr>
+    <td>${s.time}</td><td>${s.shift}</td><td>${s.code}</td><td>${s.name}</td><td>${s.qty}</td>
+    <td>₱${fmt(s.total)}</td><td>${s.who}</td>
+  </tr>`).join('') : '<tr><td colspan="7" class="empty">No sales yet for this shift.</td></tr>';
+}
+
+// ═══════════════════ TRANSACTION LOG ═══════════════════
 function renderTransactionLog(){
-  const list = SALES.filter(s=>user.type==='admin'
-    ? (user.storeCode==='ALL' || s.storeCode===user.storeCode)
-    : s.shiftKey === user.shiftKey);
+  const list = user.type==='cashier'
+    ? SALES.filter(s=>s.shiftKey === user.shiftKey)
+    : SALES.filter(s=>user.storeCode==='ALL' || s.storeCode===user.storeCode);
   $('logBody').innerHTML = list.length ? list.map(s=>`<tr>
     <td>${s.dt}</td><td>${s.storeName}</td><td>${s.shift}</td><td><strong>${s.code}</strong></td><td>${s.name}</td>
     <td>${s.qty}</td><td>₱${fmt(s.total)}</td><td>${s.who}</td>
   </tr>`).join('') : '<tr><td colspan="8" class="empty">No transactions yet.</td></tr>';
 }
 
-function renderSalesByDate(date){
-  const list = SALES.filter(s=>s.isoDate===date && (user.type==='admin'
-    ? (user.storeCode==='ALL' || s.storeCode===user.storeCode)
-    : s.shiftKey.startsWith(`${user.storeCode}||${date}`)));
-  $('dateSalesBody').innerHTML = list.length ? list.map(s=>`<tr>
-    <td>${s.time}</td><td>${s.shift}</td><td>${s.code}</td><td>${s.name}</td><td>${s.qty}</td>
-    <td>₱${fmt(s.total)}</td><td>${s.who}</td>
-  </tr>`).join('') : '<tr><td colspan="7" class="empty">No sales on this date.</td></tr>';
+// ═══════════════════ ADMIN: DASHBOARD ═══════════════════
+function renderDashboard(){
+  const todaySales = SALES.filter(s=>s.isoDate===today());
+  const totalSales = todaySales.reduce((sum,x)=>sum+x.total,0);
+  $('dashTodaySales').textContent = fmt(totalSales);
+  const cashTotal = todaySales.reduce((sum,x)=>sum+x.total,0) - GCASH_LOG.filter(g=>g.time.includes(today().replace(/-/g,'/'))).reduce((sum,g)=>sum+g.amount,0);
+  const gcashTotal = GCASH_LOG.filter(g=>{
+    const d = new Date().toLocaleDateString('en-PH');
+    return true;
+  }).reduce((sum,g)=>sum+g.amount,0);
+  $('dashCash').textContent = fmt(cashTotal>0?cashTotal:0);
+  $('dashGCash').textContent = fmt(gcashTotal);
+  $('dashStoresCount').textContent = STORES.length;
+
+  const grouped = {};
+  todaySales.forEach(s=>{
+    if(!grouped[s.code]) grouped[s.code]={name:s.name,qty:0,total:0};
+    grouped[s.code].qty += s.qty; grouped[s.code].total += s.total;
+  });
+  const sorted = Object.entries(grouped).sort((a,b)=>b[1].total-a[1].total).slice(0,5);
+  $('dashTopSales').innerHTML = sorted.length ? sorted.map(([c,d],i)=>`<tr>
+    <td><strong>#${i+1}</strong></td><td>${c}</td><td>${d.name}</td><td>${d.qty}</td><td>₱${fmt(d.total)}</td>
+  </tr>`).join('') : '<tr><td colspan="5" class="empty">No sales today.</td></tr>';
 }
 
+// ═══════════════════ ADMIN: SALES REPORT ═══════════════════
+function runReport(){
+  let from = $('rptFrom').value;
+  let to = $('rptTo').value;
+  let storeFilter = $('rptStore').value;
+  let shiftFilter = $('rptShift').value;
+
+  let list = SALES.filter(s=>{
+    if(s.isoDate < from || s.isoDate > to) return false;
+    if(storeFilter!=='ALL' && s.storeCode!==storeFilter) return false;
+    if(shiftFilter!=='ALL' && s.shiftId!==shiftFilter) return false;
+    return true;
+  });
+
+  const totalAmt = list.reduce((s,x)=>s+x.total,0);
+  const totalQty = list.reduce((s,x)=>s+x.qty,0);
+  $('rptTotal').textContent = fmt(totalAmt);
+  $('rptQty').textContent = totalQty;
+  $('rptCount').textContent = list.length;
+
+  $('rptBody').innerHTML = list.length ? list.map(s=>`<tr>
+    <td>${s.date}</td><td>${s.time}</td><td>${s.storeCode}</td><td>${s.shift}</td><td>${s.who}</td>
+    <td>${s.code}</td><td>${s.qty}</td><td>₱${fmt(s.total)}</td>
+  </tr>`).join('') : '<tr><td colspan="8" class="empty">No records found.</td></tr>';
+}
+
+// ═══════════════════ ADMIN: STOCK VIEW ═══════════════════
 function renderStockView(){
-  const storeCode = user.storeCode ===
-    'ALL' ? STORES[0]?.code : user.storeCode;
-  if(!storeCode) return;
+  const sel = $('stockStoreSel').value;
+  const codes = sel==='ALL' ? STORES.map(s=>s.code) : [sel];
   $('stockBody').innerHTML = PRODUCTS.map(p=>{
-    const qty = getStock(p.code, storeCode);
+    let qty = 0;
+    codes.forEach(c=> qty += getStock(p.code, c));
     const low = qty <= LOW_STOCK_LIMIT;
     return `<tr class="${low?'low-stock':''}">
-      <td><strong>${p.code}</strong></td>
-      <td>${p.name}</td>
-      <td><strong>${qty}</strong></td>
+      <td><strong>${p.code}</strong></td><td>${p.name}</td><td><strong>${qty}</strong></td>
       <td>${low?'<span class="tag low">⚠️ LOW</span>':'✅ OK'}</td>
       <td>
         <button class="btn-sm" onclick="adjStock('${p.code}',${qty},-5)">−5</button>
@@ -824,42 +828,37 @@ function renderStockView(){
   }).join('');
 }
 function adjStock(code, current, delta){
-  const storeCode = user.storeCode === 'ALL' ? STORES[0]?.code : user.storeCode;
-  if(!storeCode) return;
-  setStock(code, storeCode, Math.max(0, current + delta));
+  const sel = $('stockStoreSel').value;
+  if(sel==='ALL') return alert('⚠️ Select specific store first!');
+  setStock(code, sel, Math.max(0, getStock(code, sel)+delta));
   renderStockView();
 }
 
-function renderReports(){
-  const allSales = SALES.filter(s=>user.storeCode==='ALL' || s.storeCode===user.storeCode);
+// ═══════════════════ ADMIN: CASHIER PERFORMANCE ═══════════════════
+function renderCashierReport(){
   const grouped = {};
-  allSales.forEach(s=>{
-    if(!grouped[s.code]) grouped[s.code] = {name:s.name, qty:0, total:0};
-    grouped[s.code].qty += s.qty;
-    grouped[s.code].total += s.total;
+  SALES.forEach(s=>{
+    const key = `${s.who}||${s.storeName}`;
+    if(!grouped[key]) grouped[key]={name:s.who,store:s.storeName,sales:0,qty:0,last:s.dt};
+    grouped[key].sales += s.total;
+    grouped[key].qty += s.qty;
+    grouped[key].last = s.dt;
   });
-  const sorted = Object.entries(grouped).sort((a,b)=>b[1].total - a[1].total);
-  $('topSalesBody').innerHTML = sorted.length
-    ? sorted.map(([code,d],i)=>`<tr>
-        <td><strong>#${i+1}</strong></td>
-        <td>${code}</td>
-        <td>${d.name}</td>
-        <td>${d.qty}</td>
-        <td>₱${fmt(d.total)}</td>
-      </tr>`).join('')
-    : '<tr><td colspan="5" class="empty">No sales yet.</td></tr>';
+  const arr = Object.values(grouped).sort((a,b)=>b.sales-a.sales);
+  $('cashierBody').innerHTML = arr.length ? arr.map(x=>`<tr>
+    <td><strong>${x.name}</strong></td><td>${x.store}</td><td>₱${fmt(x.sales)}</td><td>${x.qty}</td><td>${x.last}</td>
+  </tr>`).join('') : '<tr><td colspan="5" class="empty">No data yet.</td></tr>';
 }
 
+// ═══════════════════ ADMIN: STORE MANAGEMENT ═══════════════════
 function renderStoreManage(){
   $('storeBody').innerHTML = STORES.length
     ? STORES.map((s,i)=>`<tr>
-        <td><strong>${s.code}</strong></td>
-        <td>${s.name}</td>
+        <td><strong>${s.code}</strong></td><td>${s.name}</td>
         <td><button class="btn-sm btn-red" onclick="delStore(${i})">❌ Delete</button></td>
       </tr>`).join('')
     : '<tr><td colspan="3" class="empty">No stores added yet.</td></tr>';
 }
-
 function addStore(){
   const code = $('newStoreCode').value.trim().toUpperCase();
   const name = $('newStoreName').value.trim();
@@ -872,7 +871,6 @@ function addStore(){
   $('newStoreName').value='';
   renderStoreManage();
 }
-
 function delStore(i){
   if(!confirm('❌ Delete this store? This cannot be undone!')) return;
   STORES.splice(i,1);
@@ -880,8 +878,47 @@ function delStore(i){
   renderStoreManage();
 }
 
-// AUTO-SET TODAY'S DATE
-$('selDate').value = today();
+// ═══════════════════ ADMIN: SETTINGS ═══════════════════
+function renderSettings(){
+  $('shiftPassEditors').innerHTML = Object.entries(SHIFTS).map(([code,info])=>`
+    <div style="display:flex;gap:8px;align-items:center;margin:4px 0">
+      <span style="width:120px">${info.label}:</span>
+      <input type="password" value="${code}" maxlength="4" oninput="updateShiftPass('${info.id}',this.value)" style="max-width:100px">
+      <span style="font-size:12px;color:#666">${info.hours}</span>
+    </div>
+  `).join('');
+}
+function updateShiftPass(id,newCode){
+  if(newCode.length===4 && /^\d+$/.test(newCode)){
+    const oldKey = Object.keys(SHIFTS).find(k=>SHIFTS[k].id===id);
+    if(oldKey && oldKey!==newCode){
+      SHIFTS[newCode] = SHIFTS[oldKey];
+      delete SHIFTS[oldKey];
+      saveAll();
+    }
+  }
+}
+function changeAdminPass(){
+  const cur = $('curAdminPass').value.trim();
+  const newP = $('newAdminPass').value.trim();
+  if(cur!==ADMIN_PASS) return alert('⚠️ Current password wrong!');
+  if(newP.length<4) return alert('⚠️ Min 4 characters!');
+  ADMIN_PASS = newP;
+  saveAll();
+  alert('✅ Admin password changed!');
+  $('curAdminPass').value=''; $('newAdminPass').value='';
+}
+function exportAllData(){
+  const data = {STORES,SALES,STOCKS,GCASH_LOG,CASH_IO,PRODUCTS,SHIFTS,exported:new Date().toLocaleString('en-PH')};
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download = `MB_POS_Backup_${today()}.json`;
+  a.click();
+}
+
+// AUTO-SET DATE
+$('selDate') && ($('selDate').value = today());
 </script>
 </body>
 </html>
